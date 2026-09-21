@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human-in-Command AI Output Verification Workbench</title>
+    <style>
+        /* === CSS VARIABLES FOR NEUTRAL PALETTE === */
+        :root {
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-slate-50: #f8fafc;
+            --bg-slate-100: #f1f5f9;
+            --bg-slate-200: #e2e8f0;
+            --bg-slate-800: #1e293b;
+            --bg-slate-900: #0f172a;
+            
+            --text-slate-300: #cbd5e1;
+            --text-slate-400: #94a3b8;
+            --text-slate-500: #64748b;
+            --text-slate-600: #475569;
+            --text-slate-700: #334155;
+            --text-slate-800: #1e293b;
+            --text-white: #ffffff;
+
+            --border-color: #e2e8f0;
+
+            --blue-50: #eff6ff;
+            --blue-100: #dbeafe;
+            --blue-200: #bfdbfe;
+            --blue-600: #2563eb;
+            --blue-700: #1d4ed8;
+            --blue-800: #1e40af;
+            --blue-900: #1e3a8a;
+
+            --amber-100: #fef3c7;
+            --amber-600: #d97706;
+            --amber-800: #92400e;
+
+            --indigo-50: #eef2ff;
+            --indigo-100: #e0e7ff;
+            --indigo-300: #a5b4fc;
+            --indigo-600: #4f46e5;
+            --indigo-700: #4338ca;
+            --indigo-800: #3730a3;
+            --indigo-900: #312e81;
+            
+            --emerald-100: #d1fae5;
+            --emerald-800: #065f46;
+        }
+
+        /* === RESET & BASE STYLES === */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-slate-800);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        h1, h2, h3, h4 { font-weight: 700; color: var(--text-slate-800); line-height: 1.2; }
+        p { color: var(--text-slate-600); }
+        button, select, input, textarea { font-family: inherit; font-size: inherit; outline: none; }
+        ul { list-style-position: inside; }
+
+        /* === TYPOGRAPHY UTILITIES === */
+        .text-xs { font-size: 12px; }
+        .text-sm { font-size: 14px; }
+        .text-base { font-size: 16px; }
+        .text-lg { font-size: 18px; }
+        .text-2xl { font-size: 24px; }
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .font-medium { font-weight: 500; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        .tracking-tight { letter-spacing: -0.025em; }
+        .tracking-wider { letter-spacing: 0.05em; }
+        .tracking-widest { letter-spacing: 0.1em; }
+        .uppercase { text-transform: uppercase; }
+        .leading-tight { line-height: 1.25; }
+        .leading-relaxed { line-height: 1.625; }
+
+        /* === TEXT COLORS === */
+        .text-slate-300 { color: var(--text-slate-300); }
+        .text-slate-400 { color: var(--text-slate-400); }
+        .text-slate-500 { color: var(--text-slate-500); }
+        .text-slate-600 { color: var(--text-slate-600); }
+        .text-slate-700 { color: var(--text-slate-700); }
+        .text-slate-800 { color: var(--text-slate-800); }
+        .text-white { color: var(--text-white); }
+        .text-blue-600 { color: var(--blue-600); }
+        .text-blue-700 { color: var(--blue-700); }
+        .text-blue-800 { color: var(--blue-800); }
+        .text-blue-900 { color: var(--blue-900); }
+        .text-amber-600 { color: var(--amber-600); }
+        .text-indigo-600 { color: var(--indigo-600); }
+        .text-indigo-800 { color: var(--indigo-800); }
+        .text-indigo-900 { color: var(--indigo-900); }
+
+        /* === BACKGROUNDS & BORDERS === */
+        .bg-white { background-color: var(--bg-surface); }
+        .bg-slate-50 { background-color: var(--bg-slate-50); }
+        .bg-slate-100 { background-color: var(--bg-slate-100); }
+        .bg-slate-800 { background-color: var(--bg-slate-800); }
+        .bg-slate-900 { background-color: var(--bg-slate-900); }
+        .bg-blue-50 { background-color: var(--blue-50); }
+        .bg-indigo-50 { background-color: var(--indigo-50); }
+        .border-t { border-top: 1px solid var(--border-color); }
+        .border-b { border-bottom: 1px solid var(--border-color); }
+        .border-r { border-right: 1px solid var(--border-color); }
+        .border { border: 1px solid var(--border-color); }
+        .border-blue-200 { border-color: var(--blue-200); }
+        .border-indigo-200 { border-color: #c7d2fe; }
+        .rounded { border-radius: 4px; }
+        .rounded-lg { border-radius: 8px; }
+        .rounded-t-lg { border-top-left-radius: 8px; border-top-right-radius: 8px; }
+        .rounded-b-lg { border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+        .rounded-full { border-radius: 9999px; }
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+
+        /* === SPACING (Padding/Margin) === */
+        .p-2 { padding: 8px; } .p-3 { padding: 12px; } .p-4 { padding: 16px; } .p-5 { padding: 20px; } .p-6 { padding: 24px; } .p-8 { padding: 32px; }
+        .px-2 { padding-left: 8px; padding-right: 8px; } .px-3 { padding-left: 12px; padding-right: 12px; } .px-4 { padding-left: 16px; padding-right: 16px; } .px-6 { padding-left: 24px; padding-right: 24px; }
+        .py-0\.5 { padding-top: 2px; padding-bottom: 2px; } .py-1\.5 { padding-top: 6px; padding-bottom: 6px; } .py-2 { padding-top: 8px; padding-bottom: 8px; } .py-3 { padding-top: 12px; padding-bottom: 12px; } .py-4 { padding-top: 16px; padding-bottom: 16px; } .py-6 { padding-top: 24px; padding-bottom: 24px; }
+        .pt-5 { padding-top: 20px; } .pb-2 { padding-bottom: 8px; } .pb-4 { padding-bottom: 16px; } .pl-4 { padding-left: 16px; } .pl-5 { padding-left: 20px; }
+        .m-0 { margin: 0; } .mt-1 { margin-top: 4px; } .mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; } .mt-8 { margin-top: 32px; } .mt-auto { margin-top: auto; }
+        .mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; } .mb-6 { margin-bottom: 24px; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+
+        /* === LAYOUT & FLEXBOX === */
+        .flex { display: flex; } .inline-flex { display: inline-flex; }
+        .flex-col { flex-direction: column; } .flex-row { flex-direction: row; } .flex-wrap { flex-wrap: wrap; }
+        .flex-1 { flex: 1 1 0%; } .flex-shrink-0 { flex-shrink: 0; }
+        .justify-between { justify-content: space-between; } .justify-center { justify-content: center; } .justify-end { justify-content: flex-end; }
+        .align-center { align-items: center; } .align-start { align-items: flex-start; } .align-end { align-items: flex-end; }
+        .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
+        .w-full { width: 100%; } .w-64 { width: 256px; } .w-1\/2 { width: 50%; }
+        .max-w-xs { max-width: 320px; } .max-w-3xl { max-width: 768px; } .max-w-4xl { max-width: 896px; } .max-w-6xl { max-width: 1152px; }
+        .h-20 { height: 80px; } .min-h-100 { min-height: 100px; }
+        
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .md\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .lg\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+            .lg\:col-span-1 { grid-column: span 1 / span 1; }
+            .lg\:col-span-2 { grid-column: span 2 / span 2; }
+            .lg\:col-span-3 { grid-column: span 3 / span 3; }
+            .lg\:w-1\/2 { width: 50%; }
+            .lg\:border-l { border-left: 1px solid var(--border-color); }
+            .lg\:border-t-0 { border-top: none; }
+            .lg\:pl-6 { padding-left: 24px; }
+            .lg\:pt-0 { padding-top: 0; }
+        }
+        @media (max-width: 1023px) {
+            .header-content { flex-direction: column; align-items: flex-start; gap: 16px; }
+        }
+
+        /* === COMPONENT SPECIFIC STYLES === */
+        
+        /* Banner */
+        .top-banner { background-color: var(--bg-slate-900); color: white; text-align: center; padding: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; z-index: 50; flex-shrink: 0; }
+        
+        /* Layout Container */
+        .app-body { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 256px; background-color: var(--bg-surface); border-right: 1px solid var(--border-color); flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; }
+        .tab-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 8px 12px; font-size: 14px; color: var(--text-slate-600); background: none; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s, color 0.2s; margin-bottom: 4px; }
+        .tab-btn:hover { background-color: var(--bg-slate-50); }
+        .tab-btn.active { background-color: var(--blue-50); color: var(--blue-700); font-weight: 600; border-right: 4px solid var(--blue-600); border-radius: 4px 0 0 4px; }
+        
+        /* Main Content */
+        .main-content { flex: 1; overflow-y: auto; background-color: var(--bg-slate-50); padding: 24px; }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 12px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-decoration: none; border: 1px solid transparent; }
+        .btn-blue-outline { background-color: var(--blue-50); color: var(--blue-700); border-color: var(--blue-200); }
+        .btn-blue-outline:hover { background-color: var(--blue-100); }
+        .btn-white { background-color: white; border-color: var(--border-color); color: var(--text-slate-700); }
+        .btn-white:hover { background-color: var(--bg-slate-50); }
+        .btn-dark { background-color: var(--bg-slate-800); color: white; }
+        .btn-dark:hover { background-color: var(--text-slate-700); }
+        .btn-primary { background-color: var(--blue-600); color: white; }
+        .btn-primary:hover { background-color: var(--blue-700); }
+        .btn-link { background: none; border: none; color: var(--blue-600); text-decoration: underline; cursor: pointer; padding: 0; }
+        .btn-link:hover { color: var(--text-slate-800); }
+        .btn-action-text { background: none; border: none; color: var(--blue-600); font-size: 12px; font-weight: 500; cursor: pointer; }
+        .btn-action-text:hover { text-decoration: underline; }
+
+        /* Inputs */
+        .form-input { width: 100%; border: 1px solid var(--border-color); border-radius: 4px; padding: 6px 8px; font-size: 14px; }
+        .form-input:focus { border-color: var(--blue-600); }
+
+        /* Badges */
+        .badge { padding: 2px 8px; border-radius: 9999px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; white-space: nowrap; }
+        .badge-amber { background-color: var(--amber-100); color: var(--amber-800); }
+        .badge-indigo { background-color: var(--indigo-100); color: var(--indigo-800); border: 1px solid var(--indigo-300); }
+        .badge-slate { background-color: var(--bg-slate-100); color: var(--text-slate-600); }
+        .badge-blue { background-color: var(--blue-100); color: var(--blue-800); }
+        .badge-emerald { background-color: var(--emerald-100); color: var(--emerald-800); }
+
+        /* Tables */
+        .table-wrapper { background-color: white; border-radius: 8px; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); border: 1px solid var(--border-color); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+        thead { background-color: var(--bg-slate-50); border-bottom: 1px solid var(--border-color); }
+        th { padding: 12px 16px; font-weight: 600; color: var(--text-slate-600); white-space: nowrap; }
+        td { padding: 12px 16px; border-bottom: 1px solid var(--bg-slate-100); color: var(--text-slate-700); }
+        tbody tr { transition: background-color 0.15s; }
+        tbody tr:hover { background-color: var(--bg-slate-50); cursor: pointer; }
+        
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.75); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+        .modal-content { background-color: white; border-radius: 8px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-height: 90vh; display: flex; flex-direction: column; width: 100%; }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); background-color: var(--bg-slate-50); border-top-left-radius: 8px; border-top-right-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid var(--border-color); background-color: var(--bg-slate-50); border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; text-align: right; display: flex; justify-content: flex-end; gap: 8px; }
+        .close-btn { background: none; border: none; font-size: 24px; color: var(--text-slate-400); cursor: pointer; line-height: 1; }
+        .close-btn:hover { color: var(--text-slate-700); }
+
+        /* Lifecycle Visual */
+        .lc-container { display: flex; width: 100%; justify-content: space-between; overflow-x: auto; padding-bottom: 8px; }
+        .lc-step { display: flex; align-items: center; cursor: pointer; flex-shrink: 0; }
+        .lc-circle { width: 40px; height: 40px; border-radius: 50%; background-color: var(--bg-slate-100); border: 1px solid var(--border-slate-300); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--text-slate-600); transition: all 0.2s; }
+        .lc-step:hover .lc-circle { background-color: var(--blue-600); color: white; border-color: var(--blue-700); }
+        .lc-line { height: 2px; width: 24px; background-color: var(--bg-slate-200); margin: 0 4px; transition: background-color 0.2s; }
+        .lc-step:hover .lc-line { background-color: var(--blue-200); }
+        .lc-circle.active { background-color: var(--blue-600); color: white; border-color: var(--blue-700); box-shadow: 0 0 0 2px var(--blue-200); }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Print Styles */
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white; height: auto; overflow: visible; }
+            .app-body { flex-direction: column; overflow: visible; }
+            .sidebar { display: none; }
+            .main-content { padding: 0 !important; margin: 0 !important; overflow: visible; background-color: white; }
+            .view-section { display: block !important; page-break-after: always; margin-bottom: 24px; }
+            .table-wrapper { box-shadow: none; border: 1px solid #ccc; overflow-x: visible; }
+            th, td { border: 1px solid #e2e8f0; }
+            .badge { border: 1px solid #94a3b8; background-color: transparent !important; color: black !important; }
+        }
+    </style>
+</head>
+<body>
+<div style="background:#1B2A4A;color:#fff;text-align:center;padding:10px 16px;font-weight:700;letter-spacing:0.4px;font-size:0.85rem;">
+ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY<br>
+<span style="font-weight:400;font-size:0.72rem;">Demonstrates operational workflow design, documentation, action tracking, human-review checkpoints, and management-ready implementation support.</span>
+</div>
+
+    <!-- REQUIRED VISIBLE BANNER -->
+    <div class="top-banner no-print">
+        ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY
+    </div>
+    
+    <header class="bg-white border-b no-print">
+        <div class="px-6 py-4 flex flex-col lg:flex-row justify-between align-center header-content">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Human-in-Command AI Output Verification Workbench</h1>
+                <p class="text-sm mt-1 max-w-4xl">AI-assisted drafting, organization, summary, and workflow support with accountable human review, source verification, decision rights, exception handling, and documented release controls.</p>
+                <div class="text-xs text-slate-500 mt-2 p-2 bg-slate-50 rounded border inline-block max-w-4xl">
+                    <strong>Organization:</strong> North Valley Services — Illustrative Demo | Prototype uses in-browser demonstration data; data resets on refresh unless exported.
+                </div>
+            </div>
+            <div class="flex flex-wrap justify-end gap-2 shrink-0">
+                <button onclick="openModal('howToUseModal')" class="btn btn-blue-outline shadow-sm">How to Use</button>
+                <button onclick="window.print()" class="btn btn-white shadow-sm">Print / PDF</button>
+                <button onclick="resetData()" class="btn btn-dark shadow-sm">Demo Data Reset</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="app-body">
+        
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar no-print custom-scrollbar">
+            <nav class="p-4 flex-col gap-2" style="display: flex;">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Dashboards & Registers</div>
+                
+                <button onclick="switchTab('overview')" id="nav-overview" class="tab-btn active">
+                    <span>1. Executive Overview</span>
+                </button>
+                <button onclick="switchTab('usecases')" id="nav-usecases" class="tab-btn">
+                    <span>2. AI Use-Case Register</span>
+                </button>
+                <button onclick="switchTab('reviewqueue')" id="nav-reviewqueue" class="tab-btn">
+                    <span>3. Output Review Queue</span>
+                    <span class="badge badge-amber" id="nav-badge-review">0</span>
+                </button>
+                <button onclick="switchTab('decisionrights')" id="nav-decisionrights" class="tab-btn">
+                    <span>4. Decision Rights</span>
+                </button>
+                <button onclick="switchTab('evidence')" id="nav-evidence" class="tab-btn">
+                    <span>5. Source Record Check</span>
+                </button>
+                <button onclick="switchTab('exceptions')" id="nav-exceptions" class="tab-btn">
+                    <span>6. Exceptions & Actions</span>
+                    <span class="badge badge-slate" id="nav-badge-exceptions">0</span>
+                </button>
+                <button onclick="switchTab('reporting')" id="nav-reporting" class="tab-btn">
+                    <span>7. Reporting & Export</span>
+                </button>
+            </nav>
+            
+            <div class="mt-auto p-4 border-t bg-slate-50">
+                <div class="text-xs font-semibold text-slate-500 mb-2">Scope Statement</div>
+                <p class="text-xs text-slate-400 leading-tight" style="font-size: 10px;">
+                    This dashboard is an illustrative management-reporting and workflow-design prototype. It does not provide legal advice, legal opinions, legal-compliance certification, AI certification, technical AI auditing, model validation, bias testing, privacy impact assessments, cybersecurity assessments, employment decisions, financial assurance, insurance-coverage opinions, safety-engineering determinations, or guarantees of outcomes.
+                </p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content custom-scrollbar">
+            
+            <!-- SECTION 1: EXECUTIVE OVERVIEW -->
+            <div id="view-overview" class="view-section active flex-col gap-6" style="display: flex;">
+                <div class="flex justify-between align-end border-b pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold">Executive Overview</h2>
+                        <p class="text-sm text-slate-500">Illustrative AI-assisted workflow status and management attention queue.</p>
+                    </div>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="bg-white p-4 rounded-lg shadow-sm border flex flex-col justify-between">
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Use Cases Logged</span>
+                        <span class="text-2xl font-bold mt-2" id="kpi-usecases">14</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border flex flex-col justify-between">
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Awaiting Human Review</span>
+                        <span class="text-2xl font-bold text-amber-600 mt-2" id="kpi-reviews">8</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border flex flex-col justify-between">
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Awaiting SME Review</span>
+                        <span class="text-2xl font-bold text-blue-600 mt-2" id="kpi-sme">4</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border flex flex-col justify-between">
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Specialist Review Flags</span>
+                        <span class="text-2xl font-bold text-indigo-600 mt-2" id="kpi-flags">2</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border flex flex-col justify-between">
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Open Follow-Up Actions</span>
+                        <span class="text-2xl font-bold text-slate-700 mt-2" id="kpi-actions">5</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Attention Queue -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border">
+                        <div class="p-4 border-b bg-slate-50 rounded-t-lg">
+                            <h3 class="font-bold">Executive Attention Queue</h3>
+                            <p class="text-xs text-slate-500">Fictional items requiring management or specialist direction.</p>
+                        </div>
+                        <ul class="text-sm" style="list-style: none; padding: 0; margin: 0;">
+                            <li class="p-4 border-b flex gap-3 align-start" style="background-color: transparent;">
+                                <div class="mt-1"><span class="badge badge-amber">Needs Review</span></div>
+                                <div>Assign a domain reviewer to the internal policy-summary workflow.</div>
+                            </li>
+                            <li class="p-4 border-b flex gap-3 align-start" style="background-color: transparent;">
+                                <div class="mt-1"><span class="badge badge-slate">Pending Info</span></div>
+                                <div>Confirm source record date for the payroll-process draft.</div>
+                            </li>
+                            <li class="p-4 border-b flex gap-3 align-start" style="background-color: transparent;">
+                                <div class="mt-1"><span class="badge badge-amber">Needs Review</span></div>
+                                <div>Review a recurring formatting error identified in a training-material workflow.</div>
+                            </li>
+                            <li class="p-4 border-b flex gap-3 align-start" style="background-color: transparent;">
+                                <div class="mt-1"><span class="badge badge-blue">Mgmt Review</span></div>
+                                <div>Confirm management owner for a client-service response pilot.</div>
+                            </li>
+                            <li class="p-4 border-b flex gap-3 align-start" style="background-color: transparent;">
+                                <div class="mt-1"><span class="badge badge-slate">Paused</span></div>
+                                <div>Pause external release of a draft until source confirmation is completed.</div>
+                            </li>
+                            <li class="p-4 flex gap-3 align-start" style="background-color: transparent;">
+                                <div class="mt-1"><span class="badge badge-indigo">Specialist Flag</span></div>
+                                <div>Schedule specialist review for a workflow that may involve confidential records.</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Principles & Status -->
+                    <div class="flex-col gap-6" style="display:flex;">
+                        <div class="bg-slate-800 text-white p-5 rounded-lg shadow-sm">
+                            <h3 class="font-bold text-lg mb-2">Human-in-Command Operating Principle</h3>
+                            <p class="text-sm text-slate-300 leading-relaxed">
+                                AI may assist with drafting, organizing, summarizing, formatting, comparing, and flagging stated-rule exceptions. Accountable human owners remain responsible for validating inputs, confirming sources, interpreting context, reviewing exceptions, assessing stakeholder impact, approving consequential actions, documenting rationale, and escalating matters requiring specialist review.
+                            </p>
+                        </div>
+                        <div class="bg-white p-5 rounded-lg shadow-sm border">
+                            <h3 class="font-bold mb-3 border-b pb-2">Program Metrics (Illustrative)</h3>
+                            <div class="flex-col gap-3 text-sm" style="display:flex;">
+                                <div class="flex justify-between align-center">
+                                    <span class="text-slate-600">AI Workflow Training Completion:</span>
+                                    <span class="font-bold">81%</span>
+                                </div>
+                                <div class="flex justify-between align-center">
+                                    <span class="text-slate-600">Use Cases in Pilot:</span>
+                                    <span class="font-bold">5</span>
+                                </div>
+                                <div class="flex justify-between align-center">
+                                    <span class="text-slate-600">Next Gov. Review:</span>
+                                    <span class="font-bold">Oct 14, 2026</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lifecycle Visual -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border">
+                    <h3 class="font-bold mb-4">Illustrative Workflow Lifecycle</h3>
+                    
+                    <div class="mb-6">
+                        <!-- Lifecycle Steps defined in JS -->
+                        <div id="lifecycle-container" class="lc-container custom-scrollbar"></div>
+                    </div>
+                    
+                    <div class="bg-slate-50 p-4 rounded border min-h-100 flex align-center justify-center text-center">
+                        <p id="lifecycle-desc" class="text-slate-600 text-sm font-medium">Click a workflow stage above to view details.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: AI USE-CASE REGISTER -->
+            <div id="view-usecases" class="view-section">
+                <div class="flex-col gap-6" style="display:flex;">
+                    <div class="flex flex-col lg:flex-row justify-between align-start lg:align-end border-b pb-4 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold">AI Use-Case Register</h2>
+                            <p class="text-sm text-slate-500">Inventory of illustrative AI-assisted workflow uses.</p>
+                        </div>
+                        <button onclick="openModal('addUseCaseModal')" class="btn btn-primary shadow-sm no-print">
+                            + Add Fictional Record
+                        </button>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-blue-800">
+                        <strong>Notice:</strong> This register organizes illustrative AI-assisted workflow uses. It is not an AI system inventory, legal review, technical assessment, privacy assessment, cybersecurity assessment, employment system, or certification record.
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="bg-white p-4 rounded-lg shadow-sm border grid grid-cols-1 md:grid-cols-4 gap-4 no-print">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Search</label>
+                            <input type="text" id="filter-uc-search" onkeyup="renderUseCases()" class="form-input" placeholder="Search any field...">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Status</label>
+                            <select id="filter-uc-status" onchange="renderUseCases()" class="form-input">
+                                <option value="">All Statuses</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Needs Review">Needs Review</option>
+                                <option value="Pilot">Pilot</option>
+                                <option value="Paused">Paused</option>
+                                <option value="Ready for Management Review">Ready for Mgmt Review</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Specialist Flag</label>
+                            <select id="filter-uc-flag" onchange="renderUseCases()" class="form-input">
+                                <option value="">All</option>
+                                <option value="Yes">Flagged (Yes)</option>
+                                <option value="No">Not Flagged (No)</option>
+                            </select>
+                        </div>
+                        <div class="flex align-end">
+                            <button onclick="resetFilters('uc')" class="btn-link text-sm">Clear Filters</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Function</th>
+                                    <th class="max-w-xs">Intended Purpose</th>
+                                    <th>AI Assistance</th>
+                                    <th>Owner</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Ext. Release</th>
+                                    <th class="text-center">Spec. Flag</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-usecases">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: OUTPUT REVIEW QUEUE -->
+            <div id="view-reviewqueue" class="view-section">
+                <div class="flex-col gap-6" style="display:flex;">
+                    <div class="flex flex-col lg:flex-row justify-between align-start lg:align-end border-b pb-4 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold">Output Review Queue</h2>
+                            <p class="text-sm text-slate-500">Interactive queue for human-in-command verification of fictional drafts.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rev ID</th>
+                                    <th>Use Case</th>
+                                    <th>Output Type</th>
+                                    <th class="max-w-xs">Draft Summary</th>
+                                    <th>Status</th>
+                                    <th>Next Step</th>
+                                    <th class="text-center no-print">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-reviews">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: DECISION RIGHTS -->
+            <div id="view-decisionrights" class="view-section">
+                <div class="flex-col gap-6" style="display:flex;">
+                    <div class="flex flex-col lg:flex-row justify-between align-start lg:align-end border-b pb-4 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold">Decision Rights and Human Review</h2>
+                            <p class="text-sm text-slate-500">Illustrative matrix separating AI drafting boundaries from human decision authority.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-50 border border-indigo-200 rounded p-4 flex gap-4 align-start">
+                        <div class="mt-1 flex-shrink-0">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background-color: var(--indigo-100); display: flex; align-items: center; justify-content: center; color: var(--indigo-700); font-weight: bold; border: 1px solid var(--indigo-300);">!</div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-indigo-900 text-sm mb-1">Decision Rights Principle & Specialist Review Flag</h3>
+                            <p class="text-sm text-indigo-800 mb-2">AI assistance does not transfer decision authority. The accountable business owner and appropriate human reviewers remain responsible for the decision, documentation, and escalation path.</p>
+                            <p class="text-sm text-indigo-800">A <strong>Specialist Review Flag</strong> is a neutral workflow prompt. It does not identify a legal, technical, safety, privacy, insurance, accounting, or compliance conclusion. It signals that the accountable owner should determine whether an appropriately qualified specialist needs to review before the work continues or is released.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex-col gap-4" style="display:flex;" id="container-decisionrights">
+                        <!-- Populated by JS as stacked cards -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 5: SOURCE RECORD CHECK -->
+            <div id="view-evidence" class="view-section">
+                <div class="flex-col gap-6" style="display:flex;">
+                    <div class="flex flex-col lg:flex-row justify-between align-start lg:align-end border-b pb-4 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold">Source Record Check</h2>
+                            <p class="text-sm text-slate-500">Management interface for tracking source documentation used in AI workflows.</p>
+                        </div>
+                        <button class="btn btn-primary shadow-sm no-print" style="opacity: 0.5; cursor: not-allowed;" title="Demonstration static view">
+                            + Add Source (Demo)
+                        </button>
+                    </div>
+                    
+                    <div class="bg-amber-100 border border-amber-200 rounded p-4 text-sm text-amber-800">
+                        This reference register organizes workflow documentation and reviewer notes. It is not a legal research database, records-retention schedule, regulatory filing system, discovery repository, privacy assessment, technical AI audit record, or certification record.
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        <div class="lg:col-span-1 flex-col gap-4" style="display:flex;">
+                            <div class="bg-white p-4 rounded-lg shadow-sm border">
+                                <h3 class="font-bold text-sm mb-3">Source Quality Questions</h3>
+                                <ul class="text-xs text-slate-600 pl-4" style="line-height: 2;">
+                                    <li>Is the source identified?</li>
+                                    <li>Is the date visible and appropriate?</li>
+                                    <li>Is the source complete enough for the limited purpose?</li>
+                                    <li>Is the source authorized for use?</li>
+                                    <li>Does content require a domain SME review?</li>
+                                    <li>Does content contain sensitive, personal, health, claim, or financial data? (If yes, abort AI use).</li>
+                                    <li>Is a specialist review flag needed?</li>
+                                    <li>Are limitations recorded?</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="lg:col-span-3 table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Ref ID</th>
+                                        <th>Use Case</th>
+                                        <th>Source Type</th>
+                                        <th>Source Review Status</th>
+                                        <th style="max-width: 200px;">Limitation Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-evidence">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 6: EXCEPTIONS AND FOLLOW-UP ACTIONS -->
+            <div id="view-exceptions" class="view-section">
+                <div class="flex-col gap-6" style="display:flex;">
+                    <div class="flex flex-col lg:flex-row justify-between align-start lg:align-end border-b pb-4 gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold">Exceptions and Follow-Up Actions</h2>
+                            <p class="text-sm text-slate-500">Tracking identified gaps, rule exceptions, and workflow follow-up items.</p>
+                        </div>
+                        <button class="btn btn-primary shadow-sm no-print" style="opacity: 0.5; cursor: not-allowed;">
+                            + Add Action (Demo)
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border flex flex-wrap gap-4 no-print text-sm">
+                        <button onclick="filterExceptions('all')" class="btn-link font-medium" style="color: var(--text-slate-600);">All Open</button>
+                        <button onclick="filterExceptions('due')" class="btn-link font-medium text-amber-600">Due in 7 Days</button>
+                        <button onclick="filterExceptions('paused')" class="btn-link font-medium" style="color: var(--text-slate-500);">Paused Workflows</button>
+                        <button onclick="filterExceptions('flag')" class="btn-link font-medium text-indigo-600">Specialist Flags</button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Link</th>
+                                    <th>Category</th>
+                                    <th style="max-width: 250px;">Observation</th>
+                                    <th>Owner</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-exceptions">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 7: REPORTING AND EXPORT -->
+            <div id="view-reporting" class="view-section">
+                <div class="flex-col gap-6" style="display:flex;">
+                    <div class="border-b pb-4">
+                        <h2 class="text-2xl font-bold">Reporting and Export</h2>
+                        <p class="text-sm text-slate-500">Generate illustrative management artifacts and export fictional demonstration data.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-sm border flex-col gap-4" style="display:flex;">
+                            <h3 class="font-bold text-lg">Management Artifacts</h3>
+                            <p class="text-sm text-slate-600">Generate in-browser summaries for illustrative review.</p>
+                            
+                            <button onclick="generateSummaryModal()" class="w-full flex align-center justify-between p-4 border rounded text-left" style="background-color: white; cursor: pointer; transition: background-color 0.2s;">
+                                <div>
+                                    <div class="font-semibold text-slate-700">Illustrative AI Workflow Summary</div>
+                                    <div class="text-xs text-slate-500 mt-1">Snapshot of program metrics and queue status.</div>
+                                </div>
+                                <span class="text-slate-400">→</span>
+                            </button>
+                            
+                            <button onclick="generateAgendaModal()" class="w-full flex align-center justify-between p-4 border rounded text-left" style="background-color: white; cursor: pointer; transition: background-color 0.2s;">
+                                <div>
+                                    <div class="font-semibold text-slate-700">Illustrative Management Review Agenda</div>
+                                    <div class="text-xs text-slate-500 mt-1">Compile items requiring management or specialist direction.</div>
+                                </div>
+                                <span class="text-slate-400">→</span>
+                            </button>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow-sm border flex-col gap-4" style="display:flex;">
+                            <h3 class="font-bold text-lg">Data Export (CSV)</h3>
+                            <p class="text-sm text-slate-600">Download currently filtered fictional table data.</p>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="exportCSV('usecases')" class="p-3 text-sm border rounded bg-slate-50 font-medium" style="cursor: pointer;">Export Use Cases</button>
+                                <button onclick="exportCSV('reviews')" class="p-3 text-sm border rounded bg-slate-50 font-medium" style="cursor: pointer;">Export Reviews</button>
+                                <button onclick="exportCSV('evidence')" class="p-3 text-sm border rounded bg-slate-50 font-medium" style="cursor: pointer;">Export Source Logs</button>
+                                <button onclick="exportCSV('exceptions')" class="p-3 text-sm border rounded bg-slate-50 font-medium" style="cursor: pointer;">Export Actions</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 p-4 bg-slate-100 rounded border text-xs text-slate-500 max-w-3xl">
+                        <strong>Design Note:</strong> Designed as an illustrative cross-industry workflow prototype for service businesses, multi-site employers, workforce operations, finance operations, training functions, and management teams using AI-assisted internal processes. It uses fictional data and does not replace qualified legal, HR, accounting, insurance, privacy, cybersecurity, safety, or technical specialists.
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- REQUIRED VISIBLE FOOTER -->
+    <footer class="bg-slate-900 text-slate-300 py-6 px-6 text-center border-t no-print" style="flex-shrink: 0; font-size: 10px;">
+        <div class="max-w-6xl mx-auto flex-col gap-3 leading-relaxed" style="display:flex;">
+            <p>
+                Gannon Compliance Group provides non-legal operational-readiness, documentation, workflow-design, training, and implementation-support services. This illustrative prototype uses fictional or redacted data and is not legal advice, a legal opinion, legal-compliance certification, an AI certification, a technical AI audit, model validation, bias testing, privacy impact assessment, cybersecurity assessment, behavioral threat assessment, safety-engineering opinion, financial assurance statement, insurance-coverage opinion, employment-decision tool, or guarantee of outcomes.
+            </p>
+            <p class="text-slate-500">
+                Designed by Gannon Compliance Group | Prototype uses in-browser demonstration data; data resets on refresh unless exported.
+            </p>
+        </div>
+    </footer>
+
+    <!-- MODALS -->
+    
+    <!-- How to Use Modal -->
+    <div id="howToUseModal" class="modal-overlay no-print">
+        <div class="modal-content max-w-3xl">
+            <div class="modal-header">
+                <h2 class="text-xl font-bold">How to Use This Prototype</h2>
+                <button onclick="closeModal('howToUseModal')" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body flex-col gap-4" style="display:flex; text-align: left; font-size: 14px; color: var(--text-slate-700);">
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">1. Purpose:</h3>
+                    <p>This prototype demonstrates how an organization can organize AI-assisted workflow use while keeping human review, domain expertise, decision rights, evidence, and escalation visible.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">2. Demonstration data:</h3>
+                    <p>All information is fictional, synthetic, or redacted. Data resets on refresh unless exported.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">3. Appropriate use:</h3>
+                    <p>Use this prototype to discuss workflow design, management reporting, documentation, training support, responsible automation, reviewer assignment, evidence controls, and follow-up tracking.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">4. Not provided:</h3>
+                    <p>This prototype does not provide legal advice, legal opinions, employment decisions, payroll calculations, insurance coverage decisions, claim outcomes, compliance certification, safety determinations, technical AI auditing, model validation, bias testing, privacy assessments, cybersecurity assessments, or guarantees.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">5. Human review:</h3>
+                    <p>AI may assist with limited drafting, organization, summary, comparison, formatting, and stated-rule exception flagging. Accountable human owners and appropriate subject-matter experts review source data, limitations, context, decisions, and external release.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 mb-1">6. Public portfolio data:</h3>
+                    <p>Use fictional/synthetic information only in public demonstrations. Do not enter real client, employee, payroll, claim, financial, security, personal, health, surveillance, proprietary, or confidential data.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('howToUseModal')" class="btn btn-primary">Acknowledge & Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Details Modal -->
+    <div id="reviewDetailsModal" class="modal-overlay no-print">
+        <div class="modal-content max-w-4xl">
+            <div class="modal-header">
+                <div>
+                    <h2 class="text-lg font-bold">Output Review Task</h2>
+                    <p class="text-xs text-slate-500" id="modal-rev-subtitle">ID: REV-XXX | Use Case: AI-XXX</p>
+                </div>
+                <button onclick="closeModal('reviewDetailsModal')" class="close-btn">&times;</button>
+            </div>
+            
+            <div class="modal-body flex flex-col lg:flex-row gap-6">
+                <!-- Left Col: Context -->
+                <div class="lg:w-1/2 flex-col gap-4" style="display:flex;">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-700 uppercase mb-2">Draft Summary</h3>
+                        <div class="p-3 bg-slate-50 border rounded text-sm" id="modal-rev-summary"></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="block text-xs text-slate-500">Source Records</span>
+                            <span class="font-medium" id="modal-rev-source"></span>
+                        </div>
+                        <div>
+                            <span class="block text-xs text-slate-500">Data Completeness</span>
+                            <span class="font-medium" id="modal-rev-complete"></span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-blue-50 border border-blue-200 rounded text-sm">
+                        <h4 class="font-bold text-blue-900 mb-1">What AI Did</h4>
+                        <p class="text-blue-800" id="modal-rev-did">Drafted structure based on provided inputs.</p>
+                    </div>
+
+                    <div class="p-4 bg-slate-100 border rounded text-sm">
+                        <h4 class="font-bold mb-1">What AI Did Not Determine</h4>
+                        <p class="text-slate-600">AI did not determine legal requirements, employment actions, payroll outcomes, safety conditions, insurance coverage, claim outcomes, technical model performance, privacy obligations, cybersecurity status, or any final business decision. The displayed content is an illustrative draft requiring accountable human review.</p>
+                    </div>
+                </div>
+
+                <!-- Right Col: Checklist & Actions -->
+                <div class="lg:w-1/2 flex-col gap-4 lg:border-l lg:pl-6 lg:pt-0 pt-5 border-t lg:border-t-0" style="display:flex;">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-700 uppercase mb-3">Required Human Review</h3>
+                        <div class="flex-col gap-2 text-sm text-slate-700" style="display:flex;">
+                            <label class="flex align-start gap-2"><input type="checkbox" class="mt-1"> Source record identified & date checked</label>
+                            <label class="flex align-start gap-2"><input type="checkbox" class="mt-1"> Scope, intended use, and boundary checked</label>
+                            <label class="flex align-start gap-2"><input type="checkbox" class="mt-1"> Unsupported assumptions & missing info reviewed</label>
+                            <label class="flex align-start gap-2"><input type="checkbox" class="mt-1"> Required SME consulted</label>
+                            <label class="flex align-start gap-2"><input type="checkbox" class="mt-1"> Specialist review flag considered</label>
+                            <label class="flex align-start gap-2"><input type="checkbox" class="mt-1"> Management decision/Release limitation recorded</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-700 uppercase mb-2">Record Decision</h3>
+                        <select class="form-input mb-3" id="modal-rev-decision">
+                            <option value="">Select a neutral decision...</option>
+                            <option value="Return for Revision">Return for Revision</option>
+                            <option value="Continue Internal Review">Continue Internal Review</option>
+                            <option value="Ready for Management Review">Ready for Management Review</option>
+                            <option value="Pause Workflow">Pause Workflow</option>
+                            <option value="Close Illustrative Review">Close Illustrative Review</option>
+                            <option value="Specialist Review Flag">Specialist Review Flag</option>
+                        </select>
+                        <textarea class="form-input h-20" placeholder="Reviewer comments..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button onclick="closeModal('reviewDetailsModal')" class="btn btn-white">Cancel</button>
+                <button onclick="closeModal('reviewDetailsModal')" class="btn btn-primary">Save Fictional Decision</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Report Modal (used for Summary and Agenda) -->
+    <div id="reportModal" class="modal-overlay">
+        <div class="modal-content max-w-3xl">
+            <div class="modal-header no-print">
+                <h2 class="text-lg font-bold" id="reportModalTitle">Report</h2>
+                <div class="flex gap-2 align-center">
+                    <button onclick="window.print()" class="btn btn-white">Print</button>
+                    <button onclick="closeModal('reportModal')" class="close-btn" style="font-size: 28px;">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body text-sm" id="reportModalContent">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA MODELS (FICTIONAL) ---
+        const initialUseCases = [
+            { id: "AI-101", function: "Operations", purpose: "Draft internal SOP outline", type: "Drafting and formatting", boundary: "Fictional/sample process notes only", owner: "Operations Lead", reviewer: "Workflow Reviewer", sme: "Operations SME", status: "In Progress", release: "No", flag: "No", lastRev: "Oct 1", nextRev: "Oct 15", notes: "" },
+            { id: "AI-102", function: "Training", purpose: "Organize training-topic outline", type: "Summarization and formatting", boundary: "Synthetic training notes only", owner: "Training Lead", reviewer: "Training Reviewer", sme: "Training SME", status: "Needs Review", release: "No", flag: "No", lastRev: "Oct 2", nextRev: "Oct 16", notes: "" },
+            { id: "AI-103", function: "Finance Ops", purpose: "Identify missing fields in illustrative invoice checklist", type: "Missing-information flagging", boundary: "Fictional invoice checklist only", owner: "Finance Ops Lead", reviewer: "Data Reviewer", sme: "Finance Ops SME", status: "Pilot", release: "No", flag: "No", lastRev: "Oct 3", nextRev: "Oct 17", notes: "" },
+            { id: "AI-104", function: "Client Service", purpose: "Draft internal communication outline", type: "Drafting", boundary: "Fictional scenario only", owner: "Client Service Lead", reviewer: "Comms Reviewer", sme: "Service Delivery SME", status: "Paused", release: "No", flag: "Yes", lastRev: "Oct 1", nextRev: "TBD", notes: "Awaiting source validation" },
+            { id: "AI-105", function: "Documentation", purpose: "Compare fictional SOP versions for formatting differences", type: "Comparison and organization", boundary: "Synthetic SOP versions only", owner: "Documentation Lead", reviewer: "Document Reviewer", sme: "Process SME", status: "In Progress", release: "No", flag: "No", lastRev: "Oct 4", nextRev: "Oct 18", notes: "" },
+            { id: "AI-106", function: "Workforce Support", purpose: "Organize non-sensitive training follow-up questions", type: "Organization and summarization", boundary: "Synthetic aggregated group data only", owner: "Workforce Support Lead", reviewer: "HR Ops Reviewer", sme: "Workforce Ops SME", status: "Needs Review", release: "No", flag: "Yes", lastRev: "Oct 5", nextRev: "Oct 19", notes: "" },
+            { id: "AI-107", function: "Process Support", purpose: "Create a fictional follow-up meeting summary", type: "Summarization", boundary: "Synthetic action-register entries only", owner: "Process Support Lead", reviewer: "Management Reviewer", sme: "Operations SME", status: "Ready for Management Review", release: "No", flag: "No", lastRev: "Oct 5", nextRev: "Oct 10", notes: "" }
+        ];
+
+        const initialReviews = [
+            { id: "REV-201", ucLink: "AI-101", type: "SOP Outline", summary: "Illustrative draft outline for a service-handoff workflow", source: "Synthetic workflow notes v1.2", complete: "Needs source-date confirmation", reviewer: "Jordan Lee", sme: "Operations SME", status: "Needs Review", nextStep: "Confirm current process owner", mgmtNeeded: "Yes", flag: "No", decision: "Blank", date: "Oct 6" },
+            { id: "REV-202", ucLink: "AI-102", type: "Training Summary", summary: "Illustrative summary of training topics and open questions", source: "Synthetic training notes", complete: "Complete for demonstration", reviewer: "Morgan Reed", sme: "Training SME", status: "Ready for Management Review", nextStep: "Confirm management release decision", mgmtNeeded: "Yes", flag: "No", decision: "Blank", date: "Oct 6" },
+            { id: "REV-203", ucLink: "AI-103", type: "Missing-Field Summary", summary: "Illustrative list of incomplete invoice-checklist fields", source: "Synthetic invoice checklist", complete: "Needs reviewer confirmation", reviewer: "Casey Patel", sme: "Finance Ops SME", status: "Pending Information", nextStep: "Confirm whether field is required", mgmtNeeded: "No", flag: "No", decision: "Blank", date: "Oct 5" },
+            { id: "REV-204", ucLink: "AI-104", type: "Internal Comms Draft", summary: "Illustrative customer-service response outline", source: "Synthetic scenario prompt", complete: "Source context incomplete", reviewer: "Taylor Kim", sme: "Service Delivery SME", status: "Paused", nextStep: "Obtain non-sensitive source context or close", mgmtNeeded: "No", flag: "Yes", decision: "Blank", date: "Oct 4" },
+            { id: "REV-205", ucLink: "AI-105", type: "SOP Comparison", summary: "Illustrative comparison of two fictional SOP formats", source: "Synthetic SOP v1 and v2", complete: "Complete for demonstration", reviewer: "Avery Chen", sme: "Process SME", status: "In Progress", nextStep: "Document reviewer comments", mgmtNeeded: "No", flag: "No", decision: "Blank", date: "Oct 6" },
+            { id: "REV-206", ucLink: "AI-107", type: "Action Meeting Summary", summary: "Illustrative management summary of fictional open actions", source: "Synthetic action register", complete: "Needs management check", reviewer: "Riley Morgan", sme: "Operations SME", status: "Ready for Management Review", nextStep: "Confirm decision and next actions", mgmtNeeded: "Yes", flag: "No", decision: "Blank", date: "Oct 7" }
+        ];
+
+        const initialDecisionRights = [
+            { activity: "Internal SOP Drafting", assist: "Drafting headings, organizing approved non-sensitive notes, formatting.", notDo: "Determine legal requirements or approve final SOP.", owner: "Documentation Lead", reviewer: "Document Reviewer", sme: "Process Owner", mgmt: "Yes, for external release.", flag: "Current source unavailable or potential external requirement identified.", evidence: "Source list, reviewer comments, final release record." },
+            { activity: "Training Outline Support", assist: "Organizing training topics and drafting plain-language outline.", notDo: "Evaluate employees or determine required legal training.", owner: "Training Lead", reviewer: "Training Reviewer", sme: "Training SME", mgmt: "Yes, for broad deployment.", flag: "Sensitive content, regulated topic, or employee-impact concern.", evidence: "Source list, trainer review, version record, release record." },
+            { activity: "Payroll Process Doc.", assist: "Format a fictional process map and organize a checklist.", notDo: "Calculate payroll, determine wage entitlement, or authorize payment.", owner: "Finance Ops Lead", reviewer: "Payroll Process Reviewer", sme: "Payroll/HR SME", mgmt: "Yes, before operational use.", flag: "Jurisdictional, payroll, legal, or employee-impact question.", evidence: "Source list, reviewer notes, approved workflow version." },
+            { activity: "Client Service Summary", assist: "Draft internal summary from fictional non-sensitive notes.", notDo: "Make client commitments, contract interpretations, or external promises.", owner: "Client Service Lead", reviewer: "Comms Reviewer", sme: "Service Delivery SME", mgmt: "Yes, before external use.", flag: "Contract, privacy, or reputational concern.", evidence: "Source list, reviewer approval, communication release note." },
+            { activity: "Follow-Up Meeting Summary", assist: "Summarize fictional action-register items and organize ownership/due dates.", notDo: "Determine root cause, assign blame, impose discipline, or close a material issue.", owner: "Operations Lead", reviewer: "Management Reviewer", sme: "Operations SME", mgmt: "Yes, where action affects operations.", flag: "Employee, legal, safety, insurance, or technical issue.", evidence: "Meeting notes, action register, reviewer comments, decision record." },
+            { activity: "Insurance Renewal Support", assist: "Organize fictional renewal checklist questions and summarize non-sensitive illustrative exposure data.", notDo: "Bind coverage, interpret insurance coverage, select insurer, adjust claims, or make coverage decisions.", owner: "Process Support Lead", reviewer: "Insurance Process Reviewer", sme: "Risk/Insurance SME", mgmt: "Yes.", flag: "Coverage interpretation, claim issue, broker/carrier question, or material exposure change.", evidence: "Source list, broker/carrier correspondence record, decision notes." }
+        ];
+
+        const initialEvidence = [
+            { id: "REF-001", ucLink: "AI-101", type: "Internal Process Note", title: "Synthetic workflow notes v1.2", date: "Sep 2026", currentness: "Date Needs Review", owner: "Ops Team", reviewer: "Jordan Lee", status: "Source Identified", limitation: "Draft notes only; not approved SOP.", restriction: "Yes" },
+            { id: "REF-002", ucLink: "AI-102", type: "Training Material", title: "Synthetic training notes", date: "Oct 2026", currentness: "Valid for demo", owner: "Training Team", reviewer: "Morgan Reed", status: "Reviewer Note Added", limitation: "Does not cover regulatory requirements.", restriction: "Yes" },
+            { id: "REF-003", ucLink: "AI-104", type: "Illustrative Demo Dataset", title: "Synthetic scenario prompt", date: "Unknown", currentness: "Context Needs Review", owner: "Client Service", reviewer: "Taylor Kim", status: "Restricted from External Release", limitation: "Lacks context on client service tier.", restriction: "Yes - Absolute" },
+            { id: "REF-004", ucLink: "AI-107", type: "Management Meeting Note", title: "Synthetic action register", date: "Oct 2026", currentness: "Valid for demo", owner: "Process Support", reviewer: "Riley Morgan", status: "Ready for Management Review", limitation: "Fictional operational issues only.", restriction: "No - Internal use" }
+        ];
+
+        const initialExceptions = [
+            { id: "EX-301", link: "AI-101 / REV-201", category: "Source Documentation", obs: "Source record date missing from illustrative SOP outline", date: "Oct 2, 2026", owner: "Documentation Lead", support: "Process Owner", status: "Open", next: "Confirm source date and attach revised note", due: "Oct 7, 2026", evNeeded: "Updated fictional process note", mgmt: "No", flag: "No", note: "" },
+            { id: "EX-302", link: "AI-104 / REV-204", category: "Workflow Definition", obs: "External communication workflow has incomplete internal source context", date: "Oct 3, 2026", owner: "Client Service Lead", support: "Comms Reviewer", status: "Paused", next: "Clarify internal-only purpose or close prototype record", due: "Oct 9, 2026", evNeeded: "Revised fictional scope note", mgmt: "Yes", flag: "Yes", note: "" },
+            { id: "EX-303", link: "AI-107 / REV-206", category: "Reviewer Assignment", obs: "Management reviewer not assigned to illustrative action-summary workflow", date: "Oct 4, 2026", owner: "Operations Lead", support: "PM Support", status: "Needs Review", next: "Assign reviewer and schedule review", due: "Oct 8, 2026", evNeeded: "Reviewer assignment record", mgmt: "Yes", flag: "No", note: "" },
+            { id: "EX-304", link: "AI-102 / REV-202", category: "Training/Guidance", obs: "Illustrative training workflow needs a clearer source-verification reminder", date: "Oct 4, 2026", owner: "Training Lead", support: "Training Reviewer", status: "In Progress", next: "Add checklist reminder to draft workflow", due: "Oct 11, 2026", evNeeded: "Updated training checklist", mgmt: "No", flag: "No", note: "" }
+        ];
+
+        // State containers
+        let useCases = [];
+        let reviews = [];
+        let evidence = [];
+        let exceptions = [];
+
+        window.onload = () => {
+            resetData();
+            buildLifecycleVisual();
+            setTimeout(() => openModal('howToUseModal'), 600); // Show on load for demo
+        };
+
+        function resetData() {
+            useCases = JSON.parse(JSON.stringify(initialUseCases));
+            reviews = JSON.parse(JSON.stringify(initialReviews));
+            evidence = JSON.parse(JSON.stringify(initialEvidence));
+            exceptions = JSON.parse(JSON.stringify(initialExceptions));
+            
+            renderUseCases();
+            renderReviews();
+            renderDecisionRights();
+            renderEvidence();
+            renderExceptions();
+            updateSidebarBadges();
+        }
+
+        // --- NAVIGATION & UTILS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            const activeView = document.getElementById(`view-${tabId}`);
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            
+            if(activeView) {
+                activeView.classList.add('active');
+            }
+            if(activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+
+        function openModal(id) {
+            const el = document.getElementById(id);
+            if(el) { el.style.display = 'flex'; }
+        }
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            if(el) { el.style.display = 'none'; }
+        }
+
+        function getStatusBadge(status) {
+            const s = status.toLowerCase();
+            if (s.includes('review') || s.includes('pilot')) return `<span class="badge badge-amber">${status}</span>`;
+            if (s.includes('paused') || s.includes('draft') || s.includes('pending')) return `<span class="badge badge-slate">${status}</span>`;
+            if (s.includes('progress') || s.includes('open')) return `<span class="badge badge-blue">${status}</span>`;
+            if (s.includes('flag') || s.includes('specialist')) return `<span class="badge badge-indigo">${status}</span>`;
+            return `<span class="badge badge-slate">${status}</span>`;
+        }
+        
+        function getFlagBadge(flag) {
+            return flag === 'Yes' ? `<span class="badge badge-indigo">Yes</span>` : `<span class="text-slate-400 text-xs">No</span>`;
+        }
+
+        function updateSidebarBadges() {
+            const revCount = reviews.filter(r => r.status.includes('Review')).length;
+            const excCount = exceptions.filter(e => e.status !== 'Closed').length;
+            document.getElementById('nav-badge-review').textContent = revCount;
+            document.getElementById('nav-badge-exceptions').textContent = excCount;
+        }
+
+        // --- TAB 2: USE CASES ---
+        function renderUseCases() {
+            const tbody = document.getElementById('table-usecases');
+            const search = document.getElementById('filter-uc-search').value.toLowerCase();
+            const statusFilter = document.getElementById('filter-uc-status').value;
+            const flagFilter = document.getElementById('filter-uc-flag').value;
+
+            tbody.innerHTML = '';
+            
+            let filtered = useCases.filter(uc => {
+                const matchesSearch = Object.values(uc).join(' ').toLowerCase().includes(search);
+                const matchesStatus = statusFilter === "" || uc.status === statusFilter;
+                const matchesFlag = flagFilter === "" || uc.flag === flagFilter;
+                return matchesSearch && matchesStatus && matchesFlag;
+            });
+
+            filtered.forEach(uc => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="font-medium text-slate-800" style="white-space: nowrap;">${uc.id}</td>
+                    <td style="white-space: nowrap;">${uc.function}</td>
+                    <td class="text-slate-800">${uc.purpose}</td>
+                    <td class="text-xs">${uc.type}</td>
+                    <td style="white-space: nowrap;">${uc.owner}</td>
+                    <td style="white-space: nowrap;">${getStatusBadge(uc.status)}</td>
+                    <td class="text-center text-slate-500" style="white-space: nowrap;">${uc.release}</td>
+                    <td class="text-center" style="white-space: nowrap;">${getFlagBadge(uc.flag)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            window.currentFilteredUseCases = filtered;
+        }
+        
+        function resetFilters(prefix) {
+            document.getElementById(`filter-${prefix}-search`).value = '';
+            if(document.getElementById(`filter-${prefix}-status`)) document.getElementById(`filter-${prefix}-status`).value = '';
+            if(document.getElementById(`filter-${prefix}-flag`)) document.getElementById(`filter-${prefix}-flag`).value = '';
+            if(prefix === 'uc') renderUseCases();
+        }
+
+        // --- TAB 3: REVIEWS ---
+        function renderReviews() {
+            const tbody = document.getElementById('table-reviews');
+            tbody.innerHTML = '';
+            reviews.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.onclick = () => openReviewDetails(r);
+                tr.innerHTML = `
+                    <td class="font-medium text-slate-800" style="white-space: nowrap;">${r.id}</td>
+                    <td class="text-slate-500" style="white-space: nowrap;">${r.ucLink}</td>
+                    <td class="text-slate-800" style="white-space: nowrap;">${r.type}</td>
+                    <td>${r.summary}</td>
+                    <td style="white-space: nowrap;">${getStatusBadge(r.status)}</td>
+                    <td class="text-xs">${r.nextStep}</td>
+                    <td class="text-center no-print" style="white-space: nowrap;">
+                        <button class="btn-action-text">Review Details</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            window.currentFilteredReviews = reviews;
+        }
+
+        function openReviewDetails(r) {
+            document.getElementById('modal-rev-subtitle').textContent = `ID: ${r.id} | Linked Use Case: ${r.ucLink}`;
+            document.getElementById('modal-rev-summary').textContent = `"${r.summary}"`;
+            document.getElementById('modal-rev-source').textContent = r.source;
+            document.getElementById('modal-rev-complete').textContent = r.complete;
+            
+            let didText = "Drafted structure based on provided inputs.";
+            if(r.type.includes('Summary')) didText = "Summarized provided text and organized key points.";
+            if(r.type.includes('Missing')) didText = "Compared input against standard checklist fields to identify gaps.";
+            document.getElementById('modal-rev-did').textContent = didText;
+            
+            document.querySelectorAll('#reviewDetailsModal input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.getElementById('modal-rev-decision').value = "";
+            
+            openModal('reviewDetailsModal');
+        }
+
+        // --- TAB 4: DECISION RIGHTS ---
+        function renderDecisionRights() {
+            const container = document.getElementById('container-decisionrights');
+            container.innerHTML = '';
+            initialDecisionRights.forEach(dr => {
+                container.innerHTML += `
+                    <div class="bg-white border rounded-lg p-5 shadow-sm flex-col md:flex-row gap-4" style="display:flex;">
+                        <div class="md:w-1/3 flex-col gap-2" style="display:flex;">
+                            <h4 class="text-lg">${dr.activity}</h4>
+                            <div class="text-xs text-slate-500 flex-col gap-1" style="display:flex;">
+                                <p><strong>Accountable:</strong> ${dr.owner}</p>
+                                <p><strong>Reviewer:</strong> ${dr.reviewer}</p>
+                                <p><strong>SME:</strong> ${dr.sme}</p>
+                            </div>
+                        </div>
+                        <div class="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                            <div class="bg-slate-50 p-3 rounded border">
+                                <span class="text-xs font-bold text-slate-500 uppercase block mb-1">AI May Assist With</span>
+                                <p class="text-sm text-slate-700">${dr.assist}</p>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded border">
+                                <span class="text-xs font-bold text-slate-500 uppercase block mb-1">AI Must Not Do</span>
+                                <p class="text-sm text-slate-700">${dr.notDo}</p>
+                            </div>
+                            <div class="md:col-span-2 border-t pt-3 flex flex-wrap gap-6 text-xs text-slate-600 mt-2">
+                                <p><strong>Mgmt Decision:</strong> ${dr.mgmt}</p>
+                                <p><strong>Spec. Flag Trigger:</strong> ${dr.flag}</p>
+                                <p><strong>Evidence:</strong> ${dr.evidence}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- TAB 5: SOURCE CHECK ---
+        function renderEvidence() {
+            const tbody = document.getElementById('table-evidence');
+            tbody.innerHTML = '';
+            evidence.forEach(ev => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="font-medium text-slate-800" style="white-space: nowrap;">${ev.id}</td>
+                        <td class="text-slate-500" style="white-space: nowrap;">${ev.ucLink}</td>
+                        <td class="text-slate-800" style="white-space: nowrap;">
+                            ${ev.type}<br>
+                            <span class="text-xs font-normal text-slate-500">${ev.title} (${ev.date})</span>
+                        </td>
+                        <td style="white-space: nowrap;">${getStatusBadge(ev.status)}</td>
+                        <td class="text-xs">${ev.limitation}</td>
+                    </tr>
+                `;
+            });
+            window.currentFilteredEvidence = evidence;
+        }
+
+        // --- TAB 6: EXCEPTIONS ---
+        function renderExceptions(data = exceptions) {
+            const tbody = document.getElementById('table-exceptions');
+            tbody.innerHTML = '';
+            data.forEach(ex => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="font-medium text-slate-800" style="white-space: nowrap;">${ex.id}</td>
+                        <td class="text-slate-500 text-xs" style="white-space: nowrap;">${ex.link}</td>
+                        <td class="text-slate-800" style="white-space: nowrap;">${ex.category}</td>
+                        <td>${ex.obs}</td>
+                        <td style="white-space: nowrap;">${ex.owner}</td>
+                        <td style="white-space: nowrap;">${getStatusBadge(ex.status)}</td>
+                        <td style="white-space: nowrap;">${ex.due}</td>
+                    </tr>
+                `;
+            });
+            window.currentFilteredExceptions = data;
+        }
+
+        function filterExceptions(type) {
+            let filtered = exceptions;
+            if (type === 'due') {
+                filtered = exceptions.filter(e => e.status !== 'Closed');
+            } else if (type === 'paused') {
+                filtered = exceptions.filter(e => e.status === 'Paused');
+            } else if (type === 'flag') {
+                filtered = exceptions.filter(e => e.flag === 'Yes');
+            }
+            renderExceptions(filtered);
+        }
+
+        // --- REPORTING & EXPORT ---
+        function exportCSV(type) {
+            let data = [];
+            let filename = `gcg_demo_${type}.csv`;
+            
+            if(type === 'usecases') data = window.currentFilteredUseCases;
+            if(type === 'reviews') data = window.currentFilteredReviews;
+            if(type === 'evidence') data = window.currentFilteredEvidence;
+            if(type === 'exceptions') data = window.currentFilteredExceptions;
+
+            if(!data || data.length === 0) return alert("No data to export.");
+
+            const headers = Object.keys(data[0]);
+            const csvRows = [];
+            csvRows.push(headers.join(','));
+
+            for (const row of data) {
+                const values = headers.map(header => {
+                    const escaped = ('' + row[header]).replace(/"/g, '""');
+                    return `"${escaped}"`;
+                });
+                csvRows.push(values.join(','));
+            }
+
+            const csvString = csvRows.join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', filename);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function generateSummaryModal() {
+            document.getElementById('reportModalTitle').textContent = "Illustrative Human-in-Command AI Workflow Summary";
+            const content = `
+                <div class="flex-col gap-6" style="display:flex;">
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded text-blue-800 font-medium">
+                        This illustrative summary is a workflow-design demonstration based on fictional data. It is not legal advice, an AI audit, technical model validation, privacy assessment, cybersecurity assessment, employment decision, financial assurance statement, insurance-coverage opinion, safety determination, compliance certification, or guarantee of outcomes. All data is fictional/synthetic. AI output is non-final and requires accountable human review.
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-4 bg-slate-50 border rounded text-center">
+                            <div class="text-2xl font-bold text-slate-800">${useCases.length}</div>
+                            <div class="text-xs text-slate-500 uppercase">Use Cases Logged</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border rounded text-center">
+                            <div class="text-2xl font-bold text-amber-600">${reviews.filter(r=>r.status==='Needs Review').length}</div>
+                            <div class="text-xs text-slate-500 uppercase">Outputs Needing Review</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border rounded text-center">
+                            <div class="text-2xl font-bold text-indigo-600">${useCases.filter(u=>u.flag==='Yes').length}</div>
+                            <div class="text-xs text-slate-500 uppercase">Specialist Flags</div>
+                        </div>
+                        <div class="p-4 bg-slate-50 border rounded text-center">
+                            <div class="text-2xl font-bold text-slate-700">${exceptions.length}</div>
+                            <div class="text-xs text-slate-500 uppercase">Open Actions</div>
+                        </div>
+                    </div>
+
+                    <h3 class="font-bold text-lg border-b pb-2 mt-6">Selected Management Attention Items</h3>
+                    <ul class="pl-5 flex-col gap-2 text-slate-700" style="display:flex;">
+                        ${exceptions.filter(e => e.mgmt === 'Yes').map(e => `<li><strong>${e.link}:</strong> ${e.obs} (Owner: ${e.owner})</li>`).join('') || "<li>No management attention items flagged.</li>"}
+                    </ul>
+                </div>
+            `;
+            document.getElementById('reportModalContent').innerHTML = content;
+            openModal('reportModal');
+        }
+
+        function generateAgendaModal() {
+            document.getElementById('reportModalTitle').textContent = "Illustrative Management Review Agenda";
+            const content = `
+                <div class="flex-col gap-6" style="display:flex;">
+                    <p class="text-slate-700 font-medium">Based on illustrative dashboard entries, management attention is requested for the following workflow, documentation, reviewer-assignment, and follow-up items.</p>
+                    
+                    <div class="flex-col gap-4" style="display:flex;">
+                        ${exceptions.map(e => `
+                            <div class="border p-4 rounded bg-white shadow-sm">
+                                <div class="flex justify-between align-start mb-2">
+                                    <span class="font-bold text-slate-800">${e.category} <span class="text-xs font-normal text-slate-500 ml-2">ID: ${e.id}</span></span>
+                                    ${getStatusBadge(e.status)}
+                                </div>
+                                <p class="text-slate-700 text-sm mb-3"><strong>Observation:</strong> ${e.obs}</p>
+                                <div class="grid grid-cols-2 text-xs text-slate-600 bg-slate-50 p-2 rounded gap-2">
+                                    <div><strong>Owner:</strong> ${e.owner}</div>
+                                    <div><strong>Due:</strong> ${e.due}</div>
+                                    <div class="md:col-span-2 mt-1"><strong>Required Next Step:</strong> ${e.next}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            document.getElementById('reportModalContent').innerHTML = content;
+            openModal('reportModal');
+        }
+
+        // --- LIFECYCLE VISUAL INTERACTION ---
+        const lifecycleSteps = [
+            { id: "frame", label: "Frame", desc: "Describe the operational problem and intended non-consequential use." },
+            { id: "define", label: "Define", desc: "Specify intended output, users, records, and decision context." },
+            { id: "limit", label: "Limit", desc: "Define data boundaries, prohibited uses, and output limitations." },
+            { id: "assign", label: "Assign", desc: "Name accountable owner, reviewer, and required SME." },
+            { id: "draft", label: "Draft", desc: "AI creates a non-final draft, summary, organization aid, or stated-rule flag." },
+            { id: "confirm", label: "Confirm", desc: "Human checks source records, dates, completeness, and unsupported assumptions." },
+            { id: "review", label: "Review", desc: "Domain SME reviews content requiring subject expertise." },
+            { id: "decide", label: "Decide", desc: "Authorized human decides whether to use, revise, pause, or escalate the output." },
+            { id: "document", label: "Document", desc: "Record sources, reviewer, decision, limitation, and follow-up." },
+            { id: "learn", label: "Learn", desc: "Track errors/patterns and improve training, workflow, or controls." }
+        ];
+
+        function buildLifecycleVisual() {
+            const container = document.getElementById('lifecycle-container');
+            container.innerHTML = '';
+            
+            lifecycleSteps.forEach((step, index) => {
+                const isLast = index === lifecycleSteps.length - 1;
+                container.innerHTML += `
+                    <div class="lc-step group" onclick="showLifecycleDesc('${step.id}')">
+                        <div class="lc-circle" id="lc-btn-${step.id}">${step.label}</div>
+                        ${!isLast ? `<div class="lc-line"></div>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        function showLifecycleDesc(id) {
+            lifecycleSteps.forEach(s => {
+                const btn = document.getElementById(`lc-btn-${s.id}`);
+                btn.classList.remove('active');
+            });
+            
+            const btn = document.getElementById(`lc-btn-${id}`);
+            btn.classList.add('active');
+            
+            const step = lifecycleSteps.find(s => s.id === id);
+            document.getElementById('lifecycle-desc').innerHTML = `
+                <div>
+                    <strong class="text-blue-800 text-base block mb-1">${step.label} Phase</strong>
+                    ${step.desc}
+                </div>
+            `;
+        }
+    </script>
+<div style="background:#F1F5F9;color:#2E3550;text-align:center;padding:14px 16px;font-size:0.72rem;border-top:1px solid #E2E8F0;">
+Gannon Compliance Group provides non-legal operational-readiness, documentation, workflow-design, training, and implementation-support services. This illustrative prototype is not legal advice, a legal opinion, legal-compliance certification, an AI-system audit, a cybersecurity assessment, a behavioral threat assessment, safety-engineering advice, an employment-decision system, or a guarantee of outcomes.
+</div>
+</body>
+</html>

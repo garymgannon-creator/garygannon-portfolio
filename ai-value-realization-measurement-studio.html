@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<!-- saved from url=(0081)file:///C:/Users/garyg/Downloads/gcg_ai_value_realization_measurement_studio.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCG AI Value Realization Measurement Studio</title>
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --bg-sidebar: #0f172a;
+            --bg-panel: #ffffff;
+            --text-main: #334155;
+            --text-dark: #0f172a;
+            --text-light: #f8fafc;
+            --text-muted: #64748b;
+            --primary-blue: #1d4ed8;
+            --primary-blue-hover: #1e40af;
+            --slate-border: #e2e8f0;
+            --muted-gold: #d97706;
+            --muted-gold-bg: #fef3c7;
+            --banner-red: #b91c1c;
+            --banner-red-text: #fef2f2;
+            
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --border-radius: 6px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        h1, h2, h3, h4 { color: var(--text-dark); margin-bottom: 0.5rem; font-weight: 600; }
+        
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .sidebar-header h2 {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-left: 3px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .nav-item:hover { background-color: #1e293b; }
+        .nav-item.active {
+            background-color: #1e293b;
+            border-left-color: var(--muted-gold);
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .banner-critical {
+            background-color: var(--banner-red);
+            color: var(--banner-red-text);
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: bold;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            z-index: 10;
+        }
+
+        .system-statement {
+            background-color: var(--muted-gold-bg);
+            color: var(--muted-gold);
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-bottom: 1px solid #fde68a;
+        }
+
+        .app-header {
+            background-color: var(--bg-panel);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--slate-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .app-title-area h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+        .app-title-area p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .content-scroll {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .view-section { display: none; animation: fadeIn 0.3s; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--slate-border);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .panel-header { margin-bottom: 1rem; border-bottom: 1px solid var(--slate-border); padding-bottom: 0.5rem; }
+
+        .grid-cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .grid-cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+        .grid-cols-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+        .kpi-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--slate-border);
+            border-radius: var(--border-radius);
+            padding: 1.25rem;
+            border-left: 4px solid var(--primary-blue);
+            box-shadow: var(--shadow-sm);
+        }
+        .kpi-card h4 { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-card .value { font-size: 2rem; font-weight: 700; color: var(--text-dark); margin-top: 0.5rem; }
+
+        .aivr-flow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: center; padding: 2rem 0; }
+        .aivr-step {
+            background: var(--bg-body); border: 1px solid var(--primary-blue); color: var(--primary-blue);
+            padding: 0.75rem 1rem; border-radius: var(--border-radius); font-weight: 600; text-align: center;
+            font-size: 0.85rem;
+        }
+        .aivr-arrow { color: var(--text-muted); font-weight: bold; }
+
+        .table-container { overflow-x: auto; width: 100%; border: 1px solid var(--slate-border); border-radius: var(--border-radius); }
+        table { width: 100%; border-collapse: collapse; text-align: left; background: var(--bg-panel); font-size: 0.85rem; }
+        th { background-color: var(--bg-body); padding: 0.75rem 1rem; font-weight: 600; color: var(--text-dark); border-bottom: 1px solid var(--slate-border); white-space: nowrap; }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--slate-border); color: var(--text-main); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f1f5f9; }
+
+        .badge {
+            display: inline-block; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;
+            background: #e2e8f0; color: #475569; white-space: nowrap;
+        }
+        .badge.gold { background: var(--muted-gold-bg); color: #92400e; }
+        .badge.blue { background: #dbeafe; color: #1e40af; }
+        .badge.neutral { background: #f1f5f9; color: #334155; }
+        .badge.red { background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; margin-bottom: 0.25rem; font-weight: 600; font-size: 0.85rem; color: var(--text-dark); }
+        .form-control {
+            width: 100%; padding: 0.5rem; border: 1px solid var(--slate-border); border-radius: 4px;
+            font-family: inherit; font-size: 0.85rem; color: var(--text-main); background: #f8fafc;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2); }
+        
+        .btn {
+            display: inline-block; padding: 0.5rem 1rem; border-radius: var(--border-radius); font-weight: 600;
+            cursor: pointer; text-align: center; border: 1px solid transparent; font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .btn-primary { background-color: var(--primary-blue); color: #ffffff; }
+        .btn-primary:hover { background-color: var(--primary-blue-hover); }
+        .btn-secondary { background-color: #e2e8f0; color: var(--text-dark); border-color: #cbd5e1; }
+        .btn-secondary:hover { background-color: #cbd5e1; }
+
+        .warning-panel {
+            background-color: var(--muted-gold-bg); border-left: 4px solid var(--muted-gold);
+            padding: 1rem; margin-bottom: 1.5rem; color: #92400e; border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .warning-panel h4 { color: #92400e; margin-bottom: 0.25rem; font-size: 0.9rem; }
+
+        .tabs { display: flex; border-bottom: 1px solid var(--slate-border); margin-bottom: 1.5rem; overflow-x: auto; }
+        .tab {
+            padding: 0.75rem 1.25rem; cursor: pointer; border-bottom: 2px solid transparent;
+            font-weight: 600; color: var(--text-muted); font-size: 0.85rem; white-space: nowrap;
+        }
+        .tab.active { border-bottom-color: var(--primary-blue); color: var(--primary-blue); }
+
+        .app-footer {
+            margin-top: 3rem; padding: 1.5rem; border-top: 1px solid var(--slate-border);
+            font-size: 0.7rem; color: var(--text-muted); text-align: justify; line-height: 1.4;
+            background-color: var(--bg-panel);
+        }
+        .footer-links { margin-bottom: 0.75rem; display: flex; gap: 1rem; font-weight: 600; }
+        .footer-links a { color: var(--primary-blue); cursor: pointer; text-decoration: none; }
+
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: var(--bg-panel); width: 90%; max-width: 600px; padding: 2rem;
+            border-radius: var(--border-radius); max-height: 90vh; overflow-y: auto;
+        }
+
+        @media print {
+            .sidebar, .banner-critical { display: none !important; }
+            .main-content { overflow: visible; height: auto; }
+            .content-scroll { padding: 0; overflow: visible; }
+            .view-section { display: none; }
+            .view-section.active { display: block; }
+            .panel { break-inside: avoid; border: 1px solid #ccc; box-shadow: none; }
+            body { background: white; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>Measurement Studio</h2>
+        </div>
+        <ul class="nav-list" id="nav-list">
+            <li class="nav-item active" data-target="view-home">1. Home / AIVR-7 Overview</li>
+            <li class="nav-item" data-target="view-inventory">2. AI Use-Case Inventory</li>
+            <li class="nav-item" data-target="view-charter">3. Use-Case Value Charter</li>
+            <li class="nav-item" data-target="view-baseline">4. Baseline &amp; Counterfactual</li>
+            <li class="nav-item" data-target="view-value">5. Value Evidence</li>
+            <li class="nav-item" data-target="view-cost">6. Full Lifecycle Cost / TCO</li>
+            <li class="nav-item" data-target="view-financial">7. Financial Planning</li>
+            <li class="nav-item" data-target="view-operational">8. Operational Performance</li>
+            <li class="nav-item" data-target="view-adoption">9. Adoption &amp; Workforce Workflow</li>
+            <li class="nav-item" data-target="view-controls">10. Controls &amp; Human Review</li>
+            <li class="nav-item" data-target="view-portfolio">11. Executive Portfolio Review</li>
+            <li class="nav-item" data-target="view-evidence">12. Evidence Register</li>
+            <li class="nav-item" data-target="view-actions">13. Action Register</li>
+            <li class="nav-item" data-target="view-export">14. Review &amp; Export</li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="banner-critical">
+            ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY — NOT LEGAL ADVICE, FINANCIAL ASSURANCE, AN EMPLOYMENT DECISION TOOL, OR A COMPLIANCE DETERMINATION.
+        </div>
+        <div class="system-statement">
+            Prototype uses in-browser demonstration data; changes reset on refresh unless exported.
+        </div>
+        
+        <header class="app-header">
+            <div class="app-title-area">
+                <h1>GCG AI Value Realization Measurement Studio</h1>
+                <p>Illustrative AI Workflow Value, Cost, Control, and Human-Review Prototype</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-secondary" onclick="openModal(&#39;modal-claim&#39;)">Claim Boundaries</button>
+            </div>
+        </header>
+
+        <div class="content-scroll">
+            
+            <section id="view-home" class="view-section active">
+                <div class="panel">
+                    <h3 class="panel-header">The AIVR-7 Methodology</h3>
+                    <div class="aivr-flow">
+                        <div class="aivr-step">Align</div> <div class="aivr-arrow">→</div>
+                        <div class="aivr-step">Inventory</div> <div class="aivr-arrow">→</div>
+                        <div class="aivr-step">Value Hypothesis</div> <div class="aivr-arrow">→</div>
+                        <div class="aivr-step">Baseline</div> <div class="aivr-arrow">→</div>
+                        <div class="aivr-step">Full Lifecycle Cost</div> <div class="aivr-arrow">→</div>
+                        <div class="aivr-step">Controls &amp; Human Review</div> <div class="aivr-arrow">→</div>
+                        <div class="aivr-step">Verify &amp; Management Decision</div>
+                    </div>
+                </div>
+
+                <div class="warning-panel">
+                    <h4>Measurement Discipline</h4>
+                    <p>AI adoption, time saved, user satisfaction, licenses issued, prompts, and training attendance are not automatically financial ROI. Financial results require organization and appropriate finance review of benefit realization and full lifecycle cost.</p>
+                </div>
+
+                <div class="grid-cols-2">
+                    <div class="panel">
+                        <h3 class="panel-header">What this prototype does</h3>
+                        <ul style="padding-left: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                            <li>Organizes AI use-case evidence and baselines.</li>
+                            <li>Structures value hypotheses and lifecycle cost inputs.</li>
+                            <li>Tracks operational results and human-review controls.</li>
+                            <li>Supports management measurement and documentation.</li>
+                        </ul>
+                    </div>
+                    <div class="panel">
+                        <h3 class="panel-header">What this prototype does not do</h3>
+                        <ul style="padding-left: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                            <li>Does not provide legal advice, compliance determinations, or safety engineering.</li>
+                            <li>Does not provide tax, investment, valuation, accounting, or financial assurance.</li>
+                            <li>Does not evaluate employees, score individuals, or make employment decisions.</li>
+                            <li>Does not perform technical AI audits, psychometrics, or model validation.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 1rem; margin-bottom: 1rem;">Portfolio Overview (Fictional Data)</h3>
+                <div class="grid-cols-3">
+                    <div class="kpi-card"><h4>AI Use Cases Logged</h4><div class="value">8</div></div>
+                    <div class="kpi-card"><h4>Baselines Ready for Review</h4><div class="value">3</div></div>
+                    <div class="kpi-card"><h4>Value Evidence Items</h4><div class="value">14</div></div>
+                    <div class="kpi-card"><h4>Cost Items Logged</h4><div class="value">21</div></div>
+                    <div class="kpi-card"><h4>Human-Review Items Open</h4><div class="value">5</div></div>
+                    <div class="kpi-card"><h4>Management Decisions Pending</h4><div class="value">2</div></div>
+                </div>
+
+                <div class="panel" style="margin-top: 1.5rem;">
+                    <h3 class="panel-header">Value Classification Legend</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem;">
+                        <div><span class="badge blue">Organization Finance Review Completed — Illustrative Realized Result</span> - Verified internally by appropriate finance review.</div>
+                        <div><span class="badge blue">Organization Finance Review Pending — Forecast / Planning Only</span> - Internal methodology for forward planning.</div>
+                        <div><span class="badge neutral">Measured Operational Result — Not Yet Monetized</span> - Verified performance change, financial impact pending.</div>
+                        <div><span class="badge neutral">Estimated Capacity Released — Not Yet Monetized</span> - Time/effort saved, not converted to financial result.</div>
+                        <div><span class="badge gold">Modeled Risk Reduction — Assumptions Required</span> - Estimated avoidance value.</div>
+                        <div><span class="badge neutral">Strategic / Foundational Value — Nonfinancial</span> - Core capabilities enabled.</div>
+                        <div><span class="badge red">Unverified Claim — Do Not Use</span> - External or anecdotal claim pending review.</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-inventory" class="view-section">
+                <div class="panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center;" class="panel-header">
+                        <h3>AI Use-Case Inventory</h3>
+                        <button class="btn btn-primary" onclick="alert(&#39;Prototype function: Modal would open to add a fictional record.&#39;)">Add Demo Use Case</button>
+                    </div>
+                    <div style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+                        <input type="text" class="form-control" placeholder="Search functional cases..." style="width: 250px;">
+                        <select class="form-control" style="width: auto;">
+                            <option>All Statuses</option>
+                            <option>Needs Review</option>
+                            <option>In Progress</option>
+                            <option>Ready for Management Review</option>
+                        </select>
+                    </div>
+                    <div class="table-container">
+                        <table id="tbl-inventory">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Business Function</th>
+                                    <th>AI Deployment Type</th>
+                                    <th>Autonomy Level</th>
+                                    <th>Maturity</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody><tr><td>UC-001</td><td>Document Intake Assistant</td><td>Operations</td><td>Workflow Automation</td><td>AI Recommends for Human Review</td><td>Pilot</td><td><span class="badge blue">In Progress</span></td></tr><tr><td>UC-002</td><td>Internal Policy Search Helper</td><td>HR Ops</td><td>Embedded AI Feature</td><td>Human Creates or Uses Output</td><td>Limited Production</td><td>Ready for Management Review</td></tr><tr><td>UC-003</td><td>Invoice Exception Routing Prototype</td><td>Finance Ops</td><td>Decision Support</td><td>AI Recommends for Human Review</td><td>Prototype</td><td><span class="badge gold">Needs Review</span></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-charter" class="view-section">
+                <div class="warning-panel">
+                    <p>No charter, baseline, accountable owner, human-review plan, and measurement approach: no external ROI claim.</p>
+                </div>
+                <div class="panel">
+                    <h3 class="panel-header">Use-Case Value Charter Workspace</h3>
+                    <div class="tabs">
+                        <div class="tab active">Business Case</div>
+                        <div class="tab">Value Hypothesis</div>
+                        <div class="tab">Measurement Plan</div>
+                    </div>
+                    <div class="grid-cols-2">
+                        <div class="form-group">
+                            <label class="form-label">Use-Case Name</label>
+                            <input type="text" class="form-control" value="Document Intake Assistant (Fictional)" readonly="">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Process Owner</label>
+                            <input type="text" class="form-control" value="Operations Manager (Redacted)" readonly="">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">AI Role</label>
+                            <input type="text" class="form-control" value="Summarize incoming vendor requirements for human review." readonly="">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Required Human-Review Points</label>
+                            <input type="text" class="form-control" value="Manager must approve summary before saving to system." readonly="">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label class="form-label">Out-of-Scope Actions</label>
+                        <textarea class="form-control" rows="3" readonly="">AI will not autonomously approve contracts. AI will not process personal information. AI will not execute payments. AI will not evaluate candidates.</textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-baseline" class="view-section">
+                <div class="warning-panel">
+                    <p>A baseline documents what occurred before the AI-enabled workflow change and what would reasonably be expected without the intervention. It supports management measurement; it does not create financial assurance, legal conclusions, or a guarantee of attributable value.</p>
+                </div>
+                <div class="grid-cols-4" style="margin-bottom: 1.5rem;">
+                    <div class="kpi-card"><h4>Baseline Period</h4><div class="value" style="font-size:1.25rem;">Q1 2026 (Mock)</div></div>
+                    <div class="kpi-card"><h4>Workflow Volume</h4><div class="value" style="font-size:1.25rem;">1,250 / mo</div></div>
+                    <div class="kpi-card"><h4>Counterfactual Method</h4><div class="value" style="font-size:1.25rem;">Historical Trend</div></div>
+                    <div class="kpi-card"><h4>Organization Finance Review</h4><div class="value" style="font-size:1.25rem;"><span class="badge gold">Pending</span></div></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header" style="display:flex; justify-content: space-between;">
+                        <h3>Baseline Freeze Register</h3>
+                        <button class="btn btn-secondary">Export Baseline Register to CSV</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="tbl-baseline">
+                            <thead>
+                                <tr>
+                                    <th>Baseline ID</th>
+                                    <th>Use Case</th>
+                                    <th>Primary Metric</th>
+                                    <th>Pre-Intervention Value</th>
+                                    <th>Control / Exception Measure</th>
+                                    <th>Limitations</th>
+                                </tr>
+                            </thead>
+                            <tbody><tr><td>BL-001</td><td>UC-001</td><td>Handling Time</td><td>16 min</td><td>Manager Sign-off</td><td>Seasonality unadjusted</td></tr><tr><td>BL-002</td><td>UC-002</td><td>Search Time</td><td>8 min</td><td>System Log</td><td>Estimated from survey</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-value" class="view-section">
+                <div class="warning-panel">
+                    <p>Do not treat time saved, user adoption, prompts, licenses issued, training attendance, perceived usefulness, or estimated avoided risk as financial ROI unless the organization and appropriate finance reviewer document an economic realization path.</p>
+                </div>
+                <div class="panel">
+                    <h3 class="panel-header">Value Evidence Register</h3>
+                    <div class="tabs">
+                        <div class="tab active">Measured Operational</div>
+                        <div class="tab">Estimated Capacity</div>
+                        <div class="tab">Strategic Option</div>
+                    </div>
+                    <div class="table-container" style="margin-top: 1rem;">
+                        <table id="tbl-value">
+                            <thead>
+                                <tr>
+                                    <th>Evidence ID</th>
+                                    <th>Category</th>
+                                    <th>Operational Change</th>
+                                    <th>Financial Classification</th>
+                                    <th>Evidence Grade</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody><tr><td>EV-101</td><td>Estimated Capacity</td><td>-2m / doc</td><td><span class="badge neutral">Estimated Capacity Released — Not Yet Monetized</span></td><td>Measured Operational Result</td><td><span class="badge neutral">Open</span></td></tr><tr><td>EV-102</td><td>Strategic Option</td><td>New search paradigm</td><td><span class="badge neutral">Strategic / Foundational Value — Nonfinancial</span></td><td><span class="badge gold">Estimated — Needs Review</span></td><td><span class="badge gold">Needs Review</span></td></tr><tr><td>EV-103</td><td>Hard Financial Value</td><td>Vendor SLA met</td><td><span class="badge blue">Organization Finance Review Completed — Illustrative Realized Result</span></td><td><span class="badge blue">Organization Finance Review Completed — Illustrative Demo Label</span></td><td><span class="badge neutral">Evidence Complete</span></td></tr><tr><td>EV-104</td><td>Unverified Claim</td><td>50% ROI assumed</td><td><span class="badge red">Unverified Claim — Do Not Use</span></td><td><span class="badge red">Unverified — Do Not Use</span></td><td><span class="badge red">Verify — Do Not Use Client-Facing</span></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-cost" class="view-section">
+                <div class="warning-panel">
+                    <p>AI value measurement must include more than vendor or subscription cost. This prototype organizes illustrative lifecycle-cost inputs; it does not validate accounting treatment, allocate costs for financial reporting, or provide financial assurance.</p>
+                </div>
+                <div class="panel" style="background-color: #f8fafc; border: 1px dashed var(--slate-border);">
+                    <h3 class="panel-header">Illustrative Management Calculation — Organization and Appropriate Finance Review Required</h3>
+                    <div class="grid-cols-4">
+                        <div><strong style="display:block; color:var(--text-muted); font-size:0.8rem;">Illustrative One-Time Setup</strong><span>$45,000 (Mock)</span></div>
+                        <div><strong style="display:block; color:var(--text-muted); font-size:0.8rem;">Illustrative Recurring Tech</strong><span>$1,200/mo (Mock)</span></div>
+                        <div><strong style="display:block; color:var(--text-muted); font-size:0.8rem;">Illustrative Internal Labor</strong><span>$8,500/mo (Mock)</span></div>
+                        <div><strong style="display:block; color:var(--text-muted); font-size:0.8rem;">Illustrative TCO (Year 1)</strong><span style="font-weight:bold;">$161,400 (Mock)</span></div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h3 class="panel-header">Cost Register Inputs</h3>
+                    <div class="table-container">
+                        <table id="tbl-cost">
+                            <thead>
+                                <tr>
+                                    <th>Cost ID</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Illustrative Amount</th>
+                                    <th>Assumption</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody><tr><td>CST-01</td><td>Technology</td><td>API / Token</td><td>$450/mo</td><td>1.2M tokens</td><td><span class="badge gold">Organization Finance Review Pending — Illustrative Demo Label</span></td></tr><tr><td>CST-02</td><td>Workforce</td><td>Training</td><td>$1,200</td><td>32 hours total</td><td><span class="badge blue">Organization Finance Review Completed — Illustrative Demo Label</span></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-financial" class="view-section">
+                <div class="warning-panel">
+                    <p>Planning scenarios are not realized financial results. Use only organization-approved finance assumptions and clearly distinguish forecasts, measured operational results, and finance-validated realized results. Time saved is not automatically a labor-cost saving when employees remain employed at the same cost and no documented economic outcome follows.</p>
+                </div>
+                <div class="panel">
+                    <div class="tabs">
+                        <div class="tab">Conservative Planning Case</div>
+                        <div class="tab active">Expected Planning Case</div>
+                        <div class="tab">Upside Opportunity Case</div>
+                    </div>
+                    <div style="background: #f1f5f9; padding: 1.5rem; border-radius: var(--border-radius); margin-bottom: 1.5rem;">
+                        <h4 style="margin-bottom: 1rem; color: var(--text-dark);">Illustrative Confidence-Adjusted Planning Estimate — Not a Predicted or Realized Result</h4>
+                        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                            <div class="form-group" style="margin:0; width:150px;">
+                                <label class="form-label">Gross Benefit (Mock)</label>
+                                <input type="text" class="form-control" value="$100,000" readonly="">
+                            </div>
+                            <span style="font-weight:bold; color:var(--text-muted);">×</span>
+                            <div class="form-group" style="margin:0; width:100px;">
+                                <label class="form-label">Adoption</label>
+                                <input type="text" class="form-control" value="60%" readonly="">
+                            </div>
+                            <span style="font-weight:bold; color:var(--text-muted);">×</span>
+                            <div class="form-group" style="margin:0; width:120px;">
+                                <label class="form-label">Tech Quality</label>
+                                <input type="text" class="form-control" value="85%" readonly="">
+                            </div>
+                            <span style="font-weight:bold; color:var(--text-muted);">×</span>
+                            <div class="form-group" style="margin:0; width:150px;">
+                                <label class="form-label">Economic Realization</label>
+                                <input type="text" class="form-control" value="25%" readonly="">
+                            </div>
+                            <span style="font-weight:bold; color:var(--text-muted);">=</span>
+                            <div class="form-group" style="margin:0; width:150px;">
+                                <label class="form-label">Adjusted (Mock)</label>
+                                <input type="text" class="form-control" value="$12,750" readonly="" style="font-weight:bold; background:#e0f2fe;">
+                            </div>
+                        </div>
+                    </div>
+                    <h4 style="margin-bottom:0.5rem;">Assumptions Tracker</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>Assumption Category</th><th>Value</th><th>Notes</th><th>Limitation</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Benefit Assumption</td><td>Time redirect to QA</td><td>Dependent on process redesign</td><td>Not yet monetized</td></tr>
+                                <tr><td>Economic Realization</td><td>Capacity absorption</td><td>Requires hiring freeze realization</td><td>Forecast only</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-operational" class="view-section">
+                <div class="warning-panel">
+                    <p>Operational changes may support a value hypothesis but are not automatically financial ROI. Quality, rework, exception handling, and required human review must be measured alongside speed and throughput.</p>
+                </div>
+                <div class="grid-cols-4" style="margin-bottom: 1.5rem;">
+                    <div class="kpi-card"><h4>Handling Time</h4><div class="value" style="font-size:1.25rem;">14m <span style="font-size:0.8rem;color:green;font-weight:normal;">↓ 2m</span></div></div>
+                    <div class="kpi-card"><h4>First-Pass Acceptance</h4><div class="value" style="font-size:1.25rem;">78% <span style="font-size:0.8rem;color:var(--text-muted);font-weight:normal;">Flat</span></div></div>
+                    <div class="kpi-card"><h4>Reviewer Override</h4><div class="value" style="font-size:1.25rem;">12%</div></div>
+                    <div class="kpi-card"><h4>Quality-Adj Prod. (Illustrative)</h4><div class="value" style="font-size:1.25rem;">4.2/hr</div></div>
+                </div>
+                <div class="panel">
+                    <h3 class="panel-header">Operational Workflow Metrics (Fictional Data)</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>Metric</th><th>Baseline</th><th>Current Period</th><th>Variance</th><th>Note</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Workflow Volume</td><td>1,250</td><td>1,310</td><td>+60</td><td>Expected seasonal flux</td></tr>
+                                <tr><td>Rework Time (Avg)</td><td>4.5m</td><td>3.1m</td><td>-1.4m</td><td>Attributed to AI prep</td></tr>
+                                <tr><td>Human Intervention Rate</td><td>N/A</td><td>100%</td><td>N/A</td><td>Mandatory by control design</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-adoption" class="view-section">
+                <div class="app-title-area" style="margin-bottom: 1rem;">
+                    <h2 style="font-size: 1.25rem;">Adoption and Workforce Workflow Indicators — Not Financial ROI by Themselves</h2>
+                </div>
+                <div class="warning-panel" style="border-left-color: var(--primary-blue);">
+                    <p style="color: var(--primary-blue);">This section supports training, workflow adoption, documentation, and human-review planning. It must not be used to evaluate individual employees, rank people, make employment decisions, or process applicant, protected-trait, health, disciplinary, compensation, or personnel data.</p>
+                </div>
+                <div class="panel">
+                    <h3 class="panel-header">Aggregate Deployment Indicators (Fictional)</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>Indicator</th><th>Metric (Role-Level Only)</th><th>Status</th><th>Adoption Barrier Note</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Eligible User Count</td><td>45 Roles</td><td><span class="badge neutral">Not Applicable — Documented</span></td><td>None</td></tr>
+                                <tr><td>Active User Count</td><td>32 Roles</td><td><span class="badge blue">In Progress</span></td><td>Shift scheduling conflicts</td></tr>
+                                <tr><td>Training Completion</td><td>85%</td><td><span class="badge gold">Needs Review</span></td><td>Make-up session required</td></tr>
+                                <tr><td>Manager Review Completion</td><td>100%</td><td><span class="badge neutral">Not Applicable — Documented</span></td><td>None - Enforced by system</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-controls" class="view-section">
+                <div class="warning-panel">
+                    <p>A faster AI action is not a positive value result if it bypasses required human authority, approved controls, data boundaries, safety requirements, employment safeguards, privacy considerations, or specialist review.</p>
+                </div>
+                <div class="panel">
+                    <h3 class="panel-header">Controls and Specialist Referral Workspace</h3>
+                    <div class="table-container">
+                        <table id="tbl-controls">
+                            <thead>
+                                <tr>
+                                    <th>Control / Review Item</th>
+                                    <th>Human Authority Point</th>
+                                    <th>Specialist Review Type</th>
+                                    <th>Status</th>
+                                    <th>Next Action</th>
+                                </tr>
+                            </thead>
+                            <tbody><tr><td>Data Classification Boundary</td><td>System Restrict</td><td>Information Security Review</td><td><span class="badge neutral">Evidence Complete</span></td><td><span class="badge neutral">Monitor</span></td></tr><tr><td>Output Approval</td><td>Manager Review Required</td><td><span class="badge gold">No Specialist Review Identified — Needs Review</span></td><td><span class="badge gold">Needs Review</span></td><td>Assign Reviewer</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-portfolio" class="view-section">
+                <div class="panel">
+                    <h3 class="panel-header">Executive Portfolio Summary (Fictional Data)</h3>
+                    <div class="table-container">
+                        <table id="tbl-portfolio">
+                            <thead>
+                                <tr>
+                                    <th>Use Case</th>
+                                    <th>Maturity</th>
+                                    <th>Financial Classification</th>
+                                    <th>TCO Evidence</th>
+                                    <th>Management Decision</th>
+                                </tr>
+                            </thead>
+                            <tbody><tr><td>Document Intake Assistant</td><td>Pilot</td><td><span class="badge neutral">Estimated Capacity Released — Not Yet Monetized</span></td><td>Evidence Partial</td><td>Continue Measurement</td></tr><tr><td>Invoice Exception Routing Prototype</td><td>Prototype</td><td><span class="badge red">Unverified Claim — Do Not Use</span></td><td><span class="badge gold">Unknown — Fact Intake Needed</span></td><td><span class="badge gold">Pause Pending Review</span></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-evidence" class="view-section">
+                <div class="panel">
+                    <div style="display:flex; justify-content:space-between; align-items:center;" class="panel-header">
+                        <h3>Combined Evidence Register</h3>
+                        <input type="text" class="form-control" placeholder="Search references..." style="width: 250px;">
+                    </div>
+                    <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <span class="badge neutral" style="cursor:pointer;">Use-Case Evidence</span>
+                        <span class="badge neutral" style="cursor:pointer;">Baseline Evidence</span>
+                        <span class="badge neutral" style="cursor:pointer;">Value Evidence</span>
+                        <span class="badge neutral" style="cursor:pointer;">Cost Evidence</span>
+                        <span class="badge neutral" style="cursor:pointer;">Control Evidence</span>
+                    </div>
+                    <div class="table-container">
+                        <table id="tbl-evidence">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Source / Ref</th>
+                                    <th>Grade</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody><tr><td>EV-001</td><td>Baseline Evidence</td><td>Q1 System logs export</td><td>Doc_Repo_A</td><td>Measured Operational Result</td><td><span class="badge neutral">Evidence Complete</span></td></tr><tr><td>EV-002</td><td>Cost Evidence</td><td>API Vendor Pricing Sheet</td><td>URL_Redacted</td><td><span class="badge red">Unverified — Do Not Use</span></td><td><span class="badge gold">Needs Review</span></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-actions" class="view-section">
+                <div class="panel">
+                    <h3 class="panel-header">Action Register</h3>
+                    <div class="table-container">
+                        <table id="tbl-actions">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Action</th>
+                                    <th>Owner</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody><tr><td>ACT-01</td><td>Confirm baseline measurement period</td><td>Ops Lead</td><td>P1 8–30 Days</td><td><span class="badge neutral">Open</span></td></tr><tr><td>ACT-02</td><td>Schedule Privacy Review</td><td>Program Mgr</td><td>U2 2–7 Days</td><td><span class="badge blue">In Progress</span></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-export" class="view-section">
+                <div class="panel">
+                    <h3 class="panel-header">Review, Export, and Handoff</h3>
+                    <div class="grid-cols-2" style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <button class="btn btn-secondary" onclick="alert(&#39;Demo: Generated summary metrics.&#39;)">Generate Review Summary</button>
+                            <button class="btn btn-secondary" onclick="alert(&#39;Demo: Exporting CSV of active table view.&#39;)">Export Current Filtered Table to CSV</button>
+                            <button class="btn btn-primary" onclick="alert(&#39;Demo: Exporting full portfolio CSV.&#39;)">Export Demo AI Value Summary (CSV)</button>
+                            <button class="btn btn-secondary" onclick="window.print()">Print / Save as PDF</button>
+                            <button class="btn btn-secondary" onclick="location.reload()" style="color: #b91c1c; border-color: #fca5a5;">Demo Data Reset</button>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Note: Changes reset on refresh unless exported.</p>
+                        </div>
+                        <div>
+                            <label class="form-label">Handoff Notes for Claude Review</label>
+                            <textarea class="form-control" rows="10" readonly="">Purpose: [Fictional Review]
+Use-case scope: Document Intake
+Workflow boundary: Pre-manager review stage
+Baseline inputs: Q1 historical average
+Cost inputs: Setup + Monthly allocation
+Value hypothesis: Capacity release for QA
+Financial classification: Estimated Capacity Released — Not Yet Monetized
+Operational metrics: 14m handling time
+Adoption indicators: 32 active roles
+Human/Specialist review: Manager approval required; Privacy Review Pending
+Claim boundaries: Acknowledged
+Open questions: None
+Management decision needed: Continue Measurement</textarea>
+                            <button class="btn btn-secondary" style="margin-top: 0.5rem;" onclick="alert(&#39;Copied to clipboard (Demo)&#39;)">Copy Handoff Notes</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="app-footer">
+                <div class="footer-links">
+                    <a onclick="openModal(&#39;modal-credentials&#39;)">Practitioner Credentials &amp; Experience</a>
+                    <span>|</span>
+                    <a onclick="openModal(&#39;modal-claim&#39;)">Claim Boundaries</a>
+                </div>
+                Gannon Compliance Group provides non-legal operational-readiness, documentation, workflow-design, training-support, implementation-support, evidence-management, accountability, human-review, and specialist-referral services. This prototype is not legal advice, a legal opinion, a legal-compliance certification, a financial audit, accounting assurance, tax or investment advice, a valuation opinion, financial assurance, a technical AI audit, AI certification, model validation, privacy impact assessment, cybersecurity assessment, psychometric assessment, employment-decision tool, incident-investigation tool, behavioral threat assessment, emergency-response system, safety-engineering opinion, technical security assessment, or guarantee of ROI, savings, revenue, margin, payback, risk reduction, or other outcomes. Users and organizations remain responsible for their decisions and should obtain qualified finance, accounting, tax, legal, HR, privacy, technical, security, safety, or other specialist review when appropriate.
+            </footer>
+
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modal-claim">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 1rem;">Claim Boundaries</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-muted);">
+                The dashboard is a fictional or fully redacted portfolio demonstration artifact. It is not a deployed client system, legal product, legal opinion, compliance certification, AI audit, technical AI assurance, model validation system, cybersecurity assessment, privacy impact assessment, accounting system, financial audit, tax tool, investment tool, valuation tool, financial assurance product, employment-decision system, workforce-evaluation tool, psychometric instrument, safety-engineering opinion, security assessment, behavioral threat-assessment tool, incident-investigation tool, emergency-response system, or guarantee of outcomes.
+            </p>
+            <button class="btn btn-primary" onclick="closeModal(&#39;modal-claim&#39;)">Acknowledge &amp; Close</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-credentials">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 1rem;">Practitioner Credentials &amp; Experience</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-muted);">
+                <strong>Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA</strong>
+            </p>
+            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-muted);">
+                Gary M. Gannon brings 29 years of California executive operations experience spanning security, HR, safety, compliance, workforce operations, licensing, fleet, client service, and 24/7 operational coordination. His background includes recurring workforce training and hands-on executive-level work in prominent multi-employer retail, office, commercial-property, industrial, and field-service environments.
+            </p>
+            <ul style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; padding-left: 1.5rem;">
+                <li>CPP® and PSP® are active ASIS professional certifications.</li>
+                <li>SHRM-SCP® is an active senior HR professional certification.</li>
+                <li>SHRM-CA® and SHRM-PA® are SHRM Specialty Credentials.</li>
+                <li>ISO/IEC 42001 Lead Implementer coursework is completed; the examination is pending.</li>
+                <li>ASIS Essentials (e.g., Workplace Violence Prevention, Security Risk Assessment) are certificate courses, not board certifications.</li>
+            </ul>
+            <p style="font-size: 0.85rem; margin-bottom: 1rem; color: var(--banner-red); font-weight:600;">
+                Credentials do not certify Gary or GCG in AI governance, California legal practice, Cal/OSHA compliance, behavioral threat assessment, safety engineering, cybersecurity, privacy assessment, technical AI assurance, accounting, tax, finance, valuation, employment decisions, or psychometrics.
+            </p>
+            <button class="btn btn-primary" onclick="closeModal(&#39;modal-credentials&#39;)">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const mockInventory = [
+            { id: "UC-001", name: "Document Intake Assistant", function: "Operations", type: "Workflow Automation", autonomy: "AI Recommends for Human Review", maturity: "Pilot", status: "In Progress" },
+            { id: "UC-002", name: "Internal Policy Search Helper", function: "HR Ops", type: "Embedded AI Feature", autonomy: "Human Creates or Uses Output", maturity: "Limited Production", status: "Ready for Management Review" },
+            { id: "UC-003", name: "Invoice Exception Routing Prototype", function: "Finance Ops", type: "Decision Support", autonomy: "AI Recommends for Human Review", maturity: "Prototype", status: "Needs Review" }
+        ];
+
+        const mockBaselines = [
+            { id: "BL-001", useCase: "UC-001", metric: "Handling Time", preVal: "16 min", control: "Manager Sign-off", limitations: "Seasonality unadjusted" },
+            { id: "BL-002", useCase: "UC-002", metric: "Search Time", preVal: "8 min", control: "System Log", limitations: "Estimated from survey" }
+        ];
+
+        const mockValue = [
+            { id: "EV-101", cat: "Estimated Capacity", change: "-2m / doc", finClass: "Estimated Capacity Released — Not Yet Monetized", grade: "Measured Operational Result", status: "Open" },
+            { id: "EV-102", cat: "Strategic Option", change: "New search paradigm", finClass: "Strategic / Foundational Value — Nonfinancial", grade: "Estimated — Needs Review", status: "Needs Review" },
+            { id: "EV-103", cat: "Hard Financial Value", change: "Vendor SLA met", finClass: "Organization Finance Review Completed — Illustrative Realized Result", grade: "Organization Finance Review Completed — Illustrative Demo Label", status: "Evidence Complete" },
+            { id: "EV-104", cat: "Unverified Claim", change: "50% ROI assumed", finClass: "Unverified Claim — Do Not Use", grade: "Unverified — Do Not Use", status: "Verify — Do Not Use Client-Facing" }
+        ];
+
+        const mockCost = [
+            { id: "CST-01", cat: "Technology", type: "API / Token", amt: "$450/mo", assumption: "1.2M tokens", status: "Organization Finance Review Pending — Illustrative Demo Label" },
+            { id: "CST-02", cat: "Workforce", type: "Training", amt: "$1,200", assumption: "32 hours total", status: "Organization Finance Review Completed — Illustrative Demo Label" }
+        ];
+
+        const mockControls = [
+            { item: "Data Classification Boundary", authority: "System Restrict", specialist: "Information Security Review", status: "Evidence Complete", action: "Monitor" },
+            { item: "Output Approval", authority: "Manager Review Required", specialist: "No Specialist Review Identified — Needs Review", status: "Needs Review", action: "Assign Reviewer" }
+        ];
+
+        const mockPortfolio = [
+            { uc: "Document Intake Assistant", maturity: "Pilot", finClass: "Estimated Capacity Released — Not Yet Monetized", tco: "Evidence Partial", decision: "Continue Measurement" },
+            { uc: "Invoice Exception Routing Prototype", maturity: "Prototype", finClass: "Unverified Claim — Do Not Use", tco: "Unknown — Fact Intake Needed", decision: "Pause Pending Review" }
+        ];
+
+        const mockEvidence = [
+            { id: "EV-001", type: "Baseline Evidence", desc: "Q1 System logs export", ref: "Doc_Repo_A", grade: "Measured Operational Result", status: "Evidence Complete" },
+            { id: "EV-002", type: "Cost Evidence", desc: "API Vendor Pricing Sheet", ref: "URL_Redacted", grade: "Unverified — Do Not Use", status: "Needs Review" }
+        ];
+
+        const mockActions = [
+            { id: "ACT-01", action: "Confirm baseline measurement period", owner: "Ops Lead", priority: "P1 8–30 Days", status: "Open" },
+            { id: "ACT-02", action: "Schedule Privacy Review", owner: "Program Mgr", priority: "U2 2–7 Days", status: "In Progress" }
+        ];
+
+        function renderTable(tableId, data, columns) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                columns.forEach(col => {
+                    const td = document.createElement('td');
+                    let val = row[col];
+                    if (typeof val === 'string') {
+                        if (val.includes('Do Not Use') || val.includes('Retired')) {
+                            td.innerHTML = `<span class="badge red">${val}</span>`;
+                        } else if (val.includes('Needs Review') || val.includes('Pending') || val.includes('Fact Intake Needed')) {
+                            td.innerHTML = `<span class="badge gold">${val}</span>`;
+                        } else if (val.includes('In Progress') || val.includes('Completed') || val.includes('Forecast')) {
+                            td.innerHTML = `<span class="badge blue">${val}</span>`;
+                        } else if (val === 'Open' || val.includes('Documented') || val.includes('Monitor') || val.includes('Not Yet Monetized') || val.includes('Nonfinancial') || val.includes('Evidence Complete')) {
+                            td.innerHTML = `<span class="badge neutral">${val}</span>`;
+                        } else {
+                            td.textContent = val;
+                        }
+                    } else {
+                        td.textContent = val;
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function init() {
+            renderTable('tbl-inventory', mockInventory, ['id', 'name', 'function', 'type', 'autonomy', 'maturity', 'status']);
+            renderTable('tbl-baseline', mockBaselines, ['id', 'useCase', 'metric', 'preVal', 'control', 'limitations']);
+            renderTable('tbl-value', mockValue, ['id', 'cat', 'change', 'finClass', 'grade', 'status']);
+            renderTable('tbl-cost', mockCost, ['id', 'cat', 'type', 'amt', 'assumption', 'status']);
+            renderTable('tbl-controls', mockControls, ['item', 'authority', 'specialist', 'status', 'action']);
+            renderTable('tbl-portfolio', mockPortfolio, ['uc', 'maturity', 'finClass', 'tco', 'decision']);
+            renderTable('tbl-evidence', mockEvidence, ['id', 'type', 'desc', 'ref', 'grade', 'status']);
+            renderTable('tbl-actions', mockActions, ['id', 'action', 'owner', 'priority', 'status']);
+        }
+
+        const navItems = document.querySelectorAll('.nav-item');
+        const views = document.querySelectorAll('.view-section');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const target = item.getAttribute('data-target');
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                views.forEach(view => {
+                    view.classList.remove('active');
+                    if (view.id === target) {
+                        view.classList.add('active');
+                    }
+                });
+                document.querySelector('.content-scroll').scrollTop = 0;
+            });
+        });
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+</body></html>

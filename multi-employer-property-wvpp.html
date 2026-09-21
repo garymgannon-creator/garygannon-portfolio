@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCG California SB 553 Readiness & Evidence Control Prototype</title>
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-sidebar: #0f172a;
+            --bg-card: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --text-light: #f8fafc;
+            --border-color: #e2e8f0;
+            --primary-color: #1e293b;
+            --accent-color: #3b82f6;
+            --focus-ring: #60a5fa;
+            
+            /* Neutral Status Colors Only - No Evaluative Red/Green */
+            --status-neutral: #94a3b8;
+            --status-open: #d97706; /* amber-600 */
+            --status-progress: #0284c7; /* sky-600 */
+            --status-review: #4f46e5; /* indigo-600 */
+            --status-specialist: #7e22ce; /* purple-700 */
+            --status-complete: #475569; /* slate-600 */
+            
+            --panel-alert-bg: #fffbeb; /* amber-50 */
+            --panel-alert-border: #fde68a; /* amber-200 */
+            --panel-alert-text: #92400e; /* amber-900 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .disclaimer-banner {
+            background-color: #1e293b;
+            color: #fca5a5;
+            text-align: center;
+            padding: 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .system-note {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            border-bottom: 1px solid #bae6fd;
+            font-weight: 500;
+        }
+
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            min-width: 280px;
+            background-color: var(--bg-sidebar);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            border-right: 1px solid var(--primary-color);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            background-color: #020617;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            line-height: 1.4;
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+            color: #cbd5e1;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #1e293b;
+            border-left-color: var(--accent-color);
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .nav-item:focus {
+            outline: 2px solid var(--focus-ring);
+            outline-offset: -2px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .top-actions {
+            padding: 1rem 2rem;
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .btn {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
+            color: var(--text-main);
+            padding: 0.4rem 0.85rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover { background-color: #e2e8f0; }
+        .btn:focus { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .btn-primary:hover { background-color: #334155; }
+
+        .dashboard-header {
+            padding: 2rem 2rem 0 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .dashboard-main-title {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-sub-title {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .module-container {
+            padding: 0 2rem 3rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .module-title {
+            font-size: 1.35rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .module-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .notice-panel {
+            background-color: var(--panel-alert-bg);
+            border: 1px solid var(--panel-alert-border);
+            border-radius: 6px;
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .notice-panel h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--panel-alert-text);
+        }
+
+        .notice-panel .panel-text {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--panel-alert-text);
+        }
+
+        .profile-panel {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .profile-panel h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary-color);
+        }
+
+        .profile-panel h4 { 
+            margin-top: 1.5rem; 
+            margin-bottom: 0.75rem; 
+            color: #475569;
+            font-size: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.25rem;
+        }
+        
+        .profile-panel .panel-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .tag {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .metric-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 300px;
+            font-size: 0.85rem;
+        }
+        .search-input:focus { outline: 2px solid var(--focus-ring); border-color: transparent; }
+
+        .table-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.8rem;
+        }
+
+        th, td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            white-space: nowrap;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: #f8fafc; }
+
+        /* Strictly Neutral Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            white-space: nowrap;
+        }
+
+        /* Neutral mapping avoiding semantic pass/fail colors */
+        .status-Open { background-color: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .status-In-Progress { background-color: #e0f2fe; color: #075985; border-color: #bae6fd; }
+        .status-Needs-Review { background-color: #f3f4f6; color: #374151; border-color: #d1d5db; }
+        .status-Ready-for-Management-Review { background-color: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+        .status-Specialist-Review-Flag { background-color: #f3e8ff; color: #6b21a8; border-color: #e9d5ff; }
+        
+        .status-Evidence-Complete { background-color: #e2e8f0; color: #334155; border-color: #94a3b8; }
+        .status-Evidence-Partial { background-color: #f8fafc; color: #475569; border-color: #cbd5e1; }
+        .status-Unknown---Fact-Intake-Needed { background-color: #ffedd5; color: #9a3412; border-color: #fed7aa; }
+        
+        .status-Current-Statutory-Baseline---Review-Date-Logged,
+        .status-Current-Statutory-Baseline { background-color: #f1f5f9; color: #334155; border-color: #cbd5e1; }
+        
+        .status-ProposedDraft---Monitor { background-color: #ffffff; color: #64748b; border: 1px dashed #94a3b8; }
+        .status-Official-Guidance---Monitor { background-color: #f8fafc; color: #475569; border-color: #cbd5e1; }
+        
+        .status-Verify---Do-Not-Use-Client-Facing { background-color: #fef2f2; color: #991b1b; border-color: #fecaca; }
+        .status-Retired---Do-Not-Use { background-color: #e5e5e5; color: #525252; border-color: #d4d4d4; }
+        .status-Adopted---Effective-Date-Not-Verified { background-color: #f0fdf4; color: #166534; border-color: #bbf7d0; } /* Neutral success style allowed here for adoption state ONLY, strictly avoiding 'compliant' */
+
+
+        .workflow-visual {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin: 1.5rem 0;
+            background: #ffffff;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+        
+        .workflow-step {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 1rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            flex: 1;
+            min-width: 140px;
+            text-align: center;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .workflow-arrow { color: #94a3b8; font-size: 1.25rem; font-weight: bold; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 750px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8fafc;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .modal-header h2 { font-size: 1.15rem; color: var(--primary-color); }
+
+        .modal-content {
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+        
+        .modal-content ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        .modal-content li { margin-bottom: 0.5rem; }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+        }
+        .close-btn:hover { color: var(--primary-color); }
+
+        .app-footer {
+            background-color: var(--primary-color);
+            color: #cbd5e1;
+            padding: 1.5rem 2rem;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            text-align: justify;
+            border-top: 4px solid #334155;
+        }
+
+        @media print {
+            .sidebar, .top-actions, .disclaimer-banner, .system-note, .table-controls, .btn {
+                display: none !important;
+            }
+            .app-container { overflow: visible; height: auto; }
+            .main-content { overflow: visible; border: none; }
+            body { background: white; color: black; display: block; height: auto;}
+            .module-container, .dashboard-header { padding: 0; max-width: 100%; margin-bottom: 1rem;}
+            .table-wrapper { border: 1px solid #000; overflow: visible; }
+            th, td { border-bottom: 1px solid #000; padding: 0.5rem; font-size: 9pt; }
+            .status-badge { border: 1px solid #000; color: #000; background: none; }
+            .metric-card { border: 1px solid #000; break-inside: avoid; }
+        }
+        
+        .specialist-text { 
+            font-weight: 600; 
+            color: #7e22ce; 
+            display: block; 
+            margin-top: 0.35rem; 
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="disclaimer-banner">
+        “ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY — NOT LEGAL ADVICE OR A COMPLIANCE DETERMINATION.”
+    </div>
+    <div class="system-note">
+        “Prototype uses in-browser demonstration data; changes reset on refresh unless exported.”
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Illustrative Central Valley Property Operations Group</h2>
+                <p>Readiness & Evidence Control</p>
+            </div>
+            <ul class="nav-list" id="nav-list" role="navigation" aria-label="Main Navigation">
+                <li class="nav-item active" data-target="mod-1" tabindex="0">1. Executive Signal</li>
+                <li class="nav-item" data-target="mod-2" tabindex="0">2. Current Statutory Baseline</li>
+                <li class="nav-item" data-target="mod-3" tabindex="0">3. Official Guidance Reference</li>
+                <li class="nav-item" data-target="mod-4" tabindex="0">4. Draft / Future-State Monitor</li>
+                <li class="nav-item" data-target="mod-5" tabindex="0">5. Multi-Employer Fact Intake</li>
+                <li class="nav-item" data-target="mod-6" tabindex="0">6. Property / Work Area Review</li>
+                <li class="nav-item" data-target="mod-7" tabindex="0">7. Employer Coordination Map</li>
+                <li class="nav-item" data-target="mod-8" tabindex="0">8. Employee Participation & Reporting Workflow</li>
+                <li class="nav-item" data-target="mod-9" tabindex="0">9. Training Support Register</li>
+                <li class="nav-item" data-target="mod-10" tabindex="0">10. Records Request & Retention Tracker</li>
+                <li class="nav-item" data-target="mod-11" tabindex="0">11. Change Trigger Register</li>
+                <li class="nav-item" data-target="mod-12" tabindex="0">12. Action Accountability Register</li>
+                <li class="nav-item" data-target="mod-13" tabindex="0">13. Document & Evidence Register</li>
+                <li class="nav-item" data-target="mod-14" tabindex="0">14. Attorney / Specialist Review Flags</li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-actions">
+                <button class="btn" onclick="openModal('how-to-modal')" aria-label="Open How To Use modal">How to Use This Prototype</button>
+                <button class="btn" onclick="openModal('boundaries-modal')" aria-label="Open Claim Boundaries modal">Claim Boundaries</button>
+                <button class="btn" onclick="exportToCSV()" aria-label="Export table to CSV">Export Current View (CSV)</button>
+                <button class="btn" onclick="window.print()" aria-label="Print or save as PDF">Print / PDF</button>
+                <button class="btn btn-primary" onclick="resetDemoData()" aria-label="Reset demonstration data">Demo Data Reset</button>
+            </div>
+
+            <div class="dashboard-header">
+                <h1 class="dashboard-main-title">California Workplace Violence Prevention<br>Multi-Employer Property Readiness & Evidence Control Prototype</h1>
+                <p class="dashboard-sub-title">A fictional operational-readiness, documentation, training-support, workforce-communication, evidence-management, action-accountability, source-monitoring, and specialist-referral demonstration for multi-employer property environments.</p>
+            </div>
+
+            <div class="module-container" id="module-render-area" role="region" aria-live="polite">
+                <!-- Content injected dynamically via JS -->
+            </div>
+        </main>
+    </div>
+
+    <footer class="app-footer">
+        “Gannon Compliance Group provides non-legal operational-readiness, documentation, workflow-design, training-support, implementation-support, evidence-management, accountability, human-review, and specialist-referral services. This prototype is not legal advice, a legal opinion, a legal-compliance certification, a Cal/OSHA audit, an incident-investigation tool, behavioral threat assessment, emergency-response system, safety-engineering opinion, technical security assessment, technical AI audit, privacy assessment, cybersecurity assessment, or guarantee of outcomes. Employers remain responsible for their decisions and should obtain qualified attorney review after using GCG services.”
+    </footer>
+
+    <div id="how-to-modal" class="modal-overlay" onclick="closeModal(event, 'how-to-modal')" role="dialog" aria-modal="true" aria-labelledby="how-to-title">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="how-to-title">How to Use This Prototype</h2>
+                <button class="close-btn" onclick="closeModal(null, 'how-to-modal')" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <ol>
+                    <li>Start with employer fact intake.</li>
+                    <li>Organize work areas, operations, shifts, workforce groups, employer interfaces, tenant/vendor interfaces, contractor interfaces, and work-location-control facts.</li>
+                    <li>Map documentation and evidence for management review.</li>
+                    <li>Track employee-participation and workforce-communication evidence.</li>
+                    <li>Track training-support evidence for employees and supervisors.</li>
+                    <li>Track records-request workflow dates and custodians.</li>
+                    <li>Record operational changes that may require management review.</li>
+                    <li>Assign internal actions and specialist-review flags.</li>
+                    <li>Separate current statutory readiness controls, official guidance references, and draft/future-state monitoring.</li>
+                    <li>Route legal, HR, safety, security, facilities, privacy, health-care, workers’ compensation, contract, reporting, and threat-management questions to qualified client professionals.</li>
+                    <li>Obtain qualified attorney review after GCG services are used.</li>
+                    <li>Keep data fictional/redacted unless a separate approved client data-governance process exists.</li>
+                    <li>Do not treat dashboard status labels as legal conclusions.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div id="boundaries-modal" class="modal-overlay" onclick="closeModal(event, 'boundaries-modal')" role="dialog" aria-modal="true" aria-labelledby="boundaries-title">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="boundaries-title">Claim Boundaries</h2>
+                <button class="close-btn" onclick="closeModal(null, 'boundaries-modal')" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <p>“GCG supports operational readiness, documentation, workflow design, training-support structure, evidence management, action accountability, human-review controls, and specialist referral. GCG does not provide legal advice, legal opinions, legal-compliance certification, Cal/OSHA audits, incident investigation, behavioral threat assessment, emergency response, safety-engineering opinions, physical-security certification, technical security assessment, technical AI audit, cybersecurity assessment, privacy impact assessment, enforcement analysis, penalty calculation, or guarantees of outcomes.”</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const demoData = {
+            m3_guidance: [
+                { category: "Official workforce guidance reference", status: "Official Guidance — Monitor", reviewed: "2023-10-15", next: "2024-10-15", owner: "HR Operations Lead", notes: "General reference document logged." },
+                { category: "Official employer information resource", status: "Verify — Do Not Use Client-Facing", reviewed: "2023-11-01", next: "2024-05-01", owner: "Compliance Liaison", notes: "Pending internal verification." },
+                { category: "Model/template reference", status: "Official Guidance — Monitor", reviewed: "2024-01-10", next: "2024-07-10", owner: "Document Controller", notes: "Used for baseline structural reference." },
+                { category: "Official health-care separate-framework reference", status: "Retired — Do Not Use", reviewed: "2022-05-01", next: "-", owner: "Archive", notes: "Superseded by recent guidance." }
+            ],
+            m4_drafts: [
+                { item: "Illustrative general-industry future-state monitoring item.", stage: "Formal Notice Not Verified", type: "Proposed Rule", lastRev: "2024-02-15", nextRev: "2024-03-15", owner: "Policy Team", gate: "Internal Review Only", status: "Proposed/Draft — Monitor" },
+                { item: "Illustrative advisory-material archive.", stage: "Discussion / Advisory Material", type: "Hearing Notes", lastRev: "2023-12-01", nextRev: "2024-06-01", owner: "Compliance Liaison", gate: "Do Not Distribute", status: "Proposed/Draft — Monitor" },
+                { item: "Illustrative potential regulatory update.", stage: "Adoption Not Verified", type: "Draft Rule", lastRev: "2024-01-20", nextRev: "2024-02-28", owner: "Policy Team", gate: "Pending OAL", status: "Adopted — Effective Date Not Verified" },
+                { item: "Illustrative OAL-status verification item.", stage: "OAL Action Not Verified", type: "Notice Register", lastRev: "2024-02-10", nextRev: "2024-03-01", owner: "Legal Liaison", gate: "Internal Review Only", status: "Proposed/Draft — Monitor" }
+            ],
+            m5_factIntake: [
+                { employer: "Illustrative Property Operations Employer", area: "Illustrative Retail Commons", workerGroup: "daytime operations", shift: "Business Hours", publicInterface: "public interface", control: "Common Area Control", otherInterface: "shared tenant/vendor activity", tenantCoord: "Active", hcScreen: "N/A", locScreen: "Completed", specReview: "Not Required", status: "Ready for Management Review" },
+                { employer: "Illustrative Contract Security Employer", area: "Illustrative Shared Parking Area", workerGroup: "evening operations", shift: "Swing/Graveyard", publicInterface: "public interface", control: "Contracted Zone", otherInterface: "service-provider coordination", tenantCoord: "Active", hcScreen: "N/A", locScreen: "Pending", specReview: "Security Review", status: "Specialist Review Flag" },
+                { employer: "Illustrative Office Tenant Employer", area: "Illustrative Office Tower A", workerGroup: "business hours", shift: "Standard", publicInterface: "controlled workplace", control: "Leased Premises", otherInterface: "tenant-operation context", tenantCoord: "Limited", hcScreen: "N/A", locScreen: "Completed", specReview: "Not Required", status: "Evidence Complete" },
+                { employer: "Illustrative Maintenance Vendor", area: "Illustrative Loading / Service Area", workerGroup: "early shift", shift: "Early Morning", publicInterface: "Limited", control: "Shared Utility Area", otherInterface: "vendor/contractor coordination", tenantCoord: "Active", hcScreen: "N/A", locScreen: "Completed", specReview: "Facilities Review", status: "In Progress" },
+                { employer: "Illustrative Remote Administrative Worker", area: "Illustrative Employee-Choice Remote Work Arrangement", workerGroup: "hybrid schedule", shift: "Variable", publicInterface: "Remote", control: "Unknown", otherInterface: "None", tenantCoord: "N/A", hcScreen: "N/A", locScreen: "Pending", specReview: "HR Review", status: "Unknown — Fact Intake Needed" }
+            ],
+            m7_coordination: [
+                { party: "Illustrative Property Operations Employer", area: "Illustrative Retail Commons", group: "Core Staff", role: "Property Manager", comm: "Bulletin & Briefing", trainStat: "Documented", route: "Prop Ops Intake", date: "2024-01-15", flag: "None", status: "Ready for Management Review" },
+                { party: "Illustrative Cleaning Contractor", area: "Illustrative Evening Operations Zone", group: "Janitorial", role: "Vendor Supervisor", comm: "Contractor Briefing", trainStat: "Vendor Responsibility", route: "Vendor Dispatch", date: "2024-02-01", flag: "Contract Review", status: "Needs Review" },
+                { party: "Illustrative Retail Tenant Employer", area: "Illustrative Tenant Service Corridor", group: "Store Staff", role: "Store Manager", comm: "Lease Addendum Notice", trainStat: "Tenant Responsibility", route: "Tenant HR", date: "2024-01-20", flag: "Shared-Worksite Review", status: "In Progress" }
+            ],
+            m9_training: [
+                { id: "TRN-001", topic: "Illustrative Workforce Reporting and Communication Overview", role: "All Employees", area: "Illustrative Retail Commons", ref: "Doc-A1", initDate: "2023-05-10", annDate: "2024-05-10", delivDate: "2023-05-10", fac: "HR Rep", lang: "English/Spanish verified", qa: "Yes", evStat: "Logged", followUp: "None", status: "Evidence Complete" },
+                { id: "TRN-002", topic: "Illustrative Evening Operations Communication Session", role: "Evening Staff", area: "Illustrative Evening Operations Zone", ref: "Doc-B2", initDate: "2023-11-01", annDate: "2024-11-01", delivDate: "2023-11-01", fac: "Ops Manager", lang: "English verified", qa: "Yes", evStat: "Partial", followUp: "Collect absent signatures", status: "Evidence Partial" },
+                { id: "TRN-003", topic: "Illustrative Contractor / Vendor Site Orientation", role: "Contractors", area: "Illustrative Loading / Service Area", ref: "Doc-C3", initDate: "2024-01-15", annDate: "2025-01-15", delivDate: "2024-01-15", fac: "Facilities Lead", lang: "English verified", qa: "No", evStat: "Logged", followUp: "Review Q&A format", status: "Needs Review" }
+            ],
+            m10_requests: [
+                { reqId: "REQ-088", reqCat: "Internal Audit", date: "2024-02-10", target: "2024-02-24", recCat: "Work-area review records", cust: "Ops Manager", privFlag: "None", deliv: "Pending Compilation", link: "Folder-A", status: "Open" },
+                { reqId: "REQ-089", reqCat: "Employee Representative", date: "2024-02-12", target: "2024-02-27", recCat: "Illustrative incident-log workflow records", cust: "HR Lead", privFlag: "Privacy / Counsel Review Flag", deliv: "Under Review", link: "Restricted-B", status: "Specialist Review Flag" }
+            ],
+            m10_retention: [
+                { category: "Training-support records", start: "2023-05-10", review: "2024-05-10", cust: "HR Records", restFlag: "No", status: "Current Statutory Baseline — Review Date Logged" },
+                { category: "Document/evidence register entry", start: "2024-01-01", review: "2025-01-01", cust: "Compliance Ops", restFlag: "No", status: "Current Statutory Baseline — Review Date Logged" }
+            ],
+            m11_triggers: [
+                { trgId: "TRG-01", type: "New evening operating hours.", date: "2024-02-15", area: "Illustrative Retail Commons", desc: "Change in operational hours noted.", impact: "Evening comms workflow", mgmtReq: "Yes", flag: "Security Review", owner: "Ops Director", due: "2024-03-01", link: "N/A", status: "Open" },
+                { trgId: "TRG-02", type: "New office tenant occupancy.", date: "2024-02-18", area: "Illustrative Office Tower B", desc: "New entity entered workspace.", impact: "Coordination mapping", mgmtReq: "Yes", flag: "None", owner: "Prop Manager", due: "2024-03-15", link: "N/A", status: "In Progress" },
+                { trgId: "TRG-03", type: "Official-source update requiring review.", date: "2024-02-20", area: "All", desc: "Monitor flagged new guidance document.", impact: "Plan reference check", mgmtReq: "Yes", flag: "Attorney Review", owner: "Legal Liaison", due: "2024-03-10", link: "N/A", status: "Specialist Review Flag" }
+            ],
+            m12_actions: [
+                { actId: "ACT-101", source: "Management Review", stmt: "Confirm workforce communication channel documentation.", area: "Illustrative Shared Parking Area", owner: "Comms Lead", due: "2024-03-05", status: "Open", flag: "None", link: "Task-A", mgmtRev: "Pending" },
+                { actId: "ACT-102", source: "Change Trigger", stmt: "Route specialized-framework question to qualified professional.", area: "Illustrative Mobile / Contractor Work Area", owner: "HR Director", due: "2024-02-28", status: "Specialist Review Flag", flag: "Health-Care Specialized Review", link: "Task-B", mgmtRev: "In Progress" },
+                { actId: "ACT-103", source: "Routine Schedule", stmt: "Log official-source review date.", area: "Global", owner: "Compliance Admin", due: "2024-02-25", status: "Ready for Management Review", flag: "None", link: "Task-C", mgmtRev: "Ready" }
+            ],
+            m13_docs: [
+                { doc: "Illustrative Working Program Draft", ver: "v1.2", owner: "Ops Director", date: "2024-01-15", access: "General Operational", note: "Annual baseline", status: "Current Statutory Baseline — Review Date Logged" },
+                { doc: "Illustrative Multi-Employer Coordination Map", ver: "v2.0", owner: "Prop Manager", date: "2024-02-01", access: "Restricted Operational", note: "Contains vendor contacts", status: "Ready for Management Review" },
+                { doc: "Illustrative Attorney / Specialist Flag Log", ver: "v1.0", owner: "Legal Liaison", date: "2024-02-20", access: "Attorney / Specialist Review", note: "Privilege review required", status: "Specialist Review Flag" }
+            ],
+            m14_flags: [
+                { flagId: "FLG-001", facts: "Contractor requesting access to sensitive operations zone.", owner: "Legal / Security Review", q: "Does agreement cover coordination duties?", gcg: "Flagged interface point for review. Specialist Review Flag — GCG does not make the final determination.", status: "Needs Review" },
+                { flagId: "FLG-002", facts: "Records request received from representative regarding evening incident workflow.", owner: "Privacy / Counsel Review", q: "What redactions are legally required prior to disclosure?", gcg: "Tracked workflow dates and custodian routing. Specialist Review Flag — GCG does not make the final determination.", status: "Open" },
+                { flagId: "FLG-003", facts: "Tenant mapping indicates potential healthcare specialized operations.", owner: "Health-Care Specialized Review", q: "Does Title 8 §3342 apply to this specific suite?", gcg: "Organized intake facts for specialist determination. Specialist Review Flag — GCG does not make the final determination.", status: "In Progress" }
+            ]
+        };
+
+        let currentActiveData = []; // State for CSV export
+
+        document.getElementById('nav-list').addEventListener('click', function(e) {
+            if (e.target.classList.contains('nav-item')) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                e.target.classList.add('active');
+                renderModule(e.target.getAttribute('data-target'));
+            }
+        });
+
+        document.getElementById('nav-list').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.classList.contains('nav-item')) {
+                e.target.click();
+            }
+        });
+
+        function renderModule(modId) {
+            const container = document.getElementById('module-render-area');
+            container.innerHTML = '';
+            currentActiveData = []; // reset
+
+            switch(modId) {
+                case 'mod-1': renderMod1(container); break;
+                case 'mod-2': renderMod2(container); break;
+                case 'mod-3': renderTableModule(container, 'Official Guidance Reference', 'Official guidance supports internal implementation reference. It is not a substitute for current statute, adopted regulation, attorney review, or worksite-specific specialist review.', demoData.m3_guidance, ['Category', 'Status', 'Reviewed', 'Next', 'Owner', 'Notes']); break;
+                case 'mod-4': renderTableModule(container, 'Draft / Future-State Monitor — Not Current Enforceable Requirements', 'Draft, advisory, agenda, public-comment, hearing, and discussion materials are not treated in this prototype as enforceable requirements. Regulatory status must be verified from current official California sources before external use.', demoData.m4_drafts, ['Item', 'Stage', 'Type', 'LastRev', 'NextRev', 'Owner', 'Gate', 'Status']); break;
+                case 'mod-5': renderTableModule(container, 'Multi-Employer Fact Intake', 'Fact intake organizes information for employer and qualified-review discussion. It does not determine legal coverage, exemption status, employer responsibility, worksite control, record-disclosure duties, or compliance.', demoData.m5_factIntake, ['Employer', 'Area', 'WorkerGroup', 'Shift', 'PublicInterface', 'Control', 'OtherInterface', 'TenantCoord', 'HcScreen', 'LocScreen', 'SpecReview', 'Status'], true); break;
+                case 'mod-6': renderMod6(container); break;
+                case 'mod-7': renderTableModule(container, 'Employer Coordination Map', 'Coordination mapping supports organized communication and documentation. It does not allocate legal responsibility, determine employer control, direct public safety, resolve contractual duties, or replace attorney review.', demoData.m7_coordination, ['Party', 'Area', 'Group', 'Role', 'Comm', 'TrainStat', 'Route', 'Date', 'Flag', 'Status']); break;
+                case 'mod-8': renderMod8(container); break;
+                case 'mod-9': renderTableModule(container, 'Training Support Register', 'GCG may support training workflow, documentation, and readiness structure. Employers remain responsible for content, delivery, workforce communication, and qualified legal/specialist review appropriate to their operations.', demoData.m9_training, ['ID', 'Topic', 'Role', 'Area', 'Ref', 'InitDate', 'AnnDate', 'DelivDate', 'Fac', 'Lang', 'QA', 'EvStat', 'FollowUp', 'Status']); break;
+                case 'mod-10': renderMod10(container); break;
+                case 'mod-11': renderTableModule(container, 'Change Trigger Register', 'A change trigger prompts review and documentation. It does not establish a legal violation, hazard conclusion, legal duty, required control, safety condition, enforcement issue, or compliance determination.', demoData.m11_triggers, ['TrgId', 'Type', 'Date', 'Area', 'Desc', 'Impact', 'MgmtReq', 'Flag', 'Owner', 'Due', 'Link', 'Status']); break;
+                case 'mod-12': renderTableModule(container, 'Action Accountability Register', 'Tracks internal administrative workflow and review steps.', demoData.m12_actions, ['ActId', 'Source', 'Stmt', 'Area', 'Owner', 'Due', 'Status', 'Flag', 'Link', 'MgmtRev']); break;
+                case 'mod-13': renderTableModule(container, 'Document & Evidence Register', 'Do not place medical information, investigation materials, witness information, legal advice, privileged communications, personal information, incident narratives, security plans, building layouts, camera details, access-control details, patrol routes, post orders, financial data, or client-identifiable information in this prototype.', demoData.m13_docs, ['Doc', 'Ver', 'Owner', 'Date', 'Access', 'Note', 'Status']); break;
+                case 'mod-14': renderMod14(container); break;
+            }
+        }
+
+        function renderMod1(container) {
+            container.innerHTML = `
+                <div class="profile-panel">
+                    <h3>Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA</h3>
+                    <p class="panel-text">Gary M. Gannon brings 29 years of California executive operations experience spanning security, HR, safety, compliance, workforce operations, licensing, fleet, client service, and 24/7 operational coordination. His background includes recurring workforce training and hands-on executive-level work in prominent multi-employer retail, office, commercial-property, industrial, and field-service environments.</p>
+                    <p class="panel-text" style="font-size:0.85rem; color: #64748b; border-left: 3px solid #cbd5e1; padding-left: 1rem; margin: 1rem 0;">Professional foundation: active ASIS professional certifications (CPP® and PSP®); active senior HR professional certification (SHRM-SCP®); SHRM Specialty Credentials in California Law HR and People Analytics; selected ASIS certificate courses in Enterprise Security Risk Management, Security Risk Assessment, Workplace Violence Prevention, CPTED, Crisis Management, Retail Asset Protection, and Pre-Employment Background Screening and Vetting; ISO/IEC 42001 Lead Implementer coursework completed, examination pending.</p>
+                    <p class="panel-text" style="font-weight: 500;">GCG supports non-legal operational readiness, documentation, workflow design, training-support structure, evidence management, accountability, human-review controls, and specialist referral. Employers remain responsible for their operations and decisions and should obtain qualified attorney review after using GCG services.</p>
+                    
+                    <h4>Applied Multi-Employer Operations Experience</h4>
+                    <p class="panel-text">Historical executive-level experience in a prominent North Fresno regional retail, office, and multi-employer property portfolio, including recurring workforce training, stakeholder coordination, annual lessons-learned discussion, and seasonal operating-readiness communication.</p>
+                    <div class="tags">
+                        <span class="tag">Multi-employer coordination</span><span class="tag">Workforce training support</span>
+                        <span class="tag">Stakeholder communication</span><span class="tag">Tenant-facing operations</span>
+                        <span class="tag">Vendor/service coordination</span><span class="tag">Seasonal readiness communication</span>
+                        <span class="tag">Annual lessons-learned discussion</span><span class="tag">Operational documentation</span>
+                        <span class="tag">Action accountability</span><span class="tag">Human-review controls</span>
+                    </div>
+                    <div style="font-size:0.75rem; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 0.75rem;">
+                        This capability summary reflects Gary M. Gannon’s self-reported historical operating experience in anonymized multi-employer property environments. It is not a current-client case study, client endorsement, legal compliance determination, incident-investigation claim, threat-assessment claim, safety-engineering opinion, security-system certification, or guarantee of outcomes.
+                    </div>
+                </div>
+
+                <div class="notice-panel">
+                    <h3>Management View — Not a Compliance Determination</h3>
+                    <p class="panel-text">Dashboard statuses organize readiness evidence, ownership, review dates, workflow timing, and open actions for management discussion. They do not determine legal coverage, exemption, compliance, safety, security adequacy, threat level, investigation outcome, record-disclosure outcome, reportability, enforcement outcome, or required corrective measures.</p>
+                </div>
+
+                <h2 class="module-title" style="margin-top: 2rem;">Executive Signal</h2>
+                <div class="metric-grid">
+                    <div class="metric-card"><div class="metric-value">10</div><div class="metric-label">Work Areas Logged for Review</div></div>
+                    <div class="metric-card"><div class="metric-value">14</div><div class="metric-label">Employer Coordination Records</div></div>
+                    <div class="metric-card"><div class="metric-value">42</div><div class="metric-label">Evidence Items Logged</div></div>
+                    <div class="metric-card"><div class="metric-value">3</div><div class="metric-label">Initial / Annual Training Reviews Due</div></div>
+                    <div class="metric-card"><div class="metric-value">12</div><div class="metric-label">Open Action Items</div></div>
+                    <div class="metric-card"><div class="metric-value">5</div><div class="metric-label">Specialist Review Flags</div></div>
+                </div>
+
+                <div class="table-wrapper">
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--border-color); background: #f8fafc; font-weight: 600;">Management Decision Queue</div>
+                    <table>
+                        <tbody>
+                            <tr><td>Confirm designated employer plan owner for illustrative common areas.</td><td><span class="status-badge status-Open">Open</span></td></tr>
+                            <tr><td>Review fictional shared-worksite contact list.</td><td><span class="status-badge status-In-Progress">In Progress</span></td></tr>
+                            <tr><td>Schedule annual management-review discussion.</td><td><span class="status-badge status-Needs-Review">Needs Review</span></td></tr>
+                            <tr><td>Confirm workforce communication documentation for evening operations.</td><td><span class="status-badge status-Ready-for-Management-Review">Ready for Management Review</span></td></tr>
+                            <tr><td>Review language/accessibility fields in training-support records.</td><td><span class="status-badge status-Needs-Review">Needs Review</span></td></tr>
+                            <tr><td>Route fictional coverage/exemption question to employer counsel.</td><td><span class="status-badge status-Specialist-Review-Flag">Specialist Review Flag</span></td></tr>
+                            <tr><td>Review fictional expanded-hours change trigger.</td><td><span class="status-badge status-Needs-Review">Needs Review</span></td></tr>
+                            <tr><td>Confirm restricted-records custodian.</td><td><span class="status-badge status-Open">Open</span></td></tr>
+                            <tr><td>Review records-request workflow date fields.</td><td><span class="status-badge status-Ready-for-Management-Review">Ready for Management Review</span></td></tr>
+                            <tr><td>Log source-monitor review date.</td><td><span class="status-badge status-In-Progress">In Progress</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderMod2(container) {
+            container.innerHTML = `
+                <h2 class="module-title">Current Statutory Baseline — Management Readiness Controls</h2>
+                <div class="notice-panel" style="margin-bottom: 1.5rem;">
+                    <p class="panel-text" style="font-weight: 500;">This panel is a high-level operational-readiness map, not legal advice, rule text, or a compliance determination. Current legal status must be verified from official California sources before external use.</p>
+                </div>
+                <div class="metric-grid" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
+                    <div class="metric-card" style="text-align: left; padding: 1.25rem;"><div class="metric-label" style="color:var(--text-main); font-weight: 600; font-size: 0.9rem;">Written program and responsible-role documentation.</div><span class="status-badge status-Current-Statutory-Baseline" style="margin-top:0.75rem; display:inline-block;">Current Statutory Baseline</span></div>
+                    <div class="metric-card" style="text-align: left; padding: 1.25rem;"><div class="metric-label" style="color:var(--text-main); font-weight: 600; font-size: 0.9rem;">Employee participation and workforce communication workflow.</div><span class="status-badge status-Current-Statutory-Baseline" style="margin-top:0.75rem; display:inline-block;">Current Statutory Baseline</span></div>
+                    <div class="metric-card" style="text-align: left; padding: 1.25rem;"><div class="metric-label" style="color:var(--text-main); font-weight: 600; font-size: 0.9rem;">Training-support and documentation workflow.</div><span class="status-badge status-Current-Statutory-Baseline" style="margin-top:0.75rem; display:inline-block;">Current Statutory Baseline</span></div>
+                    <div class="metric-card" style="text-align: left; padding: 1.25rem;"><div class="metric-label" style="color:var(--text-main); font-weight: 600; font-size: 0.9rem;">Hazard-review and action-tracking workflow.</div><span class="status-badge status-Current-Statutory-Baseline" style="margin-top:0.75rem; display:inline-block;">Current Statutory Baseline</span></div>
+                    <div class="metric-card" style="text-align: left; padding: 1.25rem;"><div class="metric-label" style="color:var(--text-main); font-weight: 600; font-size: 0.9rem;">Violent-incident-log and record-retention workflow.</div><span class="status-badge status-Current-Statutory-Baseline" style="margin-top:0.75rem; display:inline-block;">Current Statutory Baseline</span></div>
+                    <div class="metric-card" style="text-align: left; padding: 1.25rem;"><div class="metric-label" style="color:var(--text-main); font-weight: 600; font-size: 0.9rem;">Plan-review and change-trigger workflow.</div><span class="status-badge status-Current-Statutory-Baseline" style="margin-top:0.75rem; display:inline-block;">Current Statutory Baseline</span></div>
+                    <div class="metric-card" style="text-align: left; padding: 1.25rem;"><div class="metric-label" style="color:var(--text-main); font-weight: 600; font-size: 0.9rem;">Multi-employer coordination workflow.</div><span class="status-badge status-Current-Statutory-Baseline" style="margin-top:0.75rem; display:inline-block;">Current Statutory Baseline</span></div>
+                    <div class="metric-card" style="text-align: left; padding: 1.25rem;"><div class="metric-label" style="color:var(--text-main); font-weight: 600; font-size: 0.9rem;">Attorney and qualified-specialist referral workflow.</div><span class="status-badge status-Current-Statutory-Baseline" style="margin-top:0.75rem; display:inline-block;">Current Statutory Baseline</span></div>
+                </div>
+            `;
+        }
+
+        function renderTableModule(container, title, subtitle, data, columns, addIntakeWarning = false) {
+            currentActiveData = data; 
+            
+            let html = `
+                <h2 class="module-title">${title}</h2>
+                <p class="module-subtitle">${subtitle}</p>
+            `;
+            
+            if(addIntakeWarning) {
+                html += `<div class="notice-panel" style="margin-bottom: 1.5rem;"><p class="panel-text" style="font-weight: 600;">Fact intake organizes information for employer and qualified-review discussion. It does not determine legal coverage, exemption status, employer responsibility, worksite control, record-disclosure duties, or compliance.</p></div>`;
+            }
+
+            html += `
+                <div class="table-controls">
+                    <input type="text" class="search-input" placeholder="Search fictional records..." aria-label="Search records" onkeyup="filterTable(this)">
+                </div>
+                <div class="table-wrapper">
+                    <table id="data-table">
+                        <thead>
+                            <tr>
+                                ${columns.map(col => `<th scope="col">${col}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            data.forEach(row => {
+                html += '<tr>';
+                columns.forEach(col => {
+                    let key = Object.keys(row).find(k => k.toLowerCase() === col.toLowerCase() || k.includes(col.substring(0,3).toLowerCase()));
+                    let val = key ? row[key] : '';
+                    if (col === 'Status') {
+                        let badgeClass = 'status-' + val.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                        html += `<td><span class="status-badge ${badgeClass}">${val}</span></td>`;
+                    } else {
+                        html += `<td>${val}</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function renderMod6(container) {
+            const areas = [
+                "Illustrative Retail Commons", "Illustrative Reception / Visitor Area", "Illustrative Office Tower A",
+                "Illustrative Office Tower B", "Illustrative Loading / Service Area", "Illustrative Shared Parking Area",
+                "Illustrative Evening Operations Zone", "Illustrative Tenant Service Corridor", "Illustrative Mobile / Contractor Work Area",
+                "Illustrative Employee-Choice Remote Work Arrangement"
+            ];
+            const questions = [
+                "Has the employer documented who controls this work area?",
+                "Are employer, tenant, vendor, and contractor interfaces organized for review?",
+                "Are work-area and shift conditions documented for management discussion?",
+                "Are workforce communication and reporting methods documented?",
+                "Is employee/representative participation evidence logged?",
+                "Has a relevant operational change been recorded?",
+                "Is a qualified specialist-review flag needed?",
+                "Is there an assigned management-review owner?",
+                "Has the next review date been logged?"
+            ];
+
+            let html = `
+                <h2 class="module-title">Property / Work Area Review</h2>
+                <p class="module-subtitle">Neutral operational fact-finding framework. Does not establish safe/unsafe conditions or compliant/noncompliant status.</p>
+                <div class="metric-grid" style="grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));">
+            `;
+            
+            areas.forEach(area => {
+                html += `<div class="metric-card" style="text-align: left; padding: 1.5rem;">
+                    <h3 style="color: var(--primary-color); font-size: 1.05rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">${area}</h3>
+                    <ul style="list-style-type: none; font-size: 0.8rem; color: var(--text-main); padding-left: 0;">`;
+                questions.forEach(q => {
+                    html += `<li style="margin-bottom: 0.6rem; display: flex; gap: 0.5rem; line-height: 1.3;"><span style="color: #cbd5e1;" aria-hidden="true">▪</span> <span>${q}</span></li>`;
+                });
+                html += `</ul><div style="margin-top: 1rem;"><span class="status-badge status-Needs-Review">Needs Review</span></div></div>`;
+            });
+            
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function renderMod8(container) {
+            container.innerHTML = `
+                <h2 class="module-title">Employee Participation & Reporting Workflow</h2>
+                <p class="module-subtitle">GCG may help structure documentation, workflow, evidence organization, action tracking, and referral flags. Employers and qualified professionals determine response, investigation, emergency actions, legal obligations, record disclosure, employment decisions, reporting, and worksite-specific measures.</p>
+                
+                <div class="workflow-visual">
+                    <div class="workflow-step">Employee Report / Concern</div>
+                    <div class="workflow-arrow" aria-hidden="true">→</div>
+                    <div class="workflow-step">Employer-Designated Intake</div>
+                    <div class="workflow-arrow" aria-hidden="true">→</div>
+                    <div class="workflow-step">Routing to Appropriate Employer Owner</div>
+                    <div class="workflow-arrow" aria-hidden="true">→</div>
+                    <div class="workflow-step" style="border-color: #d8b4fe; background: #faf5ff;">Attorney / HR / Safety / Security / Facilities / Privacy / Workers’ Compensation / Health-Care / Threat-Management Specialist Flag Where Needed</div>
+                    <div class="workflow-arrow" aria-hidden="true">→</div>
+                    <div class="workflow-step">Documentation and Action Tracking</div>
+                    <div class="workflow-arrow" aria-hidden="true">→</div>
+                    <div class="workflow-step">Employer Communication / Follow-Up</div>
+                    <div class="workflow-arrow" aria-hidden="true">→</div>
+                    <div class="workflow-step">Plan, Training, Record, or Management Review Trigger if Applicable</div>
+                </div>
+
+                <div class="table-wrapper" style="margin-top: 2rem;">
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--border-color); background: #f8fafc; font-weight: 600;">Fictional Participation-Evidence Mini-Register</div>
+                    <table>
+                        <tbody>
+                            <tr><td>Illustrative employee feedback session.</td><td><span class="status-badge status-Evidence-Complete">Evidence Complete</span></td></tr>
+                            <tr><td>Illustrative supervisor communication briefing.</td><td><span class="status-badge status-Evidence-Complete">Evidence Complete</span></td></tr>
+                            <tr><td>Illustrative tenant-facing workforce communication.</td><td><span class="status-badge status-Needs-Review">Needs Review</span></td></tr>
+                            <tr><td>Illustrative contractor coordination meeting.</td><td><span class="status-badge status-In-Progress">In Progress</span></td></tr>
+                            <tr><td>Illustrative employee-representative contact path.</td><td><span class="status-badge status-Specialist-Review-Flag">Specialist Review Flag</span></td></tr>
+                            <tr><td>Illustrative annual management-review input record.</td><td><span class="status-badge status-Open">Open</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderMod10(container) {
+            let html = `
+                <h2 class="module-title">Records Request & Retention Tracker</h2>
+                <div class="notice-panel" style="margin-bottom: 1.5rem;">
+                    <p class="panel-text" style="font-weight: 600;">This tracker organizes dates, custodians, and workflow status. It does not determine whether a record must be produced, what must be redacted, whether information is privileged, or how a legal request should be resolved. Route sensitive requests to employer counsel and qualified privacy/HR professionals.</p>
+                </div>
+                
+                <h3 style="font-size: 1.05rem; color: var(--primary-color); margin-bottom: 0.75rem;">Fictional Request Workflow</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>ReqID</th><th>Category</th><th>ReqDate</th><th>Target</th><th>Record</th><th>Custodian</th><th>PrivFlag</th><th>Deliv</th><th>Link</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+            `;
+            demoData.m10_requests.forEach(r => {
+                let badgeClass = 'status-' + r.status.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                html += `<tr><td>${r.reqId}</td><td>${r.reqCat}</td><td>${r.date}</td><td>${r.target}</td><td>${r.recCat}</td><td>${r.cust}</td><td>${r.privFlag}</td><td>${r.deliv}</td><td>${r.link}</td><td><span class="status-badge ${badgeClass}">${r.status}</span></td></tr>`;
+            });
+            html += `</tbody></table></div>`;
+
+            html += `
+                <h3 style="font-size: 1.05rem; color: var(--primary-color); margin: 2rem 0 0.75rem;">Fictional Retention Tracker</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Evidence Category</th><th>Start Date</th><th>Review Date</th><th>Custodian Role</th><th>Restricted Flag</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+            `;
+            demoData.m10_retention.forEach(r => {
+                let badgeClass = 'status-' + r.status.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                html += `<tr><td>${r.category}</td><td>${r.start}</td><td>${r.review}</td><td>${r.cust}</td><td>${r.restFlag}</td><td><span class="status-badge ${badgeClass}">${r.status}</span></td></tr>`;
+            });
+            html += `</tbody></table></div>`;
+            
+            container.innerHTML = html;
+        }
+
+        function renderMod14(container) {
+            currentActiveData = demoData.m14_flags;
+            let html = `
+                <h2 class="module-title">Attorney / Specialist Review Flags</h2>
+                <p class="module-subtitle">Organized tracking for routing issues outside operational readiness boundaries to qualified experts.</p>
+                <div class="table-controls">
+                    <input type="text" class="search-input" placeholder="Search fictional records..." aria-label="Search records" onkeyup="filterTable(this)">
+                </div>
+                <div class="table-wrapper">
+                    <table id="data-table">
+                        <thead>
+                            <tr><th>FlagID</th><th>Trigger Facts</th><th>Owner Role</th><th>Question</th><th>GCG Contribution</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+            `;
+            demoData.m14_flags.forEach(f => {
+                let badgeClass = 'status-' + f.status.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+                html += `<tr>
+                    <td>${f.flagId}</td>
+                    <td>${f.facts}</td>
+                    <td>${f.owner}</td>
+                    <td>${f.q}</td>
+                    <td>${f.gcg}</td>
+                    <td><span class="status-badge ${badgeClass}">${f.status}</span></td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+        }
+
+        function filterTable(input) {
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("data-table");
+            if(!table) return;
+            const tr = table.getElementsByTagName("tr");
+            for (let i = 1; i < tr.length; i++) {
+                let display = false;
+                const tds = tr[i].getElementsByTagName("td");
+                for(let j = 0; j < tds.length; j++){
+                    if (tds[j].innerText.toLowerCase().indexOf(filter) > -1) {
+                        display = true; break;
+                    }
+                }
+                tr[i].style.display = display ? "" : "none";
+            }
+        }
+
+        function exportToCSV() {
+            if(!currentActiveData || currentActiveData.length === 0) {
+                console.warn("No table data in current view to export.");
+                return; 
+            }
+            const keys = Object.keys(currentActiveData[0]);
+            let csv = keys.join(",") + "\n";
+            currentActiveData.forEach(row => {
+                csv += keys.map(k => `"${String(row[k]).replace(/"/g, '""')}"`).join(",") + "\n";
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'gcg_fictional_export.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function openModal(id) { 
+            const modal = document.getElementById(id);
+            modal.style.display = 'flex';
+            modal.querySelector('.close-btn').focus();
+        }
+        function closeModal(e, id) { 
+            if(e && e.target !== e.currentTarget) return;
+            document.getElementById(id).style.display = 'none'; 
+        }
+
+        function resetDemoData() {
+            const activeNav = document.querySelector('.nav-item.active');
+            if(activeNav) {
+                renderModule(activeNav.getAttribute('data-target'));
+                console.log("Demonstration data re-rendered (reset).");
+            }
+        }
+
+        // Initialize application on load
+        window.onload = () => {
+            renderModule('mod-1');
+        };
+    </script>
+</body>
+</html>

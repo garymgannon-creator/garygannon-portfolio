@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wage &amp; Hour / PAGA Exposure Tracker — Gannon Compliance Group</title>
+<style>
+  :root{
+    --bg:#F1F5F9;
+    --surface:#FFFFFF;
+    --surface-subtle:#F8FAFC;
+    --nav:#0F172A;
+    --nav-mid:#1B2A4A;
+    --ink:#0F172A;
+    --body:#4B5563;
+    --rule-accent:#D97706;
+    --link:#1A4FD6;
+    --hair:#E2E8F0;
+    --safe:#16A34A;
+    --risk:#DC2626;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--body);}
+  body{
+    font-family:'Inter',Helvetica,Arial,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:64px 24px 96px;}
+  h1,h2,h3{font-family:Georgia,'Source Serif 4',serif;color:var(--ink);margin:0;}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-0.01em;line-height:1.2;}
+  h2{font-size:1.15rem;font-weight:700;margin-bottom:6px;}
+  h3{font-size:0.98rem;font-weight:700;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--body);
+    opacity:0.65;
+    margin-bottom:14px;
+  }
+  .tagline{font-size:1.05rem;color:var(--body);margin-top:14px;max-width:62ch;}
+  .rule{border:0;border-top:2px solid var(--rule-accent);width:56px;margin:28px 0 32px;}
+  .hair-rule{border:0;border-top:1px solid var(--hair);margin:44px 0;}
+  section{margin-bottom:8px;}
+  .context{font-size:0.98rem;color:var(--body);max-width:68ch;}
+  .context strong{color:var(--ink);}
+  .cite{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.78rem;
+    color:var(--body);
+    opacity:0.7;
+    margin-top:10px;
+  }
+  .module-nav{
+    display:flex;flex-wrap:wrap;gap:8px 18px;
+    margin-top:24px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.78rem;
+  }
+  .module-nav a{color:var(--body);opacity:0.75;}
+  .module-nav a:hover{opacity:1;color:var(--link);}
+
+  .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:24px;}
+  .calc-grid.three{grid-template-columns:1fr 1fr 1fr;}
+  @media (max-width:640px){ .calc-grid, .calc-grid.three{grid-template-columns:1fr;} }
+  .group-card{padding:0;}
+  .group-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--body);
+    opacity:0.7;
+    margin-bottom:10px;
+  }
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:0.86rem;color:var(--body);margin-bottom:6px;}
+  .field input, .field select{
+    width:100%;
+    padding:10px 12px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:1rem;
+    color:var(--ink);
+    background:#FFFFFF;
+    border:1px solid var(--hair);
+    border-radius:2px;
+  }
+  .field input:focus, .field select:focus{
+    outline:2px solid var(--rule-accent);
+    outline-offset:1px;
+    border-color:var(--rule-accent);
+  }
+  .field input[type="text"]{font-family:'Inter',sans-serif;}
+  .field .hint{font-family:'IBM Plex Mono',monospace;font-size:0.72rem;opacity:0.6;margin-top:4px;}
+
+  .result-panel{margin-top:36px;}
+  .result-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:14px 0;border-top:1px solid var(--hair);
+  }
+  .result-row:last-child{border-bottom:1px solid var(--hair);}
+  .result-label{font-size:0.92rem;color:var(--body);}
+  .result-value{
+    font-family:'IBM Plex Mono',monospace;font-size:1.15rem;color:var(--ink);font-weight:600;
+    text-align:right;
+  }
+  .result-value.big{font-size:1.4rem;}
+
+  .verdict{
+    margin-top:28px;padding:20px 22px;border-left:3px solid var(--ink);background:#FAFAF8;
+  }
+  .verdict.risk{border-left-color:var(--risk);}
+  .verdict.safe{border-left-color:var(--safe);}
+  .verdict.warn{border-left-color:var(--rule-accent);}
+  .verdict-title{
+    font-family:'IBM Plex Mono',monospace;font-size:0.78rem;
+    text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;
+  }
+  .verdict.risk .verdict-title{color:var(--risk);}
+  .verdict.safe .verdict-title{color:var(--safe);}
+  .verdict.warn .verdict-title{color:var(--rule-accent);}
+  .verdict-body{font-size:0.95rem;color:var(--body);}
+  .verdict-body strong{color:var(--ink);}
+
+  .checklist{list-style:none;margin:20px 0 0;padding:0;}
+  .checklist li{
+    display:flex;gap:14px;padding:16px 0;border-top:1px solid var(--hair);font-size:0.95rem;
+  }
+  .checklist li:last-child{border-bottom:1px solid var(--hair);}
+  .checklist input[type="checkbox"]{
+    margin-top:3px;width:16px;height:16px;accent-color:var(--rule-accent);flex-shrink:0;
+  }
+  .checklist label{cursor:pointer;color:var(--body);}
+  .checklist label strong{color:var(--ink);display:block;font-size:0.9rem;margin-bottom:2px;}
+
+  .deadline-strip{
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;
+    margin-top:24px;padding:18px 20px;background:#FAFAF8;border:1px solid var(--hair);
+  }
+  .deadline-item{font-family:'IBM Plex Mono',monospace;}
+  .deadline-item .k{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.65;display:block;margin-bottom:4px;}
+  .deadline-item .v{font-size:1rem;color:var(--ink);font-weight:600;}
+
+  .table{width:100%;border-collapse:collapse;margin-top:20px;font-size:0.9rem;}
+  .table th{
+    font-family:'IBM Plex Mono',monospace;font-size:0.7rem;text-transform:uppercase;
+    letter-spacing:0.06em;text-align:left;color:var(--body);opacity:0.7;
+    padding:8px 10px;border-bottom:1px solid var(--hair);
+  }
+  .table td{padding:10px 10px;border-bottom:1px solid var(--hair);color:var(--body);}
+  .table td.num{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--ink);}
+
+  footer{
+    margin-top:64px;padding-top:24px;border-top:1px solid var(--hair);
+    font-family:'IBM Plex Mono',monospace;font-size:0.76rem;color:var(--body);opacity:0.75;max-width:68ch;
+  }
+  a{color:var(--link);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .topbar{
+    background:var(--nav);color:#F1F5F9;
+    padding:18px 24px;display:flex;align-items:center;justify-content:space-between;
+    border-bottom:3px solid var(--rule-accent);
+  }
+  .topbar .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:0.72rem;letter-spacing:0.14em;
+    text-transform:uppercase;color:#8FA3C8;margin:0;opacity:1;
+  }
+  .topbar h1{margin:4px 0 0;font-size:1.4rem;font-weight:700;color:#FFFFFF;font-family:Georgia,'Source Serif 4',serif;letter-spacing:-0.01em;line-height:1.2;}
+  .topbar .badge{
+    font-family:'IBM Plex Mono',monospace;font-size:0.7rem;font-weight:700;
+    padding:4px 10px;border-radius:12px;border:1px solid var(--rule-accent);color:#F0C060;
+    background:rgba(217,119,6,.15);white-space:nowrap;
+  }
+  section{
+    background:var(--surface);border:1px solid var(--hair);border-radius:10px;
+    padding:26px 28px;margin-top:28px;
+  }
+  .hair-rule{display:none;}
+  .module-nav{
+    background:var(--surface-subtle);border:1px solid var(--hair);border-radius:8px;
+    padding:14px 18px;margin-top:0;
+  }
+</style>
+</head>
+<body>
+<div style="background:#1B2A4A;color:#fff;text-align:center;padding:10px 16px;font-weight:700;letter-spacing:0.4px;font-size:0.85rem;">
+ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY<br>
+<span style="font-weight:400;font-size:0.72rem;">Demonstrates operational workflow design, documentation, action tracking, human-review checkpoints, and management-ready implementation support.</span>
+</div>
+<div class="topbar">
+  <div>
+    <p class="eyebrow">Gannon Compliance Group — Applied Compliance Command Center · Module 3</p>
+    <h1>Wage &amp; Hour / PAGA Exposure Tracker</h1>
+  </div>
+  <span class="badge">Client Working Copy</span>
+</div>
+
+<div class="wrap">
+  <p class="tagline">Four working checks against the meal-and-rest-break, classification, and PAGA-penalty rules Gary Gannon administered directly as the sole internal HR authority for 29 years — updated for the post-2024 PAGA reform and 2026 California wage figures.</p>
+
+  <nav class="module-nav">
+    <a href="#breaks">1 · Meal &amp; rest break compliance</a>
+    <a href="#premium">2 · Missed-break premium calculator</a>
+    <a href="#classify">3 · Exempt/non-exempt classification screener</a>
+    <a href="#paga">4 · PAGA penalty exposure estimator</a>
+  </nav>
+
+  <hr class="hair-rule">
+
+  <section id="breaks">
+    <h2>1 · Meal &amp; rest break compliance check</h2>
+    <p class="context"><em>Brinker v. Superior Court</em> (2012) sets the meal-break timing rule; <em>Augustus v. ABM Security Services</em> (2016) requires rest breaks to be fully duty-free — an employer cannot keep a guard on-call, radio-on, or reachable during the break. Enter a shift length to see what's required.</p>
+
+    <div class="calc-grid">
+      <div class="group-card">
+        <div class="field">
+          <label for="shiftLen">Shift length (hours)</label>
+          <input type="number" id="shiftLen" min="0" max="24" step="0.25" value="10">
+        </div>
+      </div>
+      <div class="group-card">
+        <div class="field">
+          <label for="restOnCall">Are rest breaks currently duty-free (no radio/phone/post coverage)?</label>
+          <select id="restOnCall">
+            <option value="yes">Yes — fully relieved of duty</option>
+            <option value="no">No — guard stays reachable/on-call</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="deadline-strip">
+      <div class="deadline-item"><span class="k">Meal breaks required</span><span class="v" id="mealCount">—</span></div>
+      <div class="deadline-item"><span class="k">First meal break must begin by</span><span class="v" id="mealFirstBy">—</span></div>
+      <div class="deadline-item"><span class="k">Rest breaks required</span><span class="v" id="restCount">—</span></div>
+    </div>
+
+    <div class="verdict" id="breaksVerdict" style="margin-top:24px;">
+      <div class="verdict-title" id="breaksVerdictTitle">—</div>
+      <div class="verdict-body" id="breaksVerdictBody"></div>
+    </div>
+    <p class="cite">Meal breaks: 30-min unpaid before end of hour 5 (shifts &gt;5 hrs); second 30-min break before end of hour 10 (shifts &gt;10 hrs), waivable by mutual consent if total shift ≤12 hrs and first break wasn't waived. Rest breaks: 10-min paid per 4 hrs worked "or major fraction thereof." <em>Augustus v. ABM Security Services, Inc.</em>, 2 Cal.5th 257 (2016).</p>
+  </section>
+
+  <hr class="hair-rule">
+
+  <section id="premium">
+    <h2>2 · Missed-break premium pay calculator</h2>
+    <p class="context">Labor Code §226.7 requires one additional hour of pay at the employee's regular rate for each workday a compliant meal break isn't provided, and a separate hour for each workday a compliant rest break isn't provided — capped at two premium hours per employee per workday regardless of how many individual breaks were missed that day.</p>
+
+    <div class="calc-grid three">
+      <div class="group-card">
+        <div class="field">
+          <label for="premRate">Regular hourly rate ($)</label>
+          <input type="number" id="premRate" min="0" step="0.25" value="22.00">
+        </div>
+      </div>
+      <div class="group-card">
+        <div class="field">
+          <label for="premDaysMeal">Workdays with a missed/short/late meal break</label>
+          <input type="number" id="premDaysMeal" min="0" value="0">
+        </div>
+      </div>
+      <div class="group-card">
+        <div class="field">
+          <label for="premDaysRest">Workdays with a missed/on-duty rest break</label>
+          <input type="number" id="premDaysRest" min="0" value="0">
+        </div>
+      </div>
+    </div>
+    <div class="calc-grid" style="margin-top:0;">
+      <div class="group-card">
+        <div class="field">
+          <label for="premEmployees">Number of employees affected (same pattern)</label>
+          <input type="number" id="premEmployees" min="1" value="1">
+        </div>
+      </div>
+      <div class="group-card">
+        <div class="field">
+          <label for="premYears">Lookback period (years — 3-yr statute is standard, 4-yr if tied to a UCL claim)</label>
+          <input type="number" id="premYears" min="0" step="0.5" value="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="result-panel">
+      <div class="result-row"><span class="result-label">Meal-break premium hours (per employee, per year)</span><span class="result-value" id="premMealHrs">—</span></div>
+      <div class="result-row"><span class="result-label">Rest-break premium hours (per employee, per year)</span><span class="result-value" id="premRestHrs">—</span></div>
+      <div class="result-row"><span class="result-label">Total estimated premium liability (all employees, full lookback)</span><span class="result-value big" id="premTotal">—</span></div>
+    </div>
+    <p class="cite">This estimates the direct §226.7 premium only — it does not include PAGA civil penalties (Module 4), waiting-time penalties, or attorneys' fees, which stack on top of this figure. Model assumes one missed meal break and/or one missed rest break per flagged workday, not multiple violations of the same type per day.</p>
+  </section>
+
+  <hr class="hair-rule">
+
+  <section id="classify">
+    <h2>3 · Exempt / non-exempt classification screener</h2>
+    <p class="context">California uses a two-part test: a salary basis test <strong>and</strong> a duties test. Meeting the salary alone never establishes exempt status — job title and salary don't override actual job duties.</p>
+
+    <div class="calc-grid three">
+      <div class="group-card">
+        <div class="field">
+          <label for="classSalary">Annual guaranteed base salary ($)</label>
+          <input type="number" id="classSalary" min="0" step="500" value="65000">
+          <div class="hint">2026 general threshold: $70,304/yr ($5,858.67/mo)</div>
+        </div>
+      </div>
+      <div class="group-card">
+        <div class="field">
+          <label for="classCategory">Role category</label>
+          <select id="classCategory">
+            <option value="general">General exec/admin/professional</option>
+            <option value="computer">Computer software professional</option>
+            <option value="physician">Licensed physician/surgeon</option>
+          </select>
+        </div>
+      </div>
+      <div class="group-card">
+        <div class="field">
+          <label for="classDuties">Duties test — primarily exempt work (&gt;50% of time)?</label>
+          <select id="classDuties">
+            <option value="yes">Yes</option>
+            <option value="no">No / unclear</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="verdict" id="classVerdict" style="margin-top:24px;">
+      <div class="verdict-title" id="classVerdictTitle">—</div>
+      <div class="verdict-body" id="classVerdictBody"></div>
+    </div>
+    <p class="cite">2026 CA figures: general exempt threshold $70,304/yr (2x the $16.90/hr state minimum wage, 40-hr week); computer professional $58.85/hr / $122,573.13/yr; licensed physician/surgeon $107.17/hr. Only guaranteed base salary counts toward the threshold — bonuses and commissions do not. Higher local or industry-specific minimum wages (fast food, health care) will raise the effective threshold further and are not reflected in this screener.</p>
+  </section>
+
+  <hr class="hair-rule">
+
+  <section id="paga">
+    <h2>4 · PAGA penalty exposure estimator</h2>
+    <p class="context">The 2024 PAGA reform (AB 2288 / SB 92, effective for claims filed or noticed on or after June 19, 2024) replaced the old $100-initial/$200-subsequent structure. The default penalty is now $100 per aggrieved employee per pay period, with a $200 tier reserved for specific aggravating circumstances, and new caps for employers who took proactive compliance steps.</p>
+
+    <div class="calc-grid three">
+      <div class="group-card">
+        <div class="field">
+          <label for="pagaEmployees">Aggrieved employees</label>
+          <input type="number" id="pagaEmployees" min="0" value="25">
+        </div>
+      </div>
+      <div class="group-card">
+        <div class="field">
+          <label for="pagaPeriods">Pay periods in the claim window</label>
+          <input type="number" id="pagaPeriods" min="0" value="26">
+          <div class="hint">e.g., biweekly x 1 yr ≈ 26</div>
+        </div>
+      </div>
+      <div class="group-card">
+        <div class="field">
+          <label for="pagaTier">Penalty tier</label>
+          <select id="pagaTier">
+            <option value="100">Standard — $100/employee/pay period</option>
+            <option value="200">Enhanced — $200 (prior 5-yr agency/court finding, or malicious/fraudulent/oppressive conduct)</option>
+            <option value="50">Isolated &amp; cured — $50 (≤30 consecutive days or 4 pay periods, cured)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="calc-grid" style="margin-top:0;">
+      <div class="group-card">
+        <div class="field">
+          <label for="pagaReasonable">Did the employer take "all reasonable steps" to comply before any PAGA notice?</label>
+          <select id="pagaReasonable">
+            <option value="no">No / unconfirmed</option>
+            <option value="yes">Yes — 15% cap applies</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-panel">
+      <div class="result-row"><span class="result-label">Uncapped exposure (employees × pay periods × penalty rate)</span><span class="result-value" id="pagaUncapped">—</span></div>
+      <div class="result-row"><span class="result-label">Exposure after reasonable-steps cap (if applicable)</span><span class="result-value big" id="pagaCapped">—</span></div>
+    </div>
+
+    <table class="table" id="pagaSplitTable">
+      <tr><th>Distribution</th><th>Share</th><th>Amount</th></tr>
+      <tr><td>Aggrieved employees (collectively)</td><td class="num">35%</td><td class="num" id="pagaEmployeeShare">—</td></tr>
+      <tr><td>Labor &amp; Workforce Development Agency (LWDA)</td><td class="num">65%</td><td class="num" id="pagaLwdaShare">—</td></tr>
+    </table>
+
+    <div class="verdict warn" style="margin-top:28px;">
+      <div class="verdict-title">Not a substitute for counsel's exposure model</div>
+      <div class="verdict-body">This is a scoping-level estimate for identifying and prioritizing risk, not a litigation damages model. It does not include stacked Labor Code §226 wage-statement penalties, waiting-time penalties (§203), attorneys' fees (routinely ~33% of settlement value), or the separate cure/isolated-violation procedures now available to employers with fewer than 100 employees.</div>
+    </div>
+    <p class="cite">Labor Code §2699, as amended by AB 2288/SB 92 (signed July 1, 2024; applies to PAGA notices/claims filed on or after June 19, 2024). Employee/LWDA split increased from 25%/75% to 35%/65% under the reform.</p>
+  </section>
+
+  <footer>
+    Strategic Intelligence — Not Legal Counsel (CA B&amp;P §§6125–6126). This tool applies published Labor Code, IWC Wage Order, and case-law standards (Brinker v. Superior Court; Augustus v. ABM Security Services; Labor Code §§226.7, 515, 2699) as screening references current to the 2026 wage figures cited above. It is not a substitute for a formal wage-and-hour audit or PAGA exposure analysis conducted with employment counsel, and does not constitute legal advice or a compliance determination. Gannon Compliance Group.
+  </footer>
+
+</div>
+
+<script>
+function fmtMoney(n){ return '$' + Number(n).toLocaleString('en-US', {maximumFractionDigits:0}); }
+function fmtHrs(n){ return Number(n).toLocaleString('en-US', {maximumFractionDigits:1}) + ' hrs'; }
+
+/* Module 1: Meal & rest break requirements */
+function computeBreaks(){
+  const shift = parseFloat(document.getElementById('shiftLen').value) || 0;
+  const restOnCall = document.getElementById('restOnCall').value === 'no';
+
+  let mealCount = 0, mealFirstBy = '—';
+  if(shift > 10){ mealCount = 2; mealFirstBy = 'end of hour 5'; }
+  else if(shift > 5){ mealCount = 1; mealFirstBy = 'end of hour 5'; }
+  else { mealCount = 0; mealFirstBy = 'n/a (shift ≤5 hrs)'; }
+
+  // Rest breaks: 10 min per 4 hrs "or major fraction thereof"
+  let restCount = 0;
+  if(shift >= 3.5) restCount = Math.floor((shift + 2) / 4); // major-fraction approximation
+  if(shift < 3.5) restCount = 0;
+
+  document.getElementById('mealCount').textContent = mealCount;
+  document.getElementById('mealFirstBy').textContent = mealFirstBy;
+  document.getElementById('restCount').textContent = restCount;
+
+  const verdict = document.getElementById('breaksVerdict');
+  const vt = document.getElementById('breaksVerdictTitle');
+  const vb = document.getElementById('breaksVerdictBody');
+
+  if(restOnCall && restCount > 0){
+    verdict.className = 'verdict risk';
+    vt.textContent = 'Rest breaks not compliant under Augustus';
+    vb.innerHTML = 'Keeping a guard reachable by radio, phone, or post coverage during a rest break fails the duty-free standard set in <strong>Augustus v. ABM Security Services</strong> — this is treated as a missed rest break even if the 10 minutes was technically taken off-post.';
+  } else if(shift > 0){
+    verdict.className = 'verdict safe';
+    vt.textContent = 'Break schedule requirements identified';
+    vb.textContent = 'For a ' + shift + '-hour shift: ' + mealCount + ' meal break(s) and ' + restCount + ' rest break(s) are required, assuming no lawful waiver is in place.';
+  } else {
+    verdict.className = 'verdict';
+    vt.textContent = 'Enter a shift length';
+    vb.textContent = '';
+  }
+}
+['shiftLen','restOnCall'].forEach(id=>document.getElementById(id).addEventListener('input', computeBreaks));
+computeBreaks();
+
+/* Module 2: Missed-break premium calculator */
+function computePremium(){
+  const rate = parseFloat(document.getElementById('premRate').value) || 0;
+  const daysMeal = parseFloat(document.getElementById('premDaysMeal').value) || 0;
+  const daysRest = parseFloat(document.getElementById('premDaysRest').value) || 0;
+  const employees = parseFloat(document.getElementById('premEmployees').value) || 0;
+  const years = parseFloat(document.getElementById('premYears').value) || 0;
+
+  const mealHrsPerEmpYear = daysMeal; // 1 hr premium per flagged day
+  const restHrsPerEmpYear = daysRest;
+
+  document.getElementById('premMealHrs').textContent = fmtHrs(mealHrsPerEmpYear);
+  document.getElementById('premRestHrs').textContent = fmtHrs(restHrsPerEmpYear);
+
+  const totalHrsPerEmp = (mealHrsPerEmpYear + restHrsPerEmpYear) * years;
+  const totalLiability = totalHrsPerEmp * rate * employees;
+  document.getElementById('premTotal').textContent = fmtMoney(totalLiability);
+}
+['premRate','premDaysMeal','premDaysRest','premEmployees','premYears'].forEach(id=>document.getElementById(id).addEventListener('input', computePremium));
+computePremium();
+
+/* Module 3: Exempt/non-exempt classification screener */
+function computeClass(){
+  const salary = parseFloat(document.getElementById('classSalary').value) || 0;
+  const category = document.getElementById('classCategory').value;
+  const dutiesOK = document.getElementById('classDuties').value === 'yes';
+
+  let threshold, thresholdLabel;
+  if(category === 'computer'){ threshold = 122573.13; thresholdLabel = 'computer professional ($122,573.13/yr)'; }
+  else if(category === 'physician'){ threshold = 107.17 * 40 * 52; thresholdLabel = 'licensed physician/surgeon ($107.17/hr equivalent)'; }
+  else { threshold = 70304; thresholdLabel = 'general exec/admin/professional ($70,304/yr)'; }
+
+  const salaryOK = salary >= threshold;
+
+  const verdict = document.getElementById('classVerdict');
+  const vt = document.getElementById('classVerdictTitle');
+  const vb = document.getElementById('classVerdictBody');
+
+  if(salaryOK && dutiesOK){
+    verdict.className = 'verdict safe';
+    vt.textContent = 'Both prongs of the test are met';
+    vb.innerHTML = 'Salary clears the ' + thresholdLabel + ' threshold and the role is flagged as primarily exempt work. <strong>Document the duties analysis</strong> — job title and salary alone never establish exempt status if challenged.';
+  } else if(!salaryOK){
+    verdict.className = 'verdict risk';
+    vt.textContent = 'Salary basis test fails';
+    vb.innerHTML = 'Guaranteed base salary of ' + fmtMoney(salary) + ' is below the ' + thresholdLabel + ' threshold. <strong>This role cannot be classified as exempt regardless of duties</strong> — only guaranteed base salary counts; bonuses/commissions do not.';
+  } else {
+    verdict.className = 'verdict warn';
+    vt.textContent = 'Salary clears the bar — duties test is the open question';
+    vb.innerHTML = 'Salary meets the ' + thresholdLabel + ' threshold, but the duties test is flagged as not clearly met. <strong>Misclassification risk if actual day-to-day work is more than 50% non-exempt tasks</strong> — this is the single most common basis for a wage-and-hour PAGA claim.';
+  }
+}
+['classSalary','classCategory','classDuties'].forEach(id=>document.getElementById(id).addEventListener('input', computeClass));
+computeClass();
+
+/* Module 4: PAGA penalty exposure estimator */
+function computePaga(){
+  const employees = parseFloat(document.getElementById('pagaEmployees').value) || 0;
+  const periods = parseFloat(document.getElementById('pagaPeriods').value) || 0;
+  const rate = parseFloat(document.getElementById('pagaTier').value) || 0;
+  const reasonableSteps = document.getElementById('pagaReasonable').value === 'yes';
+
+  const uncapped = employees * periods * rate;
+  const capped = reasonableSteps ? uncapped * 0.15 : uncapped;
+
+  document.getElementById('pagaUncapped').textContent = fmtMoney(uncapped);
+  document.getElementById('pagaCapped').textContent = fmtMoney(capped);
+
+  const empShare = capped * 0.35;
+  const lwdaShare = capped * 0.65;
+  document.getElementById('pagaEmployeeShare').textContent = fmtMoney(empShare);
+  document.getElementById('pagaLwdaShare').textContent = fmtMoney(lwdaShare);
+}
+['pagaEmployees','pagaPeriods','pagaTier','pagaReasonable'].forEach(id=>document.getElementById(id).addEventListener('input', computePaga));
+computePaga();
+</script>
+<div style="background:#F1F5F9;color:#2E3550;text-align:center;padding:14px 16px;font-size:0.72rem;border-top:1px solid #E2E8F0;">
+Gannon Compliance Group provides non-legal operational-readiness, documentation, workflow-design, training, and implementation-support services. This illustrative prototype is not legal advice, a legal opinion, legal-compliance certification, an AI-system audit, a cybersecurity assessment, a behavioral threat assessment, safety-engineering advice, an employment-decision system, or a guarantee of outcomes.
+</div>
+</body>
+</html>

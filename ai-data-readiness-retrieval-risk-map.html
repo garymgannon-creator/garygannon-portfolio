@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Data Readiness & Retrieval-Risk Map | Gannon Compliance Group</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-panel: #1e1e1e;
+            --bg-panel-hover: #2a2a2a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-blue: #4a90e2;
+            --accent-gold: #cfa96a;
+            --border-color: #333333;
+            --nav-width: 280px;
+            --banner-bg: #cfa96a;
+            --banner-text: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        #top-banner {
+            background-color: var(--banner-bg);
+            color: var(--banner-text);
+            text-align: center;
+            padding: 8px 16px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        #system-statement {
+            background-color: var(--bg-panel);
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 6px;
+            font-size: 0.75rem;
+            position: fixed;
+            top: 32px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        nav {
+            width: var(--nav-width);
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            overflow-y: auto;
+            padding-top: 20px;
+            padding-bottom: 60px;
+        }
+
+        .nav-header {
+            padding: 0 20px 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .nav-header h1 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        .nav-header h2 {
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            font-weight: normal;
+            margin-top: 8px;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item:focus {
+            background-color: var(--bg-panel-hover);
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .nav-item.active {
+            background-color: var(--bg-panel-hover);
+            border-left-color: var(--accent-blue);
+            color: var(--accent-blue);
+            font-weight: 500;
+        }
+
+        main {
+            margin-left: var(--nav-width);
+            margin-top: 60px;
+            padding: 30px;
+            flex-grow: 1;
+            max-width: 100%;
+            padding-bottom: 120px;
+            overflow-x: hidden;
+        }
+
+        .module-container {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .module-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h2.module-title {
+            color: var(--accent-gold);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+        }
+
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            color: var(--accent-blue);
+            margin-bottom: 12px;
+        }
+
+        .text-muted { color: var(--text-secondary); }
+        .text-small { font-size: 0.85rem; }
+        
+        .summary-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+        }
+        .summary-card .val {
+            font-size: 2rem;
+            color: var(--text-primary);
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .summary-card .label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .workflow-visual {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--bg-panel);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+        .workflow-step {
+            text-align: center;
+            padding: 10px;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            min-width: 140px;
+            font-size: 0.85rem;
+        }
+        .workflow-arrow {
+            color: var(--accent-gold);
+            font-weight: bold;
+            padding: 0 10px;
+        }
+
+        button {
+            background-color: var(--bg-panel-hover);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        button:hover, button:focus {
+            background-color: #3a3a3a;
+            border-color: var(--accent-blue);
+            outline: none;
+        }
+        button.primary {
+            background-color: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+        button.primary:hover {
+            background-color: #357abd;
+        }
+
+        input[type="text"], input[type="date"], select, textarea {
+            width: 100%;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent-blue);
+            outline: none;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 1200px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            background-color: var(--bg-panel);
+            color: var(--accent-gold);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        tbody tr:hover {
+            background-color: var(--bg-panel-hover);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .checklist-item:hover { background-color: var(--bg-panel-hover); }
+        .checklist-item input[type="checkbox"] { margin-top: 4px; margin-right: 12px; cursor: pointer; }
+        .checklist-label { cursor: pointer; display: block; }
+        
+        .exposure-summary-panel {
+            background-color: rgba(74, 144, 226, 0.1);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .studio-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            min-height: 600px;
+        }
+        .tier-column {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+        }
+        .tier-header {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            font-weight: bold;
+            color: var(--accent-gold);
+            background-color: rgba(0,0,0,0.2);
+        }
+        .tier-body {
+            padding: 10px;
+            flex-grow: 1;
+            overflow-y: auto;
+            min-height: 200px;
+        }
+        .doc-card {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--text-secondary);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.8rem;
+        }
+        .doc-card:active { cursor: grabbing; }
+        .doc-card.dragging { opacity: 0.5; border: 1px dashed var(--accent-blue); }
+        .doc-card .title { font-weight: bold; margin-bottom: 4px; color: var(--text-primary); }
+        .doc-card .meta { color: var(--text-secondary); font-size: 0.75rem; margin-bottom: 2px;}
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            background-color: #333;
+            color: #ddd;
+            border: 1px solid #555;
+            margin-top: 4px;
+        }
+        .demo-scenario {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 100%;
+        }
+        .demo-scenario:hover, .demo-scenario.selected {
+            border-color: var(--accent-blue);
+            background-color: rgba(74, 144, 226, 0.05);
+        }
+        .demo-output {
+            background-color: #0a0a0a;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-family: monospace;
+            color: #d4d4d4;
+        }
+        .demo-output-label {
+            color: var(--accent-gold);
+            font-family: sans-serif;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px; right: 20px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        footer {
+            background-color: var(--bg-dark);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            padding: 20px;
+            position: fixed;
+            bottom: 0;
+            left: var(--nav-width);
+            right: 0;
+            text-align: justify;
+            z-index: 100;
+        }
+        
+        .footer-link {
+            color: var(--accent-blue);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            .studio-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            nav { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border-color); top: 0; padding-bottom: 10px;}
+            main { margin-left: 0; margin-top: 70px; padding: 15px; padding-bottom: 150px; }
+            footer { left: 0; }
+            .studio-grid { grid-template-columns: 1fr; }
+            .workflow-visual { flex-direction: column; align-items: stretch; }
+            .workflow-arrow { text-align: center; transform: rotate(90deg); margin: 5px 0; }
+            table { min-width: 800px; }
+        }
+        @media print {
+            body { background-color: white; color: black; }
+            nav, #top-banner, #system-statement, footer, .modal-overlay, button { display: none !important; }
+            main { margin: 0; padding: 0; width: 100%; max-width: 100%; }
+            .module-container { display: block !important; page-break-after: always; }
+            .panel, .summary-card, .tier-column, .doc-card, table th { background-color: white; color: black; border-color: #ccc; }
+            table td { color: black; border-color: #eee; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="top-banner">ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY — NOT LEGAL ADVICE, A TECHNICAL AI AUDIT, A CYBERSECURITY ASSESSMENT, A PRIVACY IMPACT ASSESSMENT, OR A COMPLIANCE DETERMINATION.</div>
+    <div id="system-statement">Prototype uses in-browser demonstration data; changes reset on refresh unless exported.</div>
+
+    <nav aria-label="Main Navigation">
+        <div class="nav-header">
+            <h1>AI Data Readiness &<br>Retrieval-Risk Map</h1>
+            <h2>Illustrative Knowledge Governance, Source-Status, and Human-Review Prototype</h2>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-target="mod-home" tabindex="0">1. Home / Retrieval Readiness Overview</li>
+            <li class="nav-item" data-target="mod-exposure" tabindex="0">2. Repository Retrieval Exposure Review</li>
+            <li class="nav-item" data-target="mod-studio" tabindex="0">3. 3-Tier Information Lifecycle Mapping Studio</li>
+            <li class="nav-item" data-target="mod-demo" tabindex="0">4. Retrieval Integrity Demonstration</li>
+            <li class="nav-item" data-target="mod-canonical" tabindex="0">5. Canonical Source Candidate Register</li>
+            <li class="nav-item" data-target="mod-ownership" tabindex="0">6. Document-Control & Ownership Review</li>
+            <li class="nav-item" data-target="mod-eligibility" tabindex="0">7. Retrieval Eligibility & Human Review Map</li>
+            <li class="nav-item" data-target="mod-action" tabindex="0">8. Specialist Review & Action Register</li>
+            <li class="nav-item" data-target="mod-evidence" tabindex="0">9. Evidence Register</li>
+            <li class="nav-item" data-target="mod-export" tabindex="0">10. Review & Export</li>
+        </ul>
+        <div style="padding: 20px;">
+            <button class="mb-2 w-full" onclick="openModal('how-to-modal')">How to Use</button>
+            <button class="w-full" onclick="openModal('boundaries-modal')">Claim Boundaries</button>
+        </div>
+    </nav>
+
+    <main>
+        <div id="mod-home" class="module-container active">
+            <h2 class="module-title">Home / Retrieval Readiness Overview</h2>
+
+            <div class="workflow-visual">
+                <div class="workflow-step">Unstructured / Mixed Repository</div>
+                <div class="workflow-arrow">→</div>
+                <div class="workflow-step">Source-Status Review</div>
+                <div class="workflow-arrow">→</div>
+                <div class="workflow-step" style="border-color: var(--accent-gold);">Tier 1 Canonical Source Layer</div>
+                <div class="workflow-arrow">→</div>
+                <div class="workflow-step">Tier 2 Active Work</div>
+                <div class="workflow-arrow">→</div>
+                <div class="workflow-step">Tier 3 Archive / Quarantine Review</div>
+                <div class="workflow-arrow">→</div>
+                <div class="workflow-step" style="border-color: var(--accent-blue);">Defined Retrieval Boundary</div>
+                <div class="workflow-arrow">→</div>
+                <div class="workflow-step">Human Review & Escalation</div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-4">
+                <div class="panel">
+                    <h3 class="panel-title">What this prototype does</h3>
+                    <p class="text-small">This dashboard provides a structured framework for organizations to plan information governance before connecting AI assistants to enterprise document repositories. It supports visual mapping of source status, document ownership, lifecycle separation (active vs. archive), and intended retrieval boundaries to highlight areas needing management or specialist review.</p>
+                </div>
+                <div class="panel">
+                    <h3 class="panel-title">What this prototype does not do</h3>
+                    <p class="text-small">This tool does not provide legal advice, technical AI auditing, cybersecurity assessment, privacy impact assessment, records-retention determinations, or compliance certification. It does not scan networks, evaluate actual permissions, test AI models, or guarantee accurate retrieval or data security. Data entered is fictional or redacted for demonstration only.</p>
+                </div>
+            </div>
+
+            <div class="panel" style="border-left: 4px solid var(--accent-gold);">
+                <h3 class="panel-title">Why source status matters</h3>
+                <p>An AI assistant connected to an uncontrolled information environment may retrieve content that appears relevant but has unclear currency, authority, ownership, approval status, access suitability, or business purpose. This prototype helps organize review questions; it does not determine source authority, legal status, or technical system behavior.</p>
+            </div>
+
+            <h3 class="mb-4 text-lg text-white">Illustrative Planning Metrics</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-4">
+                <div class="summary-card"><div class="val">4</div><div class="label">Repository Areas Logged</div></div>
+                <div class="summary-card"><div class="val">12</div><div class="label">Source-Status Questions Open</div></div>
+                <div

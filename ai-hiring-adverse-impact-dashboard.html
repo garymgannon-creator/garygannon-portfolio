@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Hiring Tool Adverse Impact Exposure Calculator — Gannon Compliance Group</title>
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --ink:#0A0A0F;
+    --body:#2E3550;
+    --rule-accent:#D97706;
+    --link:#1A4FD6;
+    --hair:#E4E1D8;
+    --safe:#1A4FD6;
+    --risk:#B3261E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--body);}
+  body{
+    font-family:'Inter',Helvetica,Arial,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:64px 24px 96px;}
+  h1,h2,h3{font-family:Georgia,'Source Serif 4',serif;color:var(--ink);margin:0;}
+  h1{font-size:2.1rem;font-weight:700;letter-spacing:-0.01em;line-height:1.2;}
+  h2{font-size:1.15rem;font-weight:700;margin-bottom:6px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--body);
+    opacity:0.65;
+    margin-bottom:14px;
+  }
+  .tagline{font-size:1.05rem;color:var(--body);margin-top:14px;max-width:62ch;}
+  .rule{border:0;border-top:2px solid var(--rule-accent);width:56px;margin:28px 0 32px;}
+  .hair-rule{border:0;border-top:1px solid var(--hair);margin:40px 0;}
+  section{margin-bottom:8px;}
+  .context{
+    font-size:0.98rem;
+    color:var(--body);
+    max-width:68ch;
+  }
+  .context strong{color:var(--ink);}
+  .cite{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.78rem;
+    color:var(--body);
+    opacity:0.7;
+    margin-top:10px;
+  }
+
+  /* Calculator */
+  .calc-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:36px;
+    margin-top:24px;
+  }
+  @media (max-width:640px){ .calc-grid{grid-template-columns:1fr;} }
+  .group-card{padding:0;}
+  .group-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--body);
+    opacity:0.7;
+    margin-bottom:10px;
+  }
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block;
+    font-size:0.86rem;
+    color:var(--body);
+    margin-bottom:6px;
+  }
+  .field input{
+    width:100%;
+    padding:10px 12px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:1rem;
+    color:var(--ink);
+    background:#FFFFFF;
+    border:1px solid var(--hair);
+    border-radius:2px;
+  }
+  .field input:focus{
+    outline:2px solid var(--rule-accent);
+    outline-offset:1px;
+    border-color:var(--rule-accent);
+  }
+  .field input[type="text"]{font-family:'Inter',sans-serif;}
+
+  .result-panel{margin-top:36px;}
+  .result-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    padding:14px 0;
+    border-top:1px solid var(--hair);
+  }
+  .result-row:last-child{border-bottom:1px solid var(--hair);}
+  .result-label{font-size:0.92rem;color:var(--body);}
+  .result-value{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:1.15rem;
+    color:var(--ink);
+    font-weight:600;
+  }
+  .bar-row{margin:22px 0;}
+  .bar-label{
+    display:flex;
+    justify-content:space-between;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.8rem;
+    color:var(--body);
+    margin-bottom:6px;
+  }
+  .bar-track{
+    height:10px;
+    background:#F2F0EA;
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    background:var(--ink);
+    transition:width 0.3s ease;
+  }
+  .bar-fill.risk{background:var(--risk);}
+
+  .verdict{
+    margin-top:28px;
+    padding:20px 22px;
+    border-left:3px solid var(--ink);
+    background:#FAFAF8;
+  }
+  .verdict.risk{border-left-color:var(--risk);}
+  .verdict.safe{border-left-color:var(--safe);}
+  .verdict-title{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    margin-bottom:8px;
+  }
+  .verdict.risk .verdict-title{color:var(--risk);}
+  .verdict.safe .verdict-title{color:var(--safe);}
+  .verdict-body{font-size:0.95rem;color:var(--body);}
+  .verdict-body strong{color:var(--ink);}
+
+  /* Checklist */
+  .checklist{list-style:none;margin:20px 0 0;padding:0;}
+  .checklist li{
+    display:flex;
+    gap:14px;
+    padding:16px 0;
+    border-top:1px solid var(--hair);
+    font-size:0.95rem;
+  }
+  .checklist li:last-child{border-bottom:1px solid var(--hair);}
+  .checklist input[type="checkbox"]{
+    margin-top:3px;
+    width:16px;height:16px;
+    accent-color:var(--rule-accent);
+    flex-shrink:0;
+  }
+  .checklist label{cursor:pointer;color:var(--body);}
+  .checklist label strong{color:var(--ink);display:block;font-size:0.9rem;margin-bottom:2px;}
+
+  footer{
+    margin-top:64px;
+    padding-top:24px;
+    border-top:1px solid var(--hair);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:0.76rem;
+    color:var(--body);
+    opacity:0.75;
+    max-width:68ch;
+  }
+  a{color:var(--link);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div style="background:#1B2A4A;color:#fff;text-align:center;padding:10px 16px;font-weight:700;letter-spacing:0.4px;font-size:0.85rem;">
+ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY<br>
+<span style="font-weight:400;font-size:0.72rem;">Demonstrates operational workflow design, documentation, action tracking, human-review checkpoints, and management-ready implementation support.</span>
+</div>
+<div class="wrap">
+
+  <div class="eyebrow">Gannon Compliance Group — AI Governance / Employment Practices</div>
+  <h1>AI Hiring Tool Adverse Impact Exposure Calculator</h1>
+  <p class="tagline">A working four-fifths rule check for AI-assisted hiring, screening, or scoring tools — the same statistical test regulators and courts apply to determine disparate impact.</p>
+  <hr class="rule">
+
+  <section class="context">
+    <p><strong>Why this matters right now:</strong> in <em>Mobley v. Workday, Inc.</em> (N.D. Cal.), a federal court allowed disparate impact claims against an AI hiring vendor to proceed — holding that automated screening tools performing traditional hiring functions can trigger the same anti-discrimination exposure as a human recruiter. <strong>Disparate impact</strong> is unintentional — a policy or tool that is neutral on its face but produces a statistically unequal outcome across protected groups. <strong>Disparate treatment</strong> is intentional differential treatment. AI screening tools are overwhelmingly an adverse-impact risk, not an intentional-discrimination risk — which is exactly why most employers using them haven't thought to check.</p>
+    <p class="cite">Mobley v. Workday, Inc., Case No. 3:23-cv-00770 (N.D. Cal.) — cited for procedural posture and legal theory only, not as a final determination of liability.</p>
+  </section>
+
+  <hr class="hair-rule">
+
+  <h2>Run the four-fifths rule</h2>
+  <p class="context">Enter applicant and selection (hire, advance, or shortlist) counts for two groups being compared — e.g., a protected group vs. a reference group, for any stage of an AI-assisted process.</p>
+
+  <div class="calc-grid">
+    <div class="group-card">
+      <div class="group-label">Group A</div>
+      <div class="field">
+        <label for="aName">Group label (optional)</label>
+        <input type="text" id="aName" placeholder="e.g., Applicants age 40+">
+      </div>
+      <div class="field">
+        <label for="aApplicants">Applicants</label>
+        <input type="number" id="aApplicants" min="0" value="200">
+      </div>
+      <div class="field">
+        <label for="aSelected">Selected</label>
+        <input type="number" id="aSelected" min="0" value="20">
+      </div>
+    </div>
+    <div class="group-card">
+      <div class="group-label">Group B (reference)</div>
+      <div class="field">
+        <label for="bName">Group label (optional)</label>
+        <input type="text" id="bName" placeholder="e.g., Applicants under 40">
+      </div>
+      <div class="field">
+        <label for="bApplicants">Applicants</label>
+        <input type="number" id="bApplicants" min="0" value="200">
+      </div>
+      <div class="field">
+        <label for="bSelected">Selected</label>
+        <input type="number" id="bSelected" min="0" value="40">
+      </div>
+    </div>
+  </div>
+
+  <div class="result-panel">
+    <div class="bar-row">
+      <div class="bar-label"><span id="aBarLabel">Group A selection rate</span><span id="aRateText">0%</span></div>
+      <div class="bar-track"><div class="bar-fill" id="aBar" style="width:0%"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label"><span id="bBarLabel">Group B selection rate</span><span id="bRateText">0%</span></div>
+      <div class="bar-track"><div class="bar-fill" id="bBar" style="width:0%"></div></div>
+    </div>
+
+    <div class="result-row">
+      <span class="result-label">Impact ratio (Group A rate ÷ Group B rate)</span>
+      <span class="result-value" id="ratioValue">—</span>
+    </div>
+    <div class="result-row">
+      <span class="result-label">Standard deviation shortfall (2–3 SD is the alternate legal test)</span>
+      <span class="result-value" id="sdValue">—</span>
+    </div>
+
+    <div class="verdict" id="verdict">
+      <div class="verdict-title" id="verdictTitle">Enter data above</div>
+      <div class="verdict-body" id="verdictBody">Results will appear here once both groups have applicant and selection counts.</div>
+    </div>
+  </div>
+
+  <hr class="hair-rule">
+
+  <h2>AI hiring tool readiness checklist</h2>
+  <p class="context">Based on the response pattern employment counsel are recommending post-<em>Mobley</em>: inventory, audit, oversight, and contract protection.</p>
+
+  <ul class="checklist">
+    <li>
+      <input type="checkbox" id="c1">
+      <label for="c1"><strong>Tool inventory complete</strong>Every AI-assisted step in the hiring pipeline is identified — sourcing, resume screening, video/text scoring, scheduling, and any automated rejection.</label>
+    </li>
+    <li>
+      <input type="checkbox" id="c2">
+      <label for="c2"><strong>Vendor bias-audit documentation on file</strong>Written confirmation from each AI vendor of independent bias testing, and when it was last performed.</label>
+    </li>
+    <li>
+      <input type="checkbox" id="c3">
+      <label for="c3"><strong>Human review checkpoint exists</strong>A person with actual authority to override the tool reviews outcomes before a final rejection or advancement — not a rubber stamp.</label>
+    </li>
+    <li>
+      <input type="checkbox" id="c4">
+      <label for="c4"><strong>Adverse impact tested on your own data</strong>The four-fifths (or standard deviation) test above has been run on your actual applicant flow, not just the vendor's general claims.</label>
+    </li>
+    <li>
+      <input type="checkbox" id="c5">
+      <label for="c5"><strong>Vendor contract has indemnification language</strong>Your agreement with the AI vendor assigns responsibility for discriminatory outcomes, rather than leaving your organization fully exposed as the "employer of record."</label>
+    </li>
+  </ul>
+
+  <footer>
+    Strategic Intelligence — Not Legal Counsel (CA B&amp;P §§6125–6126). This tool applies the EEOC's four-fifths rule (29 C.F.R. §1607.4(D)) as a screening heuristic; it is not a substitute for a formal adverse impact analysis conducted with employment counsel and does not constitute a legal determination of discrimination. Gannon Compliance Group.
+  </footer>
+
+</div>
+
+<script>
+function computeAndRender(){
+  const aApplicants = parseFloat(document.getElementById('aApplicants').value) || 0;
+  const aSelected = parseFloat(document.getElementById('aSelected').value) || 0;
+  const bApplicants = parseFloat(document.getElementById('bApplicants').value) || 0;
+  const bSelected = parseFloat(document.getElementById('bSelected').value) || 0;
+
+  const aName = document.getElementById('aName').value.trim() || 'Group A';
+  const bName = document.getElementById('bName').value.trim() || 'Group B';
+
+  document.getElementById('aBarLabel').textContent = aName + ' selection rate';
+  document.getElementById('bBarLabel').textContent = bName + ' selection rate';
+
+  const verdict = document.getElementById('verdict');
+  const verdictTitle = document.getElementById('verdictTitle');
+  const verdictBody = document.getElementById('verdictBody');
+
+  if(aApplicants <= 0 || bApplicants <= 0){
+    document.getElementById('aRateText').textContent = '—';
+    document.getElementById('bRateText').textContent = '—';
+    document.getElementById('aBar').style.width = '0%';
+    document.getElementById('bBar').style.width = '0%';
+    document.getElementById('ratioValue').textContent = '—';
+    document.getElementById('sdValue').textContent = '—';
+    verdict.className = 'verdict';
+    verdictTitle.textContent = 'Enter data above';
+    verdictBody.textContent = 'Results will appear here once both groups have applicant and selection counts.';
+    return;
+  }
+
+  const aRate = aSelected / aApplicants;
+  const bRate = bSelected / bApplicants;
+
+  document.getElementById('aRateText').textContent = (aRate*100).toFixed(1) + '%';
+  document.getElementById('bRateText').textContent = (bRate*100).toFixed(1) + '%';
+
+  const maxRate = Math.max(aRate, bRate, 0.0001);
+  document.getElementById('aBar').style.width = ((aRate/maxRate)*100).toFixed(1) + '%';
+  document.getElementById('bBar').style.width = ((bRate/maxRate)*100).toFixed(1) + '%';
+
+  let ratio = null;
+  if(bRate > 0){
+    ratio = aRate / bRate;
+    document.getElementById('ratioValue').textContent = (ratio*100).toFixed(1) + '%';
+  } else {
+    document.getElementById('ratioValue').textContent = 'n/a (0% reference rate)';
+  }
+
+  // Standard deviation test (simplified two-proportion z-test), the EEOC's alternate/preferred method
+  const totalApplicants = aApplicants + bApplicants;
+  const totalSelected = aSelected + bSelected;
+  const overallRate = totalSelected / totalApplicants;
+  const expectedASelected = aApplicants * overallRate;
+  const variance = aApplicants * bApplicants * overallRate * (1-overallRate) / totalApplicants;
+  const sd = Math.sqrt(variance);
+  let zScore = null;
+  if(sd > 0){
+    zScore = (aSelected - expectedASelected) / sd;
+    document.getElementById('sdValue').textContent = zScore.toFixed(2) + ' SD';
+  } else {
+    document.getElementById('sdValue').textContent = 'n/a';
+  }
+
+  const flaggedByRatio = ratio !== null && ratio < 0.8;
+  const flaggedBySD = zScore !== null && zScore <= -2;
+
+  if(flaggedByRatio || flaggedBySD){
+    verdict.className = 'verdict risk';
+    verdictTitle.textContent = 'Adverse impact indicated';
+    let reasons = [];
+    if(flaggedByRatio) reasons.push('the impact ratio is below the 80% threshold');
+    if(flaggedBySD) reasons.push('the shortfall exceeds 2 standard deviations');
+    verdictBody.innerHTML = 'This comparison meets the screening threshold for adverse impact because ' + reasons.join(' and ') + '. <strong>This is a signal to investigate further, not a legal finding.</strong> Recommended next step: a formal adverse impact review with employment counsel, examining whether the disparity is job-related and consistent with business necessity.';
+  } else {
+    verdict.className = 'verdict safe';
+    verdictTitle.textContent = 'No adverse impact indicated by this test';
+    verdictBody.innerHTML = 'Neither the four-fifths ratio nor the standard deviation test is flagged for this comparison. <strong>A clean result here does not clear every risk</strong> — disparate treatment, intersectional effects, and other protected categories should still be reviewed separately.';
+  }
+}
+
+document.querySelectorAll('#aApplicants,#aSelected,#bApplicants,#bSelected,#aName,#bName').forEach(el=>{
+  el.addEventListener('input', computeAndRender);
+});
+computeAndRender();
+</script>
+<div style="background:#F1F5F9;color:#2E3550;text-align:center;padding:14px 16px;font-size:0.72rem;border-top:1px solid #E2E8F0;">
+Gannon Compliance Group provides non-legal operational-readiness, documentation, workflow-design, training, and implementation-support services. This illustrative prototype is not legal advice, a legal opinion, legal-compliance certification, an AI-system audit, a cybersecurity assessment, a behavioral threat assessment, safety-engineering advice, an employment-decision system, or a guarantee of outcomes.
+</div>
+</body>
+</html>

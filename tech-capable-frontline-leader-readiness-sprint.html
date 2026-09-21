@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCG Tech-Capable Frontline Leader Readiness Sprint</title>
+    <style>
+        /* ==========================================================================
+           CSS VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --color-bg: #FFFFFF;
+            --color-bg-alt: #F7F8FA;
+            --color-ink: #0A0A0F;
+            --color-body: #2E3550;
+            --color-navy: #0B1F3A;
+            --color-gold: #C99A2E;
+            --color-gold-dark: #B8860B;
+            --color-border: #E4E1D8;
+            --color-green: #16794A;
+            --color-amber: #B86B00;
+            --color-red: #B3261E;
+            --color-blue: #1A4FD6;
+            
+            --font-head: 'Georgia', 'Source Serif 4', 'Times New Roman', serif;
+            --font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            
+            --max-width: 1050px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 32px;
+            --spacing-xl: 64px;
+            --radius: 4px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--color-body);
+            background-color: var(--color-bg);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: var(--font-head);
+            color: var(--color-ink);
+            line-height: 1.2;
+            margin-bottom: var(--spacing-md);
+            font-weight: 600;
+        }
+
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 2rem; border-bottom: 1px solid var(--color-border); padding-bottom: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
+        h3 { font-size: 1.5rem; margin-top: var(--spacing-lg); }
+        h4 { font-size: 1.2rem; }
+
+        p { margin-bottom: var(--spacing-md); }
+        
+        a { color: var(--color-navy); text-decoration: underline; text-decoration-color: var(--color-border); text-underline-offset: 4px; }
+        a:hover { color: var(--color-gold); text-decoration-color: var(--color-gold); }
+
+        ul, ol { margin-bottom: var(--spacing-md); padding-left: var(--spacing-lg); }
+        li { margin-bottom: var(--spacing-sm); }
+
+        /* ==========================================================================
+           LAYOUT & NAVIGATION
+           ========================================================================== */
+        .brand-line {
+            background-color: var(--color-navy);
+            color: white;
+            padding: 12px 24px;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .brand-line span { opacity: 0.9; }
+        .brand-line .divider { opacity: 0.4; margin: 0 12px; }
+
+        .progress-bar {
+            position: sticky;
+            top: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--color-border);
+            padding: 16px 24px;
+            z-index: 100;
+            display: none; /* Shown via JS after start */
+        }
+        
+        .progress-steps {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--color-body);
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        .step-indicator.active { opacity: 1; font-weight: 600; color: var(--color-navy); }
+        .step-indicator.completed { opacity: 0.8; }
+        
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: var(--spacing-xl) 24px;
+        }
+        
+        .section-view { display: none; }
+        .section-view.active { display: block; animation: fadeIn 0.4s ease-in; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==========================================================================
+           COMPONENTS
+           ========================================================================== */
+        .eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--color-gold-dark);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--spacing-md);
+            display: block;
+        }
+
+        .lead {
+            font-size: 1.25rem;
+            color: var(--color-navy);
+            font-family: var(--font-head);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .designed-for {
+            background-color: var(--color-bg-alt);
+            border-left: 3px solid var(--color-gold);
+            padding: var(--spacing-md);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            margin-bottom: var(--spacing-lg);
+            color: var(--color-ink);
+        }
+
+        .info-panel {
+            background-color: var(--color-bg-alt);
+            border: 1px solid var(--color-border);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius);
+            margin-top: var(--spacing-lg);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-family: var(--font-body);
+        }
+        
+        .btn-primary {
+            background-color: var(--color-navy);
+            color: white;
+        }
+        .btn-primary:hover { background-color: var(--color-ink); }
+        .btn-primary:focus { outline: 2px solid var(--color-gold); outline-offset: 2px; }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--color-navy);
+            border-color: var(--color-navy);
+        }
+        .btn-secondary:hover { background-color: var(--color-bg-alt); }
+        
+        .btn-danger {
+            background-color: transparent;
+            color: var(--color-red);
+            border-color: var(--color-border);
+        }
+        .btn-danger:hover { background-color: #FDF3F3; border-color: var(--color-red); }
+
+        .btn-group {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .controls-footer {
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--color-ink);
+        }
+
+        .optional-tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--color-body);
+            font-weight: normal;
+            margin-left: 8px;
+        }
+
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            background-color: var(--color-bg);
+            color: var(--color-ink);
+        }
+        
+        input[type="text"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--color-navy);
+            box-shadow: 0 0 0 3px rgba(11, 31, 58, 0.1);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            margin-top: var(--spacing-sm);
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .checkbox-label input { margin-top: 4px; margin-right: 12px; }
+
+        /* Assessment Scales */
+        .question-block {
+            background-color: var(--color-bg-alt);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+        }
+        
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-ink);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .scale-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        @media (min-width: 768px) {
+            .scale-options {
+                flex-direction: row;
+                justify-content: space-between;
+                background: #fff;
+                border: 1px solid var(--color-border);
+                border-radius: var(--radius);
+                overflow: hidden;
+            }
+            .scale-label {
+                flex: 1;
+                text-align: center;
+                border-bottom: none !important;
+                border-right: 1px solid var(--color-border);
+            }
+            .scale-label:last-child { border-right: none; }
+        }
+
+        .scale-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 8px;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid var(--color-border);
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .scale-label:hover { background-color: var(--color-bg-alt); }
+        
+        .scale-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .scale-number {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--color-navy);
+            margin-bottom: 4px;
+        }
+        
+        .scale-text {
+            font-size: 0.75rem;
+            text-align: center;
+            line-height: 1.2;
+            color: var(--color-body);
+        }
+
+        .scale-input:checked + .scale-content {
+            background-color: var(--color-navy);
+        }
+        .scale-input:checked ~ .scale-number,
+        .scale-input:checked ~ .scale-text {
+            color: white;
+        }
+        .scale-label:has(input:checked) {
+            background-color: var(--color-navy);
+            border-color: var(--color-navy);
+        }
+        .scale-input:focus-visible ~ .scale-number {
+            outline: 2px solid var(--color-gold);
+            outline-offset: 4px;
+        }
+
+        .validation-error {
+            color: var(--color-red);
+            background-color: #FDF3F3;
+            padding: 12px;
+            border-left: 4px solid var(--color-red);
+            margin-bottom: var(--spacing-lg);
+            font-weight: 600;
+            display: none;
+        }
+
+        /* Tooltips/Expandables */
+        details.expandable-term {
+            margin-bottom: var(--spacing-md);
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 8px 12px;
+        }
+        
+        details.expandable-term summary {
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--color-navy);
+            font-size: 0.9rem;
+            list-style: none; /* Hide default marker */
+            display: flex;
+            align-items: center;
+        }
+        details.expandable-term summary::-webkit-details-marker { display: none; }
+        details.expandable-term summary::before {
+            content: '+';
+            margin-right: 8px;
+            font-family: var(--font-mono);
+            color: var(--color-gold-dark);
+            font-weight: bold;
+        }
+        details.expandable-term[open] summary::before { content: '-'; }
+        
+        details.expandable-term p {
+            margin-top: 8px;
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            padding-left: 20px;
+        }
+
+        /* ==========================================================================
+           RESULTS DASHBOARD
+           ========================================================================== */
+        .score-hero {
+            text-align: center;
+            padding: var(--spacing-xl) 24px;
+            background-color: var(--color-navy);
+            color: white;
+            border-radius: var(--radius);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .score-hero h2 { color: white; border: none; margin-bottom: 0; }
+        
+        .score-giant {
+            font-size: 5rem;
+            font-family: var(--font-head);
+            font-weight: 700;
+            color: var(--color-gold);
+            line-height: 1;
+            margin: var(--spacing-md) 0;
+        }
+        
+        .score-band-label {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        @media (min-width: 768px) { .score-grid { grid-template-columns: 1fr 1fr; } }
+        
+        .score-panel {
+            background-color: var(--color-bg-alt);
+            border: 1px solid var(--color-border);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius);
+            text-align: center;
+        }
+        .score-panel-title { font-family: var(--font-mono); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .score-panel-value { font-size: 3rem; font-family: var(--font-head); color: var(--color-navy); line-height: 1; }
+
+        .foundation-scorecard { margin-top: var(--spacing-xl); }
+        
+        .score-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+        @media (min-width: 768px) {
+            .score-row {
+                grid-template-columns: 3fr 1fr 4fr;
+                align-items: center;
+            }
+        }
+        
+        .score-row-title { font-weight: 600; font-family: var(--font-head); font-size: 1.1rem; color: var(--color-ink); }
+        
+        .score-row-metric { display: flex; align-items: center; gap: 12px; }
+        .score-row-number { font-family: var(--font-mono); font-weight: 600; font-size: 1.2rem; }
+        .score-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        
+        .dot-red { background-color: var(--color-red); }
+        .dot-amber { background-color: var(--color-amber); }
+        .dot-green { background-color: var(--color-green); }
+
+        .score-row-text { font-size: 0.9rem; color: var(--color-body); }
+
+        .action-plan-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-md);
+        }
+        @media (min-width: 768px) { .action-plan-grid { grid-template-columns: repeat(3, 1fr); } }
+        
+        .action-phase {
+            background: var(--color-bg-alt);
+            border-top: 4px solid var(--color-navy);
+            padding: var(--spacing-md);
+        }
+        .action-phase h4 { font-family: var(--font-mono); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--color-navy); }
+        .action-phase ul { padding-left: 16px; font-size: 0.9rem; }
+
+        .engagement-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+        @media (min-width: 768px) { .engagement-cards { grid-template-columns: repeat(3, 1fr); } }
+        
+        .card {
+            border: 1px solid var(--color-border);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        .card-type { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; color: var(--color-gold-dark); margin-bottom: 8px; font-weight: 600; }
+        .card h4 { font-size: 1.2rem; margin-bottom: 12px; }
+        .card ul { font-size: 0.9rem; margin-bottom: var(--spacing-lg); flex-grow: 1; }
+        .card-rate { font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-body); padding-top: 12px; border-top: 1px solid var(--color-border); }
+
+        .research-note {
+            font-size: 0.85rem;
+            color: var(--color-body);
+            border-top: 1px solid var(--color-border);
+            padding-top: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+            opacity: 0.9;
+        }
+
+        .site-footer {
+            background-color: var(--color-ink);
+            color: white;
+            padding: var(--spacing-lg) 24px;
+            margin-top: var(--spacing-xl);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        .site-footer p { opacity: 0.7; margin-bottom: 8px; }
+
+        /* ==========================================================================
+           PRINT STYLES
+           ========================================================================== */
+        @media print {
+            body { font-size: 10pt; color: black; background: white; }
+            .no-print, .progress-bar, .controls-footer, .btn, .brand-line { display: none !important; }
+            .container { padding: 0; margin: 0; width: 100%; max-width: none; }
+            .section-view { display: block !important; opacity: 1; page-break-before: always; }
+            #step-hero { page-break-before: auto; }
+            .score-hero { background-color: white; color: black; border: 2px solid black; padding: 20px; }
+            .score-hero h2, .score-giant, .score-band-label { color: black; }
+            .score-panel { border: 1px solid black; background: white; }
+            .action-phase { border-top-color: black; background: white; border: 1px solid #ccc; }
+            .card { border: 1px solid #ccc; }
+            h1, h2, h3, h4 { color: black; page-break-after: avoid; }
+            .dot-red, .dot-amber, .dot-green { border: 1px solid black; } /* Ensure visibility in b/w */
+        }
+    </style>
+</head>
+<body>
+<div style="background:#1B2A4A;color:#fff;text-align:center;padding:10px 16px;font-weight:700;letter-spacing:0.4px;font-size:0.85rem;">
+ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY<br>
+<span style="font-weight:400;font-size:0.72rem;">Demonstrates operational workflow design, documentation, action tracking, human-review checkpoints, and management-ready implementation support.</span>
+</div>
+
+    <header class="brand-line no-print">
+        <span>GANNON COMPLIANCE GROUP</span>
+        <span class="divider">|</span>
+        <span>Human-Owned AI Adoption / Strategic Intelligence</span>
+    </header>
+
+    <div class="progress-bar" id="progressBar">
+        <div class="progress-steps">
+            <span class="step-indicator active" id="ind-hero">Start</span>
+            <span>&rsaquo;</span>
+            <span class="step-indicator" id="ind-profile">Profile</span>
+            <span>&rsaquo;</span>
+            <span class="step-indicator" id="ind-foundations">Foundations</span>
+            <span>&rsaquo;</span>
+            <span class="step-indicator" id="ind-leaders">Leaders</span>
+            <span>&rsaquo;</span>
+            <span class="step-indicator" id="ind-workflow">Workflow</span>
+            <span>&rsaquo;</span>
+            <span class="step-indicator" id="ind-results">Results</span>
+        </div>
+    </div>
+
+    <main id="app" class="container">
+
+        <!-- ============================================================
+             STEP 1: HERO & HOW TO
+             ============================================================ -->
+        <section id="step-hero" class="section-view active">
+            <span class="eyebrow">GANNON COMPLIANCE GROUP — HUMAN-OWNED AI ADOPTION</span>
+            <h1>Tech-Capable Frontline Leader Readiness Sprint</h1>
+            <h2>Who owns the work after AI arrives?</h2>
+            
+            <p class="lead">“AI does not implement itself. Tools create value only when leaders closest to the work can define the real problem, redesign the workflow, verify consequential outputs, coach adoption, manage exceptions, and remain accountable for outcomes.”</p>
+            
+            <p>This confidential self-assessment helps leaders identify their organization’s practical readiness to implement AI through human judgment, operating discipline, workforce capability, and responsible governance.</p>
+
+            <div class="designed-for">
+                <strong>Designed for:</strong> Operations &middot; HR &middot; Safety/Security &middot; Compliance &middot; Workforce Development &middot; Multi-site and 24/7 Environments
+            </div>
+
+            <div class="btn-group no-print">
+                <button class="btn btn-primary" onclick="app.nextStep('step-profile')">Begin the assessment</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('how-it-works').scrollIntoView({behavior: 'smooth'})">What you will assess</button>
+            </div>
+
+            <div class="info-panel" id="how-it-works">
+                <h3>What this is—and is not</h3>
+                <ul>
+                    <li>A structured reflection and conversation starter for executive, HR, operations, safety, security, compliance, and workforce leaders.</li>
+                    <li>A way to identify readiness gaps before an AI pilot or broader implementation.</li>
+                    <li><strong>Not</strong> a legal analysis, ISO certification assessment, technology selection tool, guarantee of performance, or substitute for qualified legal, technical, privacy, cybersecurity, or employment advice.</li>
+                </ul>
+
+                <h3 style="margin-top: 32px;">How to use this assessment</h3>
+                <ol>
+                    <li><strong>Assess six organizational foundations:</strong> Rate the practical conditions that determine whether AI can be adopted safely and used in real work.</li>
+                    <li><strong>Assess frontline leader capability:</strong> Identify whether the people closest to high-consequence workflows can lead AI-enabled change.</li>
+                    <li><strong>Generate a focused 90-day action plan:</strong> Receive a maturity profile, priority gaps, and practical next steps for discussion.</li>
+                </ol>
+                <p class="no-print"><em>Estimated time: 8–12 minutes. The assessment does not transmit or store data. Your responses remain in this browser unless you choose to print or download your results.</em></p>
+                
+                <div class="btn-group no-print">
+                    <button class="btn btn-primary" onclick="app.nextStep('step-profile')">Start assessment</button>
+                </div>
+            </div>
+            
+            <div class="info-panel" style="background-color: transparent; border: none; padding: 24px 0;">
+                <p style="font-size: 0.9rem; color: var(--color-body); border-left: 2px solid var(--color-border); padding-left: 16px;">
+                    Built by Gary M. Gannon—an operations, safety-security, compliance, and workforce leader with 29 years of 24/7, multi-site operating experience, including responsibility for workforce growth, training, risk, service continuity, and operational performance. (U.S. Navy veteran; former operations executive overseeing operations growth from ~30 employees to 350+ and improving WC EMR by 47% with zero WILLFUL Cal/OSHA violations).
+                </p>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             STEP 2: ORGANIZATION PROFILE
+             ============================================================ -->
+        <section id="step-profile" class="section-view">
+            <h2>Organization Profile <span class="optional-tag">(Optional - Not stored or transmitted)</span></h2>
+            
+            <div class="form-group">
+                <label for="org_name">Organization name</label>
+                <input type="text" id="org_name" name="org_name">
+            </div>
+            
+            <div class="form-group">
+                <label for="part_name">Participant name / title</label>
+                <input type="text" id="part_name" name="part_name">
+            </div>
+            
+            <div class="form-group">
+                <label for="industry">Industry or operating environment</label>
+                <input type="text" id="industry" name="industry">
+            </div>
+
+            <div class="form-group">
+                <label for="emp_count">Number of employees</label>
+                <select id="emp_count" name="emp_count">
+                    <option value="">Select range...</option>
+                    <option value="1-49">1–49</option>
+                    <option value="50-149">50–149</option>
+                    <option value="150-499">150–499</option>
+                    <option value="500-999">500–999</option>
+                    <option value="1,000+">1,000+</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Operating model (select all that apply)</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label"><input type="checkbox" name="op_model" value="Single site"> Single site</label>
+                    <label class="checkbox-label"><input type="checkbox" name="op_model" value="Multi-site"> Multi-site</label>
+                    <label class="checkbox-label"><input type="checkbox" name="op_model" value="24/7 operations"> 24/7 operations</label>
+                    <label class="checkbox-label"><input type="checkbox" name="op_model" value="Field/mobile workforce"> Field/mobile workforce</label>
+                    <label class="checkbox-label"><input type="checkbox" name="op_model" value="Public-facing environment"> Public-facing environment</label>
+                    <label class="checkbox-label"><input type="checkbox" name="op_model" value="Multi-employer/shared workplace"> Multi-employer/shared workplace</label>
+                    <label class="checkbox-label"><input type="checkbox" name="op_model" value="Other"> Other</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="ai_stage">Current AI stage</label>
+                <select id="ai_stage" name="ai_stage">
+                    <option value="">Select stage...</option>
+                    <option value="Exploring / individual experimentation">1. Exploring / individual experimentation</option>
+                    <option value="Piloting one or more use cases">2. Piloting one or more use cases</option>
+                    <option value="Deploying tools in selected functions">3. Deploying tools in selected functions</option>
+                    <option value="Scaling across multiple workflows or business areas">4. Scaling across multiple workflows or business areas</option>
+                    <option value="Reviewing or stabilizing existing AI-supported operations">5. Reviewing or stabilizing existing AI-supported operations</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="primary_reason">Primary reason for completing this assessment</label>
+                <select id="primary_reason" name="primary_reason">
+                    <option value="">Select reason...</option>
+                    <option value="AI implementation planning">AI implementation planning</option>
+                    <option value="HR / workforce capability planning">HR / workforce capability planning</option>
+                    <option value="Risk, compliance, or governance readiness">Risk, compliance, or governance readiness</option>
+                    <option value="Training / manager development">Training / manager development</option>
+                    <option value="Executive or board discussion">Executive or board discussion</option>
+                    <option value="Post-pilot adoption issues">Post-pilot adoption issues</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="controls-footer no-print">
+                <button class="btn btn-secondary" onclick="app.prevStep('step-hero')">Back</button>
+                <button class="btn btn-primary" onclick="app.nextStep('step-foundations')">Continue to foundations</button>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             STEP 3: FOUNDATIONS
+             ============================================================ -->
+        <section id="step-foundations" class="section-view">
+            <h2>The Six GCG Implementation Foundations</h2>
+            <p>Rate the practical conditions that determine whether AI can be adopted safely. Provide one answer per statement.</p>
+            
+            <div id="foundations-error" class="validation-error" role="alert">Please answer all foundation questions before continuing. Missing questions are highlighted.</div>
+
+            <!-- F1 -->
+            <div class="question-block" id="block-f1">
+                <span class="eyebrow">Foundation 1</span>
+                <h3>Value and mission</h3>
+                <p><em>Why it matters: AI efforts are more likely to produce useful outcomes when they begin with a meaningful operating, customer, workforce, safety, quality, risk, or compliance problem—not a tool purchase.</em></p>
+                <div id="q-f1-wrapper"></div>
+            </div>
+
+            <!-- F2 -->
+            <div class="question-block" id="block-f2">
+                <span class="eyebrow">Foundation 2</span>
+                <h3>Accountable operating leaders</h3>
+                <p><em>Why it matters: AI adoption stalls when no credible business or frontline leader owns the changed work after a pilot ends.</em></p>
+                <div id="q-f2-wrapper"></div>
+            </div>
+
+            <!-- F3 -->
+            <div class="question-block" id="block-f3">
+                <span class="eyebrow">Foundation 3</span>
+                <h3>Human-owned workflow design</h3>
+                <p><em>Why it matters: AI should support better work, not create unclear decisions, hidden handoffs, or unaccountable automation.</em></p>
+                
+                <details class="expandable-term no-print">
+                    <summary>What is a "human-owned decision"?</summary>
+                    <p>A decision that a responsible person—not an automated system—must make or approve because it has meaningful consequences for people, safety, compliance, rights, service, money, or reputation.</p>
+                </details>
+                
+                <div id="q-f3-wrapper"></div>
+            </div>
+
+            <!-- F4 -->
+            <div class="question-block" id="block-f4">
+                <span class="eyebrow">Foundation 4</span>
+                <h3>Data, controls, and evidence</h3>
+                <p><em>Why it matters: Useful AI depends on trustworthy information, appropriate access, visible sources, review discipline, and records that support accountability.</em></p>
+                <div id="q-f4-wrapper"></div>
+            </div>
+
+            <!-- F5 -->
+            <div class="question-block" id="block-f5">
+                <span class="eyebrow">Foundation 5</span>
+                <h3>Learning and reinforcement</h3>
+                <p><em>Why it matters: Training creates awareness; managers, incentives, practice, feedback, and workflow reinforcement make new behavior stick.</em></p>
+                <div id="q-f5-wrapper"></div>
+            </div>
+
+            <!-- F6 -->
+            <div class="question-block" id="block-f6">
+                <span class="eyebrow">Foundation 6</span>
+                <h3>Scale and measurement</h3>
+                <p><em>Why it matters: An isolated AI pilot is not an operating capability. Organizations need measures, learning loops, and a disciplined method for reuse and local adaptation.</em></p>
+                <div id="q-f6-wrapper"></div>
+            </div>
+
+            <div class="controls-footer no-print">
+                <button class="btn btn-secondary" onclick="app.prevStep('step-profile')">Back</button>
+                <button class="btn btn-primary" onclick="app.validateAndNext('foundations')">Continue to frontline leader assessment</button>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             STEP 4: LEADERS
+             ============================================================ -->
+        <section id="step-leaders" class="section-view">
+            <h2>Can your frontline leaders make AI real?</h2>
+            <p>“Tech-capable frontline leaders” are not necessarily technical specialists. They are credible domain and operating leaders who understand the work, can use data and technology thoughtfully, can lead people through changed workflows, and remain accountable for outcomes.</p>
+            
+            <div id="leaders-error" class="validation-error" role="alert">Please answer all leadership questions before continuing. Missing questions are highlighted.</div>
+
+            <!-- L1 -->
+            <div class="question-block" id="block-l1">
+                <span class="eyebrow">Dimension 1</span>
+                <h3>Domain and workflow ownership</h3>
+                <p><em>Leaders understand the actual work, including exceptions, workarounds, handoffs, risks, service requirements, and customer or employee impacts.</em></p>
+                <div id="q-l1-wrapper"></div>
+            </div>
+
+            <!-- L2 -->
+            <div class="question-block" id="block-l2">
+                <span class="eyebrow">Dimension 2</span>
+                <h3>Problem definition and value judgment</h3>
+                <p><em>Leaders begin with the operating problem and intended outcome before selecting or promoting an AI tool.</em></p>
+                <div id="q-l2-wrapper"></div>
+            </div>
+
+            <!-- L3 -->
+            <div class="question-block" id="block-l3">
+                <span class="eyebrow">Dimension 3</span>
+                <h3>Data, technology, and verification fluency</h3>
+                <p><em>Leaders can use AI and data thoughtfully without treating outputs as automatically correct.</em></p>
+                <details class="expandable-term no-print">
+                    <summary>What is a "human review"?</summary>
+                    <p>A meaningful check by a person with the knowledge and authority to question, correct, override, or stop an AI-supported output. It is not a rubber stamp.</p>
+                </details>
+                <div id="q-l3-wrapper"></div>
+            </div>
+
+            <!-- L4 -->
+            <div class="question-block" id="block-l4">
+                <span class="eyebrow">Dimension 4</span>
+                <h3>Human accountability and risk judgment</h3>
+                <p><em>Leaders know which decisions must remain human-owned and can manage exceptions, escalation, and consequential risk.</em></p>
+                <details class="expandable-term no-print">
+                    <summary>What is an "escalation trigger"?</summary>
+                    <p>A defined condition requiring the issue to be reviewed by a qualified person or higher authority, such as uncertainty, conflicting evidence, a safety concern, sensitive information, suspected bias, or a result outside normal limits.</p>
+                </details>
+                <div id="q-l4-wrapper"></div>
+            </div>
+
+            <!-- L5 -->
+            <div class="question-block" id="block-l5">
+                <span class="eyebrow">Dimension 5</span>
+                <h3>Change leadership, learning, and adoption</h3>
+                <p><em>Leaders can turn a changed workflow into clear expectations, practice, coaching, feedback, and accountable daily behavior.</em></p>
+                <div id="q-l5-wrapper"></div>
+            </div>
+
+            <div class="info-panel">
+                <div class="form-group">
+                    <label for="leader_mapping">Which roles or individuals are likely candidates to lead AI-enabled workflow adoption? <span class="optional-tag">(Optional)</span></label>
+                    <p style="font-size: 0.85rem; margin-bottom: 8px;">Do not choose only the most technical people. Consider credible leaders closest to high-consequence workflows and real employee adoption.</p>
+                    <textarea id="leader_mapping" rows="3" placeholder="Examples: Operations Manager, HR Director, Safety Manager, Regional Supervisor, Compliance Lead, Service Delivery Manager, Training Manager, Site Lead..."></textarea>
+                </div>
+            </div>
+
+            <div class="controls-footer no-print">
+                <button class="btn btn-secondary" onclick="app.prevStep('step-foundations')">Back</button>
+                <button class="btn btn-primary" onclick="app.validateAndNext('leaders')">Continue to workflow reflection</button>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             STEP 5: WORKFLOW
+             ============================================================ -->
+        <section id="step-workflow" class="section-view">
+            <h2>Choose one workflow to make the conversation real <span class="optional-tag">(Optional)</span></h2>
+            <p>AI readiness becomes clearer when discussed through a specific workflow rather than general intentions. Use this reflection to identify practical conditions for a safe pilot or workflow redesign. It does not authorize automation or determine legal compliance.</p>
+            
+            <div class="form-group">
+                <label for="wf_name">Workflow or use case name</label>
+                <input type="text" id="wf_name" placeholder="Example: employee incident intake and follow-up; client-report drafting; safety observation review...">
+            </div>
+            <div class="form-group">
+                <label for="wf_problem">Business or operating problem to improve</label>
+                <textarea id="wf_problem" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="wf_owner">Who owns the workflow today?</label>
+                <input type="text" id="wf_owner">
+            </div>
+            <div class="form-group">
+                <label for="wf_performer">Who performs the work?</label>
+                <input type="text" id="wf_performer">
+            </div>
+            <div class="form-group">
+                <label for="wf_consequence">What decision or outcome is most consequential?</label>
+                <textarea id="wf_consequence" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="wf_assist">Where could AI assist?</label>
+                <textarea id="wf_assist" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="wf_human">What must remain human-owned?</label>
+                <textarea id="wf_human" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="wf_wrong">What could go wrong if the output is wrong, incomplete, biased, delayed, or used outside its intended purpose?</label>
+                <textarea id="wf_wrong" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="wf_improve">What would tell you the workflow is improving?</label>
+                <textarea id="wf_improve" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="wf_records">What records, evidence, or approvals should be retained?</label>
+                <textarea id="wf_records" rows="2"></textarea>
+            </div>
+
+            <div class="controls-footer no-print">
+                <button class="btn btn-secondary" onclick="app.prevStep('step-leaders')">Back</button>
+                <button class="btn btn-primary" onclick="app.generateResults()">Generate readiness profile</button>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             STEP 6: RESULTS
+             ============================================================ -->
+        <section id="step-results" class="section-view">
+            
+            <div class="score-hero">
+                <h2>Overall Readiness Profile</h2>
+                <div class="score-giant" id="res-overall-score">0.0</div>
+                <div class="score-band-label" id="res-overall-band">Calculating...</div>
+                <p id="res-overall-text" style="max-width: 800px; margin: 0 auto;"></p>
+            </div>
+
+            <div class="score-grid">
+                <div class="score-panel">
+                    <div class="score-panel-title">Organizational Foundations (70%)</div>
+                    <div class="score-panel-value" id="res-org-score">0.0</div>
+                </div>
+                <div class="score-panel">
+                    <div class="score-panel-title">Frontline Leadership (30%)</div>
+                    <div class="score-panel-value" id="res-ldr-score">0.0</div>
+                </div>
+            </div>
+
+            <div class="foundation-scorecard">
+                <h3>Foundation Scorecard</h3>
+                <div id="res-scorecard-rows">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <div class="score-grid" style="margin-top: var(--spacing-xl);">
+                <div class="info-panel" style="margin-top: 0; border-top: 4px solid var(--color-amber);">
+                    <h3>Priority attention areas</h3>
+                    <div id="res-priority-areas"></div>
+                </div>
+                <div class="info-panel" style="margin-top: 0; border-top: 4px solid var(--color-green);">
+                    <h3>Potential implementation strengths</h3>
+                    <p class="eyebrow" style="margin-bottom: 12px; color: var(--color-body);">Reported strength to validate in discovery.</p>
+                    <div id="res-strength-areas"></div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <h3>Evidence to validate</h3>
+                <ul id="res-evidence-list">
+                    <!-- Injected by JS based on weak scores -->
+                </ul>
+            </div>
+
+            <h3 style="margin-top: var(--spacing-xl);">Your practical 90-day readiness plan</h3>
+            <div class="action-plan-grid">
+                <div class="action-phase">
+                    <h4>Days 1–30</h4>
+                    <h3>Clarify and assign</h3>
+                    <ul id="plan-phase-1"></ul>
+                </div>
+                <div class="action-phase">
+                    <h4>Days 31–60</h4>
+                    <h3>Design and equip</h3>
+                    <ul id="plan-phase-2"></ul>
+                </div>
+                <div class="action-phase">
+                    <h4>Days 61–90</h4>
+                    <h3>Pilot, learn, and decide</h3>
+                    <ul id="plan-phase-3"></ul>
+                </div>
+            </div>
+
+            <div class="info-panel" style="border: 2px solid var(--color-navy);">
+                <h3>First meeting agenda</h3>
+                <ol style="margin-bottom: 0;">
+                    <li>Confirm the problem worth solving.</li>
+                    <li>Identify the workflow owner and frontline leaders.</li>
+                    <li>Map today’s workflow and exceptions.</li>
+                    <li>Define human-owned decisions and escalation triggers.</li>
+                    <li>Identify required evidence, measures, and training.</li>
+                    <li>Agree on the next 30-day deliverable.</li>
+                </ol>
+            </div>
+
+            <div class="no-print">
+                <h3 style="margin-top: var(--spacing-xl);">Possible next steps with GCG</h3>
+                <div class="engagement-cards">
+                    <div class="card">
+                        <div class="card-type">Executive Briefing</div>
+                        <h4>AI Will Not Implement Itself: Building Tech-Capable Frontline Leaders</h4>
+                        <ul>
+                            <li>45–60 minute leadership, board, HR, operations, safety, security, or workforce briefing.</li>
+                            <li>Focus: shared language, practical readiness questions, and accountable adoption.</li>
+                            <li>Best for: leadership groups seeking alignment before an AI initiative.</li>
+                        </ul>
+                        <div class="card-rate">Rate guidance: Custom speaking engagement; current rate position $1,500–$10,000 per keynote/briefing, depending on scope, audience, travel, and preparation.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-type">Leadership Workshop</div>
+                        <h4>Tech-Capable Frontline Leader Workshop</h4>
+                        <ul>
+                            <li>90 minutes to half day.</li>
+                            <li>Uses one real workflow to identify leaders, decision points, human review, training needs, and adoption barriers.</li>
+                            <li>Best for: cross-functional teams that need a common operating picture.</li>
+                        </ul>
+                        <div class="card-rate">Rate guidance: Scoped fixed-fee workshop or advisory support at $275/hour.</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-type">Readiness Sprint</div>
+                        <h4>GCG Tech-Capable Frontline Leader Readiness Sprint</h4>
+                        <ul>
+                            <li>2–4 week focused assessment.</li>
+                            <li>Includes stakeholder interviews, workflow review, leader mapping, readiness scorecard, human-accountability crosswalk, and 90-day roadmap.</li>
+                            <li>Best for: organizations moving from AI interest or disconnected pilots to a practical, governed operating approach.</li>
+                        </ul>
+                        <div class="card-rate">Rate guidance: Foundation $8,500–$12,500 (50–125 employees) / Core $15,000–$25,000 (100–500 employees) / Regulated-Workforce $25,000–$40,000 (higher-sensitivity data or multi-shift/field workforce) — 2 to 4 week engagement, scoped by organization size, workflow complexity, number of participants, locations, and deliverables.</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: var(--spacing-lg);">
+                    <a href="mailto:gary@gannoncompliancegroup.com?subject=Tech-Capable%20Frontline%20Leader%20Readiness%20Sprint%20Inquiry" class="btn btn-primary" id="contact-btn">Discuss a readiness sprint</a>
+                </div>
+
+                <div class="controls-footer" style="flex-direction: column; gap: var(--spacing-md); align-items: stretch;">
+                    <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" onclick="window.print()">Print / Save as PDF</button>
+                        <button class="btn btn-secondary" onclick="app.downloadResults()">Download results as text</button>
+                        <button class="btn btn-danger" onclick="app.startOver()">Start over</button>
+                    </div>
+                    <p style="text-align: center; font-size: 0.85rem; color: var(--color-body); margin-top: 8px;"><em>Responses remain in your browser and are not transmitted or retained by GCG through this tool. (Save / print before closing).</em></p>
+                </div>
+            </div>
+            
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="container" style="padding: var(--spacing-lg) 0; text-align: left;">
+            <div class="research-note" style="margin-top: 0; border: none; padding-top: 0;">
+                <h4 style="color: white; font-family: var(--font-body); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Research context</h4>
+                <p>McKinsey’s August 2026 article, ‘The new management playbook for AI: How to move faster and create more value,’ highlights a recurring pattern among selected successful AI transformations: business leaders who combine deep domain knowledge, technology and data fluency, and the ability to orchestrate end-to-end operating change. The research describes average outcomes within a selected 20-company success sample; those figures are not typical-result claims or promises for GCG clients.</p>
+                <p>AI literacy matters, but training alone rarely changes work. Adoption depends on changed workflows, manager behavior, clear decision rights, human verification, reinforcement, and measures that show whether the new way of working is actually improving outcomes.</p>
+                <p><em>The assessment is informed by publicly available research on AI implementation, management capability, workflow redesign, workforce learning, and responsible adoption. It is not affiliated with or endorsed by McKinsey & Company or any other organization.</em></p>
+            </div>
+            
+            <div class="research-note">
+                <h4 style="color: white; font-family: var(--font-body); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">A note on interpretation</h4>
+                <p>This assessment is a structured strategic-intelligence and organizational-readiness tool. Scores reflect participant responses, not an independent audit. They should be validated through interviews, workflow review, records, data, and appropriate subject-matter expertise.</p>
+            </div>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: var(--spacing-lg); margin-top: var(--spacing-lg); text-align: center;">
+                <p style="font-weight: 600; font-size: 1rem; color: white;">Strategic Intelligence — Not Legal Counsel (CA B&P §§6125–6126).</p>
+                <p>Gannon Compliance Group | Fresno, California | AI Governance &middot; Workforce Capability &middot; Safety/Security &middot; Compliance Readiness</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * GCG Assessment Application Logic
+         * Vanilla JS, No Dependencies
+         */
+        
+        // Configuration
+        const GCG_EMAIL = "gary@gannoncompliancegroup.com";
+        const EMAIL_SUBJECT = "Tech-Capable Frontline Leader Readiness Sprint Inquiry";
+        
+        document.getElementById('contact-btn').href = `mailto:${GCG_EMAIL}?subject=${encodeURIComponent(EMAIL_SUBJECT)}`;
+
+        // Assessment Data Structures
+        const foundationsData = [
+            { id: 'f1', count: 3, title: 'Value and mission' },
+            { id: 'f2', count: 3, title: 'Accountable operating leaders' },
+            { id: 'f3', count: 3, title: 'Human-owned workflow design' },
+            { id: 'f4', count: 3, title: 'Data, controls, and evidence' },
+            { id: 'f5', count: 3, title: 'Learning and reinforcement' },
+            { id: 'f6', count: 3, title: 'Scale and measurement' }
+        ];
+
+        const fQuestions = [
+            "Our organization has identified one to three priority business or operating problems where AI-supported improvement could matter.",
+            "For each priority AI use case, leadership has defined the intended outcome, the affected workflow, and how success will be measured.",
+            "Our AI agenda considers service, quality, safety, risk, workforce, and customer outcomes—not only efficiency or cost reduction.",
+            "Each priority AI use case has a named business or domain owner who is accountable for operational results.",
+            "Leaders closest to the work are involved early enough to identify practical exceptions, risks, workarounds, and adoption barriers.",
+            "Managers and supervisors have sufficient authority, time, and support to help redesign work and coach adoption.",
+            "Our priority workflows are documented well enough to show tasks, inputs, decisions, handoffs, exceptions, and performance expectations.",
+            "We have identified which tasks AI may assist, which decisions must remain human-owned, and when human review is required.",
+            "We have defined escalation paths for incorrect, incomplete, unsafe, biased, privacy-sensitive, or otherwise consequential AI outputs.",
+            "People can identify the approved data sources, documents, and knowledge bases that should inform priority AI-supported work.",
+            "Our organization has practical rules for safe AI use, including sensitive information, privacy, security, intellectual property, and approved tools.",
+            "Important AI-supported outputs can be checked for accuracy, completeness, relevance, source quality, and alignment with policy or professional standards.",
+            "Employees and managers receive role-relevant AI literacy that includes prompting, output evaluation, safe use, and human accountability.",
+            "Managers model appropriate AI use, discuss its limitations, and create a safe environment for employees to question outputs or report concerns.",
+            "Performance expectations, job aids, coaching, peer learning, and recognition reinforce the new workflow rather than the old one.",
+            "We measure adoption and usage alongside relevant outcomes such as quality, service, risk, safety, compliance, capacity, employee experience, or customer experience.",
+            "We have a routine for reviewing AI-supported work, learning from exceptions, and improving the workflow over time.",
+            "We can distinguish what should be standardized across teams or sites from what requires local adaptation and accountable oversight."
+        ];
+
+        const leadersData = [
+            { id: 'l1', count: 2, title: 'Domain and workflow ownership' },
+            { id: 'l2', count: 2, title: 'Problem definition and value judgment' },
+            { id: 'l3', count: 2, title: 'Data, technology, and verification fluency' },
+            { id: 'l4', count: 2, title: 'Human accountability and risk judgment' },
+            { id: 'l5', count: 2, title: 'Change leadership, learning, and adoption' }
+        ];
+
+        const lQuestions = [
+            "The leader can clearly explain the current workflow, where decisions occur, where work slows down, and where errors or risks emerge.",
+            "The leader is trusted by frontline employees and has enough credibility to influence how work is actually performed.",
+            "The leader can distinguish a useful business problem from a vague request to ‘use AI.’",
+            "The leader can prioritize AI opportunities based on operational value, risk, workforce impact, feasibility, and evidence—not novelty alone.",
+            "The leader understands enough about the relevant data, source materials, and system limitations to ask informed questions.",
+            "The leader can verify important AI outputs for accuracy, completeness, relevance, policy alignment, and operational reality before action is taken.",
+            "The leader can identify decisions that should not be delegated to AI without meaningful human review.",
+            "The leader can establish or follow clear escalation procedures when AI outputs are incorrect, uncertain, unsafe, biased, privacy-sensitive, or otherwise consequential.",
+            "The leader can explain why the workflow is changing, what people must do differently, and how success will be evaluated.",
+            "The leader can coach employees, encourage responsible experimentation, surface resistance or confusion, and reinforce appropriate use over time."
+        ];
+
+        const orgScale = [
+            { val: 1, label: "Not in place" },
+            { val: 2, label: "Emerging" },
+            { val: 3, label: "Partially established" },
+            { val: 4, label: "Operational" },
+            { val: 5, label: "Embedded and repeatable" }
+        ];
+
+        const ldrScale = [
+            { val: 1, label: "Significant gap" },
+            { val: 2, label: "Early awareness" },
+            { val: 3, label: "Developing capability" },
+            { val: 4, label: "Demonstrated capability" },
+            { val: 5, label: "Strong, repeatable capability" }
+        ];
+
+        // Initialization
+        const app = {
+            currentStep: 'step-hero',
+            steps: ['step-hero', 'step-profile', 'step-foundations', 'step-leaders', 'step-workflow', 'step-results'],
+            
+            init() {
+                this.renderQuestions();
+                window.scrollTo(0,0);
+            },
+
+            renderQuestions() {
+                // Foundations
+                let qIndex = 0;
+                foundationsData.forEach((section, sIndex) => {
+                    const wrapper = document.getElementById(`q-${section.id}-wrapper`);
+                    let html = '';
+                    for (let i = 0; i < section.count; i++) {
+                        const qNum = qIndex + 1;
+                        html += `
+                            <div class="form-group" style="margin-top: 24px;" id="q_f_${qNum}_container">
+                                <p class="question-text">${qNum}. ${fQuestions[qIndex]}</p>
+                                <fieldset style="border: none; padding: 0; margin: 0;">
+                                    <legend class="visually-hidden" style="display:none;">Question ${qNum}</legend>
+                                    <div class="scale-options">
+                                        ${orgScale.map(opt => `
+                                            <label class="scale-label">
+                                                <input type="radio" name="q_f_${qNum}" value="${opt.val}" class="scale-input">
+                                                <div class="scale-number">${opt.val}</div>
+                                                <div class="scale-text">${opt.label}</div>
+                                            </label>
+                                        `).join('')}
+                                    </div>
+                                </fieldset>
+                            </div>
+                        `;
+                        qIndex++;
+                    }
+                    wrapper.innerHTML = html;
+                });
+
+                // Leaders
+                qIndex = 0;
+                leadersData.forEach((section, sIndex) => {
+                    const wrapper = document.getElementById(`q-${section.id}-wrapper`);
+                    let html = '';
+                    for (let i = 0; i < section.count; i++) {
+                        const qNum = qIndex + 1;
+                        html += `
+                            <div class="form-group" style="margin-top: 24px;" id="q_l_${qNum}_container">
+                                <p class="question-text">${qNum}. ${lQuestions[qIndex]}</p>
+                                <fieldset style="border: none; padding: 0; margin: 0;">
+                                    <legend class="visually-hidden" style="display:none;">Question ${qNum}</legend>
+                                    <div class="scale-options">
+                                        ${ldrScale.map(opt => `
+                                            <label class="scale-label">
+                                                <input type="radio" name="q_l_${qNum}" value="${opt.val}" class="scale-input">
+                                                <div class="scale-number">${opt.val}</div>
+                                                <div class="scale-text">${opt.label}</div>
+                                            </label>
+                                        `).join('')}
+                                    </div>
+                                </fieldset>
+                            </div>
+                        `;
+                        qIndex++;
+                    }
+                    wrapper.innerHTML = html;
+                });
+            },
+
+            nextStep(targetId) {
+                document.getElementById(this.currentStep).classList.remove('active');
+                document.getElementById(targetId).classList.add('active');
+                this.currentStep = targetId;
+                this.updateProgress();
+                window.scrollTo(0,0);
+            },
+
+            prevStep(targetId) {
+                document.getElementById(this.currentStep).classList.remove('active');
+                document.getElementById(targetId).classList.add('active');
+                this.currentStep = targetId;
+                this.updateProgress();
+                window.scrollTo(0,0);
+            },
+
+            updateProgress() {
+                const pBar = document.getElementById('progressBar');
+                if (this.currentStep === 'step-hero') {
+                    pBar.style.display = 'none';
+                    return;
+                }
+                pBar.style.display = 'block';
+
+                document.querySelectorAll('.step-indicator').forEach(el => {
+                    el.classList.remove('active', 'completed');
+                });
+                
+                let foundCurrent = false;
+                this.steps.forEach(step => {
+                    if (step === 'step-hero') return;
+                    const ind = document.getElementById(`ind-${step.replace('step-','')}`);
+                    if (!ind) return;
+
+                    if (step === this.currentStep) {
+                        ind.classList.add('active');
+                        foundCurrent = true;
+                    } else if (!foundCurrent) {
+                        ind.classList.add('completed');
+                    }
+                });
+            },
+
+            validateAndNext(sectionType) {
+                let isValid = true;
+                const total = sectionType === 'foundations' ? 18 : 10;
+                const prefix = sectionType === 'foundations' ? 'q_f_' : 'q_l_';
+                const errorDiv = document.getElementById(`${sectionType}-error`);
+                
+                // Clear previous highlights
+                for(let i=1; i<=total; i++) {
+                    const container = document.getElementById(`${prefix}${i}_container`);
+                    if(container) container.style.borderLeft = "none";
+                }
+
+                for(let i=1; i<=total; i++) {
+                    const checked = document.querySelector(`input[name="${prefix}${i}"]:checked`);
+                    if (!checked) {
+                        isValid = false;
+                        const container = document.getElementById(`${prefix}${i}_container`);
+                        if(container) {
+                            container.style.borderLeft = "4px solid var(--color-red)";
+                            container.style.paddingLeft = "12px";
+                        }
+                    }
+                }
+
+                if (isValid) {
+                    errorDiv.style.display = 'none';
+                    this.nextStep(sectionType === 'foundations' ? 'step-leaders' : 'step-workflow');
+                } else {
+                    errorDiv.style.display = 'block';
+                    errorDiv.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            },
+
+            generateResults() {
+                // Calculate Orgs (18)
+                let fTotal = 0;
+                const fScores = [];
+                let qIdx = 1;
+                foundationsData.forEach(f => {
+                    let sTotal = 0;
+                    for(let i=0; i<f.count; i++) {
+                        const val = parseInt(document.querySelector(`input[name="q_f_${qIdx}"]:checked`)?.value || 0);
+                        sTotal += val;
+                        fTotal += val;
+                        qIdx++;
+                    }
+                    const avg = sTotal / f.count;
+                    fScores.push({ id: f.id, title: f.title, score: avg });
+                });
+                const orgScore = (fTotal / 18);
+
+                // Calculate Leaders (10)
+                let lTotal = 0;
+                const lScores = [];
+                qIdx = 1;
+                leadersData.forEach(l => {
+                    let sTotal = 0;
+                    for(let i=0; i<l.count; i++) {
+                        const val = parseInt(document.querySelector(`input[name="q_l_${qIdx}"]:checked`)?.value || 0);
+                        sTotal += val;
+                        lTotal += val;
+                        qIdx++;
+                    }
+                    const avg = sTotal / l.count;
+                    lScores.push({ id: l.id, title: l.title, score: avg });
+                });
+                const ldrScore = (lTotal / 10);
+
+                // Overall Score (70/30)
+                const overallScore = (orgScore * 0.7) + (ldrScore * 0.3);
+
+                this.renderDashboard(overallScore, orgScore, ldrScore, fScores, lScores);
+                this.nextStep('step-results');
+            },
+
+            getBand(score) {
+                if (score >= 4.5) return { band: "Embedded and repeatable", color: "green" };
+                if (score >= 3.8) return { band: "Operational", color: "green" };
+                if (score >= 3.0) return { band: "Developing", color: "amber" };
+                if (score >= 2.0) return { band: "Emerging", color: "amber" };
+                return { band: "Foundation gap", color: "red" };
+            },
+
+            getTailoredInterpretation(fId, score) {
+                if (score < 3.0) {
+                    const maps = {
+                        'f1': "Clarify the operating problem and intended outcome before selecting or expanding tools.",
+                        'f2': "Name credible domain owners and give them the time, authority, and support to lead changed work.",
+                        'f3': "Map the workflow and make human decision rights, review points, and escalation expectations explicit.",
+                        'f4': "Define approved sources, safe-use boundaries, verification expectations, and records that support accountability.",
+                        'f5': "Move beyond awareness training by equipping managers with practice, job aids, coaching, and reinforcement.",
+                        'f6': "Establish a small set of outcome and adoption measures, then create a learning loop for exceptions and improvement."
+                    };
+                    return maps[fId];
+                } else if (score < 3.8) {
+                    return "A workable base exists. The next step is to make this capability consistent, evidence-based, and repeatable across the selected workflow.";
+                } else {
+                    return "Reported capability is operational. Validate it with evidence, test edge cases, and strengthen consistency across sites, teams, and use cases.";
+                }
+            },
+
+            getOverallText(score) {
+                if (score < 2.0) return "Foundational conditions require attention before expanding AI use. Focus first on defining priority problems, naming accountable owners, documenting workflows, and establishing basic human-review and escalation expectations.";
+                if (score < 3.0) return "Important building blocks are emerging, but adoption risk remains. Target one manageable workflow, strengthen leader ownership, define human decision rights, and build practical training and review routines before scaling.";
+                if (score < 3.8) return "Your organization has a workable starting point for a focused, human-accountable pilot. Proceed selectively: choose a defined workflow, measure both adoption and operating outcomes, build manager capability, and review exceptions systematically.";
+                if (score < 4.5) return "Your organization has operational foundations for disciplined AI-enabled workflow improvement. Focus on cross-functional coordination, repeatable governance, reusable assets, and local adaptation while protecting human judgment and accountability.";
+                return "Your organization reports embedded, repeatable foundations for AI-enabled operating change. Validate the assessment through evidence, stress-test controls and exception handling, and continue improving workforce capability, measurement, and governance as systems scale.";
+            },
+
+            renderDashboard(overall, org, ldr, fScores, lScores) {
+                // Main numbers
+                document.getElementById('res-overall-score').innerText = overall.toFixed(1);
+                const overallBand = this.getBand(overall);
+                document.getElementById('res-overall-band').innerText = `${overallBand.band} (${(overall/5*100).toFixed(0)}%)`;
+                document.getElementById('res-overall-text').innerText = this.getOverallText(overall);
+
+                document.getElementById('res-org-score').innerText = org.toFixed(1);
+                document.getElementById('res-ldr-score').innerText = ldr.toFixed(1);
+
+                // Foundation Scorecard
+                let fHtml = '';
+                fScores.forEach(f => {
+                    const band = this.getBand(f.score);
+                    const interp = this.getTailoredInterpretation(f.id, f.score);
+                    fHtml += `
+                        <div class="score-row">
+                            <div class="score-row-title">${f.title}</div>
+                            <div class="score-row-metric">
+                                <span class="score-row-number">${f.score.toFixed(1)}</span>
+                                <span class="score-dot dot-${band.color}" title="${band.band}"></span>
+                            </div>
+                            <div class="score-row-text">
+                                <strong>${band.band}:</strong> ${interp}
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById('res-scorecard-rows').innerHTML = fHtml;
+
+                // Priority & Strengths (combine all 11 dimension scores for sorting)
+                const allScores = [...fScores, ...lScores].sort((a,b) => a.score - b.score);
+                
+                const priorities = allScores.slice(0, 3);
+                let prmHtml = '';
+                priorities.forEach(p => {
+                    prmHtml += `
+                        <div style="margin-bottom: 12px;">
+                            <strong>${p.title} (${p.score.toFixed(1)})</strong>
+                        </div>
+                    `;
+                });
+                document.getElementById('res-priority-areas').innerHTML = prmHtml;
+
+                const strengths = allScores.slice(-2).reverse();
+                let strHtml = '';
+                strengths.forEach(s => {
+                    strHtml += `
+                        <div style="margin-bottom: 12px;">
+                            <strong>${s.title} (${s.score.toFixed(1)})</strong>
+                        </div>
+                    `;
+                });
+                document.getElementById('res-strength-areas').innerHTML = strHtml;
+
+                // Build tailored Action Plan & Evidence based on weaknesses
+                const weakIds = priorities.map(p => p.id);
+                this.buildActionPlan(weakIds);
+                this.buildEvidenceList(weakIds);
+            },
+
+            buildActionPlan(weakIds) {
+                // Phase 1 mapped logic
+                let p1 = [];
+                if(weakIds.includes('f1')) p1.push("Select one priority workflow and define the business/operating problem.");
+                if(weakIds.includes('f2') || weakIds.includes('l1') || weakIds.includes('l2')) p1.push("Name an executive sponsor and accountable domain/workflow owner.", "Identify candidate tech-capable frontline leaders.");
+                if(weakIds.includes('f3') || weakIds.includes('l4')) p1.push("Create a simple baseline workflow map.", "Identify human-owned decisions, risk points, and immediate escalation needs.");
+                if(weakIds.includes('f4') || weakIds.includes('l3')) p1.push("Inventory AI tools currently in use or being considered.");
+                // Fallbacks if empty
+                if(p1.length === 0) p1 = ["Select one priority workflow and define the business/operating problem.", "Name an executive sponsor and accountable domain/workflow owner."];
+                
+                document.getElementById('plan-phase-1').innerHTML = p1.map(i => `<li>${i}</li>`).join('');
+
+                // Phase 2 mapped logic
+                let p2 = [];
+                if(weakIds.includes('f3') || weakIds.includes('l4')) p2.push("Create human-AI task allocation and review checkpoints.");
+                if(weakIds.includes('f4') || weakIds.includes('l3')) p2.push("Define safe-use expectations, source controls, approved tools, data boundaries, and documentation.");
+                if(weakIds.includes('f5') || weakIds.includes('l5')) p2.push("Build role-relevant AI literacy and manager practice sessions.", "Develop job aids, scenario exercises, feedback channels, and escalation procedures.");
+                if(weakIds.includes('f6')) p2.push("Decide what evidence and measures will show adoption and operational improvement.");
+                // Fallbacks
+                if(p2.length === 0) p2 = ["Create human-AI task allocation and review checkpoints.", "Develop job aids, scenario exercises, feedback channels, and escalation procedures."];
+                
+                document.getElementById('plan-phase-2').innerHTML = p2.map(i => `<li>${i}</li>`).join('');
+
+                // Phase 3 mapped logic
+                let p3 = ["Run a controlled pilot in one workflow."]; // Always included
+                if(weakIds.includes('f6')) p3.push("Monitor quality, service, risk, employee experience, and adoption—not merely usage.");
+                if(weakIds.includes('f2') || weakIds.includes('l5')) p3.push("Hold structured review sessions with workflow owners and frontline leaders.");
+                if(weakIds.includes('f4') || weakIds.includes('f5')) p3.push("Document exceptions, lessons, changes, and limits.");
+                p3.push("Decide whether to improve, pause, retire, or cautiously extend the workflow."); // Always included
+                
+                document.getElementById('plan-phase-3').innerHTML = p3.map(i => `<li>${i}</li>`).join('');
+            },
+
+            buildEvidenceList(weakIds) {
+                let ev = [];
+                if(weakIds.includes('f3')) ev.push("Current-state workflow map");
+                if(weakIds.includes('f2') || weakIds.includes('l1')) ev.push("Named owner and decision-rights matrix");
+                if(weakIds.includes('f1')) ev.push("AI use-case inventory");
+                if(weakIds.includes('f4') || weakIds.includes('l3')) ev.push("Approved-tool and data-source list", "Existing policy, governance, risk, privacy, or security documentation");
+                if(weakIds.includes('f3') || weakIds.includes('l4')) ev.push("Human-review and exception/escalation protocol");
+                if(weakIds.includes('f5') || weakIds.includes('l5')) ev.push("Training agenda, job aids, manager coaching plan");
+                if(weakIds.includes('f6')) ev.push("Adoption and operating-outcome measurement plan", "Samples of completed work or process records");
+                
+                // Fallback
+                if(ev.length === 0) ev = ["Current-state workflow map", "AI use-case inventory", "Human-review and exception/escalation protocol"];
+                
+                // Unique
+                ev = [...new Set(ev)];
+                document.getElementById('res-evidence-list').innerHTML = ev.map(i => `<li>${i}</li>`).join('');
+            },
+
+            downloadResults() {
+                let txt = "========================================================\n";
+                txt += "GCG Tech-Capable Frontline Leader Readiness Sprint\n";
+                txt += `Date: ${new Date().toLocaleDateString()}\n`;
+                txt += "========================================================\n\n";
+
+                // Profile
+                const org = document.getElementById('org_name').value;
+                const part = document.getElementById('part_name').value;
+                if(org || part) {
+                    txt += "[ Organization Profile ]\n";
+                    if(org) txt += `Organization: ${org}\n`;
+                    if(part) txt += `Participant: ${part}\n`;
+                    txt += "\n";
+                }
+
+                // Scores
+                txt += "[ Overall Readiness ]\n";
+                txt += `Score: ${document.getElementById('res-overall-score').innerText} / 5.0\n`;
+                txt += `Band: ${document.getElementById('res-overall-band').innerText}\n`;
+                txt += `${document.getElementById('res-overall-text').innerText}\n\n`;
+
+                txt += `Organizational Foundations: ${document.getElementById('res-org-score').innerText} / 5.0\n`;
+                txt += `Frontline Leadership: ${document.getElementById('res-ldr-score').innerText} / 5.0\n\n`;
+
+                txt += "[ Foundation Details ]\n";
+                document.querySelectorAll('#res-scorecard-rows .score-row').forEach(row => {
+                    const title = row.querySelector('.score-row-title').innerText;
+                    const score = row.querySelector('.score-row-number').innerText;
+                    const text = row.querySelector('.score-row-text').innerText;
+                    txt += `- ${title} (${score})\n  ${text.replace(/\n/g, ' ')}\n\n`;
+                });
+
+                // Action Plan
+                txt += "[ 90-Day Action Plan ]\n";
+                txt += "Days 1-30: Clarify and assign\n";
+                document.querySelectorAll('#plan-phase-1 li').forEach(li => txt += `* ${li.innerText}\n`);
+                txt += "\nDays 31-60: Design and equip\n";
+                document.querySelectorAll('#plan-phase-2 li').forEach(li => txt += `* ${li.innerText}\n`);
+                txt += "\nDays 61-90: Pilot, learn, and decide\n";
+                document.querySelectorAll('#plan-phase-3 li').forEach(li => txt += `* ${li.innerText}\n`);
+                txt += "\n";
+
+                // Workflow
+                const wfName = document.getElementById('wf_name').value;
+                if(wfName) {
+                    txt += "[ Priority Workflow Reflection ]\n";
+                    txt += `Workflow: ${wfName}\n`;
+                    txt += `Problem: ${document.getElementById('wf_problem').value}\n`;
+                    txt += `Owner: ${document.getElementById('wf_owner').value}\n`;
+                    txt += `Human-owned: ${document.getElementById('wf_human').value}\n\n`;
+                }
+
+                txt += "========================================================\n";
+                txt += "Strategic Intelligence — Not Legal Counsel (CA B&P §§6125–6126).\n";
+                txt += "Gannon Compliance Group | Fresno, California\n";
+
+                const blob = new Blob([txt], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `GCG_Readiness_Results_${new Date().getTime()}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            },
+
+            startOver() {
+                if(confirm("Are you sure you want to start over? All your responses will be cleared.")) {
+                    // Reset forms
+                    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => el.checked = false);
+                    document.querySelectorAll('input[type="text"], select, textarea').forEach(el => el.value = '');
+                    
+                    // Reset highlights
+                    document.querySelectorAll('[id$="_container"]').forEach(el => {
+                        el.style.borderLeft = "none";
+                        el.style.paddingLeft = "0";
+                    });
+                    
+                    this.nextStep('step-hero');
+                }
+            }
+        };
+
+        // Run
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+
+    </script>
+<div style="background:#F1F5F9;color:#2E3550;text-align:center;padding:14px 16px;font-size:0.72rem;border-top:1px solid #E2E8F0;">
+Gannon Compliance Group provides non-legal operational-readiness, documentation, workflow-design, training, and implementation-support services. This illustrative prototype is not legal advice, a legal opinion, legal-compliance certification, an AI-system audit, a cybersecurity assessment, a behavioral threat assessment, safety-engineering advice, an employment-decision system, or a guarantee of outcomes.
+</div>
+</body>
+</html>

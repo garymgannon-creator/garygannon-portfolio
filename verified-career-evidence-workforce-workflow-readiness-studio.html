@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verified Career Evidence & Workforce Workflow Readiness Studio</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gcg: {
+                            blue: '#1e3a8a',    // Neutral deep blue
+                            slate: '#475569',   // Neutral slate
+                            gold: '#b45309',    // Muted gold accent
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .modal-overlay { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px); }
+        .tab-active { border-bottom: 2px solid #1e3a8a; color: #1e3a8a; font-weight: 600; }
+        
+        @media print {
+            #sidebar, #top-banner, .no-print { display: none !important; }
+            #main-content { margin-left: 0 !important; width: 100% !important; overflow: visible !important; height: auto !important;}
+            .shadow { box-shadow: none !important; }
+            body { background-color: white; overflow: auto; height: auto;}
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased h-screen flex flex-col">
+
+    <div id="top-banner" class="bg-red-700 text-white text-center py-2 px-4 text-sm font-bold uppercase tracking-wider z-50 shadow-md">
+        ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY
+    </div>
+    <div class="bg-slate-800 text-slate-300 text-center py-1 px-4 text-xs z-50 font-medium">
+        Prototype uses in-browser demonstration data; data resets on refresh unless exported.
+    </div>
+
+    <div class="flex flex-1 overflow-hidden">
+        <nav id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col h-full shadow-sm z-10 transition-transform duration-300 ease-in-out absolute md:relative -translate-x-full md:translate-x-0">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <div>
+                    <h1 class="font-bold text-gcg-blue leading-tight text-lg">GCG Studio</h1>
+                    <p class="text-xs text-slate-500 mt-1">Demonstration Prototype</p>
+                </div>
+                <button id="close-sidebar-btn" class="md:hidden text-slate-500 hover:text-slate-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto py-4 hide-scroll">
+                <ul class="space-y-1 px-2">
+                    <li>
+                        <button onclick="nav('home')" class="nav-btn w-full text-left px-3 py-2 rounded text-sm font-medium flex items-center gap-3 bg-blue-50 text-gcg-blue" data-target="home">
+                            <i class="fas fa-home w-4 text-center"></i> Home / Overview
+                        </button>
+                    </li>
+                    <li class="pt-2 pb-1 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Methodology</li>
+                    <li>
+                        <button onclick="nav('part1')" class="nav-btn w-full text-left px-3 py-2 rounded text-sm font-medium flex items-center gap-3 text-slate-600 hover:bg-slate-50" data-target="part1">
+                            <i class="fas fa-list-check w-4 text-center"></i> 1. Evidence Inventory
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="nav('part2')" class="nav-btn w-full text-left px-3 py-2 rounded text-sm font-medium flex items-center gap-3 text-slate-600 hover:bg-slate-50" data-target="part2">
+                            <i class="fas fa-search-dollar w-4 text-center"></i> 2. Market Validation
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="nav('part3')" class="nav-btn w-full text-left px-3 py-2 rounded text-sm font-medium flex items-center gap-3 text-slate-600 hover:bg-slate-50" data-target="part3">
+                            <i class="fas fa-object-group w-4 text-center"></i> 3. Artifact Design
+                        </button>
+                    </li>
+                    
+                    <li class="pt-4 pb-1 px-3 text-xs font-semibold text-gcg-gold uppercase tracking-wider">Organization</li>
+                    <li>
+                        <button onclick="nav('org')" class="nav-btn w-full text-left px-3 py-2 rounded text-sm font-medium flex items-center gap-3 text-slate-600 hover:bg-slate-50 border-l-2 border-transparent hover:border-gcg-gold" data-target="org">
+                            <i class="fas fa-sitemap w-4 text-center"></i> Workforce Readiness
+                        </button>
+                    </li>
+
+                    <li class="pt-4 pb-1 px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Management</li>
+                    <li>
+                        <button onclick="nav('evidence-reg')" class="nav-btn w-full text-left px-3 py-2 rounded text-sm font-medium flex items-center gap-3 text-slate-600 hover:bg-slate-50" data-target="evidence-reg">
+                            <i class="fas fa-database w-4 text-center"></i> Evidence Register
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="nav('actions')" class="nav-btn w-full text-left px-3 py-2 rounded text-sm font-medium flex items-center gap-3 text-slate-600 hover:bg-slate-50" data-target="actions">
+                            <i class="fas fa-tasks w-4 text-center"></i> Action Register
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="nav('review')" class="nav-btn w-full text-left px-3 py-2 rounded text-sm font-medium flex items-center gap-3 text-slate-600 hover:bg-slate-50" data-target="review">
+                            <i class="fas fa-file-export w-4 text-center"></i> Review & Export
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main id="main-content" class="flex-1 flex flex-col h-full overflow-hidden w-full relative bg-slate-100">
+            <header class="md:hidden bg-white border-b border-slate-200 p-3 flex justify-between items-center z-0">
+                <h1 class="font-bold text-gcg-blue text-lg truncate">GCG Studio</h1>
+                <button id="open-sidebar-btn" class="text-slate-600 p-2"><i class="fas fa-bars"></i></button>
+            </header>
+
+            <div id="view-container" class="flex-1 overflow-y-auto p-4 md:p-8 pb-32">
+                
+                <div id="view-home" class="view-section block animate-fade-in">
+                    <div class="max-w-5xl mx-auto">
+                        <div class="flex justify-between items-start mb-2">
+                            <h2 class="text-3xl font-bold text-gcg-blue">Verified Career Evidence & Workforce Workflow Readiness Studio</h2>
+                        </div>
+                        <p class="text-slate-600 mb-8 text-lg font-medium">Demonstrating the "AI-Enabled Evidence Portfolio and Market-Validation Sprint" methodology.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 border-t-4 border-t-gcg-blue">
+                                <p class="text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-1">Evidence Ready</p>
+                                <p class="text-3xl font-bold text-slate-800" id="stat-evidence">0</p>
+                                <p class="text-[10px] text-slate-400 mt-1 uppercase font-semibold">Needs Review status</p>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 border-t-4 border-t-emerald-600">
+                                <p class="text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-1">Market Sources</p>
+                                <p class="text-3xl font-bold text-slate-800" id="stat-sources">0</p>
+                                <p class="text-[10px] text-slate-400 mt-1 uppercase font-semibold">Logged for validation</p>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 border-t-4 border-t-indigo-600">
+                                <p class="text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-1">Artifact Decisions</p>
+                                <p class="text-3xl font-bold text-slate-800" id="stat-artifacts">1</p>
+                                <p class="text-[10px] text-slate-400 mt-1 uppercase font-semibold">Open design items</p>
+                            </div>
+                            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4 border-t-4 border-t-gcg-gold">
+                                <p class="text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-1">Management Review</p>
+                                <p class="text-3xl font-bold text-slate-800" id="stat-review">0</p>
+                                <p class="text-[10px] text-slate-400 mt-1 uppercase font-semibold">Items pending review</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-8">
+                            <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Individual Methodology Flow</h3>
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-4 py-4">
+                                <div class="flex-1 bg-slate-50 border border-slate-200 p-4 rounded text-center shadow-sm w-full">
+                                    <div class="w-10 h-10 mx-auto bg-blue-100 text-gcg-blue rounded-full flex items-center justify-center mb-2"><i class="fas fa-list-check"></i></div>
+                                    <h4 class="font-semibold text-sm">1. Evidence Inventory</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Organize documented experience.</p>
+                                </div>
+                                <div class="text-slate-300 md:rotate-0 rotate-90"><i class="fas fa-arrow-right text-2xl"></i></div>
+                                <div class="flex-1 bg-slate-50 border border-slate-200 p-4 rounded text-center shadow-sm w-full">
+                                    <div class="w-10 h-10 mx-auto bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mb-2"><i class="fas fa-search-dollar"></i></div>
+                                    <h4 class="font-semibold text-sm">2. Market Validation</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Map evidence to buyer problems.</p>
+                                </div>
+                                <div class="text-slate-300 md:rotate-0 rotate-90"><i class="fas fa-arrow-right text-2xl"></i></div>
+                                <div class="flex-1 bg-slate-50 border border-slate-200 p-4 rounded text-center shadow-sm w-full">
+                                    <div class="w-10 h-10 mx-auto bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mb-2"><i class="fas fa-object-group"></i></div>
+                                    <h4 class="font-semibold text-sm">3. Artifact Design</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Plan interactive demonstrations.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 rounded-lg shadow-sm border border-amber-200 p-6 mb-8">
+                            <h3 class="text-lg font-bold text-amber-900 mb-4 border-b border-amber-200 pb-2"><i class="fas fa-sitemap mr-2"></i>Organization Pathway</h3>
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-2 py-2">
+                                <div class="flex-1 text-center text-sm font-medium text-amber-800 bg-white border border-amber-100 p-2 rounded w-full">Workforce Skills</div>
+                                <div class="text-amber-300 md:rotate-0 rotate-90"><i class="fas fa-arrow-right"></i></div>
+                                <div class="flex-1 text-center text-sm font-medium text-amber-800 bg-white border border-amber-100 p-2 rounded w-full">Tasks & Workflows</div>
+                                <div class="text-amber-300 md:rotate-0 rotate-90"><i class="fas fa-arrow-right"></i></div>
+                                <div class="flex-1 text-center text-sm font-medium text-amber-800 bg-white border border-amber-100 p-2 rounded w-full">AI-Assistive Opps</div>
+                                <div class="text-amber-300 md:rotate-0 rotate-90"><i class="fas fa-arrow-right"></i></div>
+                                <div class="flex-1 text-center text-sm font-medium text-amber-800 bg-white border border-amber-100 p-2 rounded w-full">Human Review & Training</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-white border border-slate-200 rounded p-5 shadow-sm">
+                                <h4 class="font-bold text-gcg-blue mb-3 flex items-center"><i class="fas fa-check-circle text-emerald-600 mr-2"></i> What this prototype does</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-2">
+                                    <li>Organizes self-reported and documented capability evidence.</li>
+                                    <li>Provides a structured format for human review of capabilities.</li>
+                                    <li>Maps evidence to documented (hypothetical) market sources.</li>
+                                    <li>Supports planning for interactive proof-of-work artifacts.</li>
+                                    <li>Identifies safe AI-assistive administrative workflow opportunities.</li>
+                                    <li>Flags items requiring management or specialist human review.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded p-5 shadow-sm">
+                                <h4 class="font-bold text-slate-700 mb-3 flex items-center"><i class="fas fa-times-circle text-red-500 mr-2"></i> What this prototype does NOT do</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-2">
+                                    <li>Does not make or recommend automated employment decisions.</li>
+                                    <li>Does not score, rank, screen, hire, promote, or assess employees/candidates.</li>
+                                    <li>Does not perform psychometric, behavioral, or threat assessments.</li>
+                                    <li>Does not provide legal advice, compliance certification, or audits.</li>
+                                    <li>Does not guarantee career placement, job fit, or market demand.</li>
+                                    <li>Does not process protected-trait data or conduct surveillance.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <button onclick="openModal('how-to-modal')" class="px-4 py-2 bg-white border border-slate-300 rounded shadow-sm text-sm font-semibold hover:bg-slate-50"><i class="fas fa-info-circle text-gcg-blue mr-2"></i> How to Use This Prototype</button>
+                            <button onclick="openModal('boundaries-modal')" class="px-4 py-2 bg-white border border-red-200 rounded shadow-sm text-sm font-semibold text-red-700 hover:bg-red-50"><i class="fas fa-shield-alt mr-2"></i> Claim Boundaries</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-part1" class="view-section hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gcg-blue">1. Evidence-Based Capability Inventory</h2>
+                        <p class="text-slate-500 text-sm mt-1">Organize self-reported and documented evidence for human review.</p>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-6 text-sm text-blue-800 font-medium">
+                        <i class="fas fa-info-circle mr-2"></i> This section organizes evidence for human review. It is not a validated skills test, psychometric assessment, job-fit determination, candidate ranking, performance evaluation, credential certification, or employment-decision tool.
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-50">
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Active Profile (Fictional)</label>
+                            <select class="w-full border-slate-300 rounded text-sm p-2 bg-white font-medium" id="profile-selector">
+                                <option>Illustrative Professional Profile</option>
+                                <option>Illustrative Organization Role Group</option>
+                                <option>Add New Demo Profile</option>
+                            </select>
+                        </div>
+                        <div class="w-full md:w-auto flex gap-2">
+                            <button class="bg-gcg-blue text-white px-4 py-2 rounded text-sm hover:bg-blue-800 transition shadow-sm font-semibold" onclick="alert('Demo functionality only.')"><i class="fas fa-plus mr-1"></i> Add Evidence Item</button>
+                        </div>
+                    </div>
+
+                    <!-- Fictional Profile Summary -->
+                    <div id="profile-summary" class="bg-white p-5 rounded-lg shadow-sm border border-slate-200 mb-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 text-xl"><i class="fas fa-user-tie"></i></div>
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-800">Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA</h3>
+                                <p class="text-sm text-slate-600 mt-1">Gary M. Gannon brings 29 years of California executive operations experience spanning security, HR, safety, compliance, workforce operations, licensing, fleet, client service, and 24/7 operational coordination. His background includes recurring workforce training and hands-on executive-level work in a prominent North Fresno regional retail, office, and multi-employer property portfolio.</p>
+                                <p class="text-xs text-slate-500 mt-2 font-medium">ISO/IEC 42001 Lead Implementer coursework completed; certification examination pending.</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded text-xs text-slate-500 italic">
+                            <strong>Mandatory Disclosure:</strong> This capability summary reflects Gary M. Gannon’s self-reported historical operating experience in anonymized multi-employer property environments. It is not a current-client case study, client endorsement, legal compliance determination, incident-investigation claim, threat-assessment claim, safety-engineering opinion, security-system certification, employment-assessment claim, psychometric assessment, or guarantee of outcomes.
+                        </div>
+                    </div>
+
+                    <!-- Evidence Table -->
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="p-4 border-b border-slate-200 bg-slate-50 flex flex-wrap gap-4 items-center justify-between">
+                            <div class="relative w-full md:w-64">
+                                <i class="fas fa-search absolute left-3 top-2.5 text-slate-400"></i>
+                                <input type="text" placeholder="Search evidence..." class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded text-sm">
+                            </div>
+                            <div class="flex gap-2 w-full md:w-auto">
+                                <button class="bg-white border border-slate-300 text-slate-700 px-3 py-2 rounded text-sm hover:bg-slate-50 transition shadow-sm font-medium" onclick="exportCSV('table-evidence', 'Evidence_Inventory')"><i class="fas fa-download mr-1"></i> CSV Export</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm whitespace-nowrap" id="table-evidence">
+                                <thead class="bg-slate-50 text-slate-600 text-[10px] uppercase font-bold tracking-wider">
+                                    <tr>
+                                        <th class="px-4 py-3 border-b">ID</th>
+                                        <th class="px-4 py-3 border-b">Category</th>
+                                        <th class="px-4 py-3 border-b">Capability / Skill</th>
+                                        <th class="px-4 py-3 border-b">Evidence Strength</th>
+                                        <th class="px-4 py-3 border-b">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="tbody-evidence">
+                                    <!-- Rendered via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-part2" class="view-section hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gcg-blue">2. Source-Verified Market Validation</h2>
+                        <p class="text-slate-500 text-sm mt-1">Map evidence to documented (fictionalized) market research and organization problems.</p>
+                    </div>
+
+                    <div class="flex border-b border-slate-200 mb-6">
+                        <button class="px-4 py-2 text-sm font-semibold tab-btn tab-active" onclick="switchMarketTab('roles', this)">A. Target Roles</button>
+                        <button class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 tab-btn" onclick="switchMarketTab('buyers', this)">B. Target Buyers</button>
+                        <button class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 tab-btn" onclick="switchMarketTab('sources', this)">C. Source Register</button>
+                    </div>
+
+                    <div id="market-roles" class="market-tab-content block">
+                        <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm" id="table-market-roles">
+                                    <thead class="bg-slate-50 text-slate-600 text-[10px] uppercase font-bold tracking-wider">
+                                        <tr>
+                                            <th class="px-4 py-3 border-b">Target Role</th>
+                                            <th class="px-4 py-3 border-b">Core Skills Evidenced</th>
+                                            <th class="px-4 py-3 border-b">Market Signal Summary</th>
+                                            <th class="px-4 py-3 border-b">Validation Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100" id="tbody-market-roles"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Claim Map -->
+                        <div class="mt-6 bg-indigo-50 border border-indigo-200 rounded-lg p-5 shadow-sm">
+                            <h4 class="font-bold text-indigo-900 mb-2"><i class="fas fa-map-signs mr-2"></i> Claim-to-Evidence Map</h4>
+                            <p class="text-sm text-indigo-700 mb-4 font-medium">Click a claim to view associated fictional source requirements.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 border border-indigo-200 rounded shadow-sm cursor-pointer hover:border-indigo-400 transition" onclick="showClaimSources()">
+                                    <span class="text-[10px] font-bold uppercase text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded block mb-2 w-max">Illustrative claim — verify before external use</span>
+                                    <p class="text-sm font-medium text-slate-800">"Target buyers need practical documentation and workflow-design support."</p>
+                                </div>
+                                <div class="bg-white p-4 border border-indigo-200 rounded shadow-sm cursor-pointer hover:border-indigo-400 transition" onclick="showClaimSources()">
+                                    <span class="text-[10px] font-bold uppercase text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded block mb-2 w-max">Illustrative claim — verify before external use</span>
+                                    <p class="text-sm font-medium text-slate-800">"Target roles value structured problem-solving, training, and human-reviewed AI workflow capability."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="market-buyers" class="market-tab-content hidden">
+                         <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="p-4 border-b border-slate-200 bg-slate-50">
+                                <h3 class="font-semibold text-slate-700 text-sm">Target Buyers / Organization Problems (Hypothetical)</h3>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm" id="table-market-buyers">
+                                    <thead class="bg-slate-50 text-slate-600 text-[10px] uppercase font-bold tracking-wider">
+                                        <tr>
+                                            <th class="px-4 py-3 border-b">Buyer Type</th>
+                                            <th class="px-4 py-3 border-b">Operational Problem</th>
+                                            <th class="px-4 py-3 border-b">Potential Deliverable</th>
+                                            <th class="px-4 py-3 border-b">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100" id="tbody-market-buyers"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="market-sources" class="market-tab-content hidden">
+                         <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm" id="table-market-sources">
+                                    <thead class="bg-slate-50 text-slate-600 text-[10px] uppercase font-bold tracking-wider">
+                                        <tr>
+                                            <th class="px-4 py-3 border-b">Source ID</th>
+                                            <th class="px-4 py-3 border-b">Source Title</th>
+                                            <th class="px-4 py-3 border-b">Source Type</th>
+                                            <th class="px-4 py-3 border-b">Verification Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100" id="tbody-market-sources"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-part3" class="view-section hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gcg-blue">3. Interactive Proof-of-Work Design</h2>
+                        <p class="text-slate-500 text-sm mt-1">Plan and document interactive demonstrations of capability.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-1 space-y-6">
+                            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+                                <h3 class="font-bold text-slate-800 mb-3 border-b pb-2 text-sm uppercase tracking-wide">Artifact Types</h3>
+                                <div class="grid grid-cols-2 gap-2" id="artifact-types"></div>
+                            </div>
+
+                            <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 shadow-sm">
+                                <h3 class="font-bold text-slate-800 mb-3 flex items-center text-sm"><i class="fas fa-clipboard-check text-gcg-gold mr-2"></i> Proof-of-Work Readiness Checklist</h3>
+                                <div class="space-y-3 text-sm text-slate-700" id="artifact-checklist">
+                                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1" checked> <span>Demonstrates a real work method rather than self-description only</span></label>
+                                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1" checked> <span>Uses fictional or redacted data</span></label>
+                                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1" checked> <span>Includes visible limitations</span></label>
+                                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1" checked> <span>Identifies human review points</span></label>
+                                    <label class="flex items-start gap-2 font-medium"><input type="checkbox" class="mt-1 text-gcg-blue" checked> <span>Avoids legal, safety, employment, financial, privacy, cybersecurity, and technical-assurance claims</span></label>
+                                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1" checked> <span>Includes evidence/source references outside prototype when externally used</span></label>
+                                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1" checked> <span>Has clear intended buyer or recruiter viewer</span></label>
+                                    <label class="flex items-start gap-2"><input type="checkbox" class="mt-1"> <span>Ready for management or peer review</span></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+                                <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                                    <h3 class="font-bold text-slate-800">Artifact Planner: <span class="text-gcg-blue font-semibold">Workflow Map</span></h3>
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-[10px] uppercase font-bold tracking-wider rounded border border-yellow-200">In Progress</span>
+                                </div>
+                                <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <label class="block text-slate-500 font-bold mb-1 text-[10px] uppercase tracking-wider">Artifact Name</label>
+                                        <input type="text" value="Demo: Training Support Matrix" class="w-full border-slate-300 border p-2 rounded bg-slate-50 font-medium text-slate-700">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-500 font-bold mb-1 text-[10px] uppercase tracking-wider">Intended Viewer</label>
+                                        <input type="text" value="Operations Director" class="w-full border-slate-300 border p-2 rounded bg-slate-50 font-medium text-slate-700">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-slate-500 font-bold mb-1 text-[10px] uppercase tracking-wider">Capability Demonstrated</label>
+                                        <textarea class="w-full border-slate-300 border p-2 rounded bg-slate-50 h-16 font-medium text-slate-700">Structuring complex operating requirements into actionable front-line training modules.</textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-500 font-bold mb-1 text-[10px] uppercase tracking-wider">Human Review Points</label>
+                                        <input type="text" value="Final content review by SME; Privacy check" class="w-full border-slate-300 border p-2 rounded bg-slate-50 font-medium text-slate-700">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-500 font-bold mb-1 text-[10px] uppercase tracking-wider">Explicit Limitations</label>
+                                        <input type="text" value="Not a certified training program; structural demo only" class="w-full border-slate-300 border p-2 rounded bg-slate-50 font-medium text-slate-700">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
+                                <h3 class="font-bold text-slate-800 mb-4 border-b pb-2 text-sm uppercase tracking-wide">Artifact Storyboard</h3>
+                                <div class="flex flex-col md:flex-row gap-2 justify-between">
+                                    <div class="flex-1 bg-slate-50 p-3 rounded border border-slate-200 text-center">
+                                        <div class="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">STAGE 1</div>
+                                        <div class="text-sm font-semibold text-slate-700">Viewer Problem</div>
+                                    </div>
+                                    <div class="flex-1 bg-slate-50 p-3 rounded border border-slate-200 text-center">
+                                        <div class="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">STAGE 2</div>
+                                        <div class="text-sm font-semibold text-slate-700">Context & Evidence</div>
+                                    </div>
+                                    <div class="flex-1 bg-blue-50 p-3 rounded border border-blue-200 text-center">
+                                        <div class="text-[10px] font-bold text-gcg-blue mb-1 uppercase tracking-wider">STAGE 3</div>
+                                        <div class="text-sm font-semibold text-blue-800">Interactive Demo</div>
+                                    </div>
+                                    <div class="flex-1 bg-slate-50 p-3 rounded border border-slate-200 text-center">
+                                        <div class="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">STAGE 4</div>
+                                        <div class="text-sm font-semibold text-slate-700">Review / Limitation</div>
+                                    </div>
+                                    <div class="flex-1 bg-slate-50 p-3 rounded border border-slate-200 text-center">
+                                        <div class="text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-wider">STAGE 5</div>
+                                        <div class="text-sm font-semibold text-slate-700">Practical Next Step</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-org" class="view-section hidden animate-fade-in">
+                    
+                    <div class="bg-amber-800 text-white p-4 rounded-t-lg shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div>
+                            <h2 class="text-xl font-bold uppercase tracking-wider">Organization Pathway — Role-Level and Workflow-Level Readiness Only</h2>
+                        </div>
+                        <i class="fas fa-sitemap text-3xl opacity-50 mt-2 md:mt-0"></i>
+                    </div>
+                    
+                    <div class="bg-white border-x border-b border-amber-200 p-4 rounded-b-lg shadow-sm mb-6 text-sm text-slate-800 font-medium">
+                        <i class="fas fa-exclamation-triangle text-amber-500 mr-2 text-lg"></i> This pathway supports workforce planning discussions, training support, documentation design, workflow mapping, and human review. <strong class="text-red-700">It must not be used to make or recommend automated employment decisions</strong>, evaluate individual employees, rank people, or process protected-trait, health, disciplinary, or applicant data.
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-200 mb-6 overflow-hidden">
+                        <div class="bg-slate-50 p-3 border-b border-slate-200 font-bold text-slate-700 text-sm">A. Workflow Inventory</div>
+                        <div class="overflow-x-auto p-4 text-center text-slate-500 text-sm italic">Fictional tabular data hidden for prototype spacing.</div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-200 mb-6 overflow-hidden">
+                        <div class="bg-slate-50 p-3 border-b border-slate-200 font-bold text-slate-700 text-sm">B. Role-Level Capability Map</div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm" id="table-org-role">
+                                <thead class="bg-slate-50 text-slate-600 text-[10px] uppercase font-bold tracking-wider">
+                                    <tr>
+                                        <th class="px-4 py-3 border-b">Role Group</th>
+                                        <th class="px-4 py-3 border-b">Role-Level Capability</th>
+                                        <th class="px-4 py-3 border-b">AI-Assistive Boundary</th>
+                                        <th class="px-4 py-3 border-b">Review Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="tbody-org-role"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border border-indigo-200 mb-6 overflow-hidden">
+                        <div class="bg-indigo-50 p-3 border-b border-indigo-200 font-bold text-indigo-900 text-sm flex items-center">
+                            <i class="fas fa-robot text-indigo-400 mr-2"></i> C. AI-Assistive Opportunity Register
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm" id="table-org-ai">
+                                <thead class="bg-slate-50 text-slate-600 text-[10px] uppercase font-bold tracking-wider">
+                                    <tr>
+                                        <th class="px-4 py-3 border-b">Workflow</th>
+                                        <th class="px-4 py-3 border-b">Candidate AI-Assistive Use (Administrative Only)</th>
+                                        <th class="px-4 py-3 border-b">Specialist Review Flag</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="tbody-org-ai"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-evidence-reg" class="view-section hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gcg-blue">Combined Evidence Register</h2>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden p-8 text-center text-slate-500 italic text-sm">
+                        Table UI placeholder: Provides unified view of individual professional evidence, organization workflow evidence, and market validation sources.
+                    </div>
+                </div>
+
+                <div id="view-actions" class="view-section hidden animate-fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gcg-blue">Action Register</h2>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm" id="table-actions">
+                                <thead class="bg-slate-50 text-slate-600 text-[10px] uppercase font-bold tracking-wider">
+                                    <tr>
+                                        <th class="px-4 py-3 border-b">Action ID</th>
+                                        <th class="px-4 py-3 border-b">Action</th>
+                                        <th class="px-4 py-3 border-b">Priority</th>
+                                        <th class="px-4 py-3 border-b">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="tbody-actions"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-review" class="view-section hidden animate-fade-in">
+                    <div class="mb-6 no-print">
+                        <h2 class="text-2xl font-bold text-gcg-blue">Review & Export</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-1 space-y-4 no-print">
+                            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col gap-3">
+                                <h3 class="font-bold text-slate-700 border-b pb-2 text-sm uppercase tracking-wide">Export Tools</h3>
+                                <button class="w-full text-left px-4 py-2 bg-blue-50 text-blue-800 rounded border border-blue-200 hover:bg-blue-100 transition text-sm font-semibold" onclick="generateSummary()"><i class="fas fa-sync-alt mr-2 w-4"></i> Generate Review Summary</button>
+                                <button class="w-full text-left px-4 py-2 bg-slate-50 text-slate-700 rounded border border-slate-200 hover:bg-slate-100 transition text-sm font-medium" onclick="alert('Exporting filtered CSV demo data.')"><i class="fas fa-file-csv mr-2 w-4"></i> Export Demo Summary (CSV)</button>
+                                <button class="w-full text-left px-4 py-2 bg-slate-50 text-slate-700 rounded border border-slate-200 hover:bg-slate-100 transition text-sm font-medium" onclick="window.print()"><i class="fas fa-file-pdf mr-2 w-4"></i> Print / Save as PDF</button>
+                                <div class="mt-4 pt-4 border-t border-slate-200">
+                                    <button class="w-full text-left px-4 py-2 bg-red-50 text-red-700 rounded border border-red-200 hover:bg-red-100 transition text-sm font-medium" onclick="location.reload()"><i class="fas fa-trash-alt mr-2 w-4"></i> Demo Data Reset</button>
+                                    <p class="text-[10px] text-slate-500 mt-2 leading-tight">Note: No data is stored on refresh unless exported locally.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 space-y-6">
+                            <div id="dynamic-summary" class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm hidden">
+                                <h3 class="font-bold text-lg text-gcg-blue mb-4 print:text-black">Dynamic Data Summary</h3>
+                                <div id="summary-content" class="text-sm space-y-2 font-medium text-slate-700"></div>
+                            </div>
+                            <div class="bg-slate-800 p-6 rounded-lg shadow-sm text-slate-200">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="font-bold text-white text-sm uppercase tracking-wide"><i class="fas fa-robot mr-2"></i> Handoff Notes for Claude Review</h3>
+                                    <button class="text-[10px] font-bold uppercase tracking-wider bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-white transition no-print" onclick="copyHandoff()"><i class="fas fa-copy mr-1"></i> Copy</button>
+                                </div>
+                                <textarea id="handoff-text" class="w-full h-64 bg-slate-900 border border-slate-700 rounded p-4 text-xs font-mono text-slate-300 focus:outline-none" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> 
+
+            <footer class="bg-slate-200 text-slate-700 text-[10px] p-5 text-center border-t border-slate-300 z-10 shrink-0 font-medium leading-relaxed">
+                <div class="max-w-6xl mx-auto">
+                    <p>Gannon Compliance Group provides non-legal operational-readiness, documentation, workflow-design, training-support, implementation-support, evidence-management, accountability, human-review, and specialist-referral services. This prototype is not legal advice, a legal opinion, a legal-compliance certification, a Cal/OSHA audit, a psychometric assessment, an employment-decision tool, an incident-investigation tool, behavioral threat assessment, emergency-response system, safety-engineering opinion, technical security assessment, privacy impact assessment, technical AI audit, cybersecurity assessment, or guarantee of outcomes. Users and employers remain responsible for their decisions and should obtain qualified attorney, HR, privacy, technical, or other specialist review when appropriate.</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <div id="how-to-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] flex flex-col border border-slate-200">
+            <div class="p-4 border-b flex justify-between items-center bg-slate-50 rounded-t-lg">
+                <h3 class="font-bold text-gcg-blue text-lg">How to Use This Prototype</h3>
+                <button onclick="closeModal('how-to-modal')" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto text-sm text-slate-700 space-y-4 font-medium">
+                <p>This dashboard is a front-end demonstration of the <strong>AI-Enabled Evidence Portfolio and Market-Validation Sprint</strong> methodology.</p>
+                <p>It demonstrates a structured approach to mapping self-reported capability evidence (Part 1) to hypothetical documented market problems (Part 2), leading to the design of interactive proof-of-work artifacts (Part 3).</p>
+                <p>A separate Organizational Pathway supports mapping workflows and defining safe administrative AI-assistive uses, strictly separated from any individual employment decision.</p>
+                <p class="text-xs text-slate-500 mt-4 border-t pt-4"><strong>Data Privacy:</strong> All data is fictional. The interface is completely self-contained in your browser. No data is stored externally.</p>
+            </div>
+            <div class="p-4 border-t bg-slate-50 text-right rounded-b-lg">
+                <button onclick="closeModal('how-to-modal')" class="px-4 py-2 bg-slate-200 text-slate-800 font-semibold rounded text-sm hover:bg-slate-300">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="boundaries-modal" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col border border-red-200">
+            <div class="p-4 border-b flex justify-between items-center bg-red-50 rounded-t-lg border-red-200">
+                <h3 class="font-bold text-red-800 text-lg"><i class="fas fa-shield-alt mr-2"></i> Claim Boundaries & Limitations</h3>
+                <button onclick="closeModal('boundaries-modal')" class="text-red-400 hover:text-red-700"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto text-sm text-slate-800 space-y-4 font-medium">
+                <p class="font-bold text-red-900 border-b border-red-100 pb-2">The methodology demonstrated explicitly excludes the following functions:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <ul class="list-disc pl-5 space-y-3">
+                        <li><strong>No Legal Services:</strong> Not legal advice, legal interpretation, or compliance certification.</li>
+                        <li><strong>No Employment Decisions:</strong> Must not be used for automated hiring, screening, ranking, promotion, compensation, discipline, or termination.</li>
+                        <li><strong>No Assessments:</strong> Excludes psychometric, personality, behavioral, or mental-health assessments.</li>
+                        <li><strong>No Audits:</strong> Excludes Cal/OSHA, HR, safety, technical AI bias, or cybersecurity audits.</li>
+                    </ul>
+                    <ul class="list-disc pl-5 space-y-3">
+                        <li><strong>No Investigations:</strong> Excludes incident investigations, credibility assessments, or witness evaluation.</li>
+                        <li><strong>No Threat Prediction:</strong> Excludes behavioral threat assessment, violence prediction, or person-level risk scoring.</li>
+                        <li><strong>No Engineering Certs:</strong> Excludes safety engineering, architecture, or security-system design certification.</li>
+                        <li><strong>No Guarantees:</strong> Does not guarantee career placement, job offers, revenue, market demand, or prevention of incidents/liabilities.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="p-4 border-t bg-slate-50 text-right rounded-b-lg">
+                <button onclick="closeModal('boundaries-modal')" class="px-4 py-2 bg-slate-200 text-slate-800 font-semibold rounded text-sm hover:bg-slate-300">Acknowledge</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STATE = {
+            evidence: [
+                { id: "EV-001", cat: "Operating Experience", skill: "Cross-Functional Coordination", strength: "Directly Documented", status: "Evidence Complete" },
+                { id: "EV-002", cat: "Technology / AI-Enabled Workflow", skill: "Prompt Engineering for Research", strength: "Documented but Needs Context", status: "Needs Review" },
+                { id: "EV-003", cat: "Work Product", skill: "Documentation Design", strength: "Directly Documented", status: "Evidence Complete" },
+                { id: "EV-004", cat: "Gap / Claim Requiring Verification", skill: "Specific Software Admin", strength: "Self-Reported — Needs Review", status: "Unknown — Fact Intake Needed" }
+            ],
+            marketRoles: [
+                { role: "Operations Training Specialist", skills: "Documentation, Instruction", note: "Fictional signal: Focus on internal capability building.", status: "Needs Source Check" },
+                { role: "Workflow Optimization Analyst", skills: "Process Mapping, AI-Assistive Use", note: "Fictional signal: High demand for human-reviewed AI application.", status: "Market Signal — Secondary" }
+            ],
+            marketBuyers: [
+                { buyer: "Mid-Size Regional Ops Team", problem: "Fragmented onboarding docs", deliverable: "Training Planner Prototype", status: "Open" },
+                { buyer: "Compliance Training Dept", problem: "Updating manuals for AI use", deliverable: "Workflow Readiness Map", status: "In Progress" }
+            ],
+            marketSources: [
+                { id: "SRC-101", title: "Generic Industry Report 2024", type: "Professional Association Research", status: "Verified Authoritative Research" },
+                { id: "SRC-102", title: "Sample Job Posting (Ops Manager)", type: "Job Posting Sample — Market Signal Only", status: "Market Signal — Secondary" }
+            ],
+            artifactTypes: ["Readiness Triage Tool", "Workflow Map", "Documentation Tracker", "Training Planner", "Evidence Navigator", "Scenario Simulator", "Capability Dashboard", "Decision Guide", "Action Register"],
+            orgRoles: [
+                { role: "Frontline Supervisor", cap: "Initial Fact Gathering", bound: "No AI used for credibility assessment", status: "Evidence Complete" },
+                { role: "Documentation Clerk", cap: "Drafting Summaries", bound: "Human review required before publishing", status: "In Progress" }
+            ],
+            orgAI: [
+                { wf: "Training Material Update", use: "Structuring research notes", flag: "None" },
+                { wf: "Incident Logging", use: "Generating meeting summaries for human review", flag: "Specialist Review Flag" }
+            ],
+            actions: [
+                { id: "ACT-01", desc: "Verify source for EV-004", prio: "P1 8–30 Days", status: "Open" },
+                { id: "ACT-02", desc: "Review AI-assistive data boundary", prio: "U2 2–7 Days", status: "Needs Review" }
+            ]
+        };
+
+        const getStatusBadge = (status) => {
+            const classes = {
+                "Evidence Complete": "bg-emerald-100 text-emerald-800 border-emerald-200",
+                "Needs Review": "bg-yellow-100 text-yellow-800 border-yellow-200",
+                "Unknown — Fact Intake Needed": "bg-slate-200 text-slate-800 border-slate-300",
+                "Open": "bg-blue-50 text-blue-700 border-blue-200",
+                "In Progress": "bg-indigo-100 text-indigo-800 border-indigo-200",
+                "Ready for Management Review": "bg-purple-100 text-purple-800 border-purple-200",
+                "Market Signal — Secondary": "bg-blue-100 text-blue-800 border-blue-200",
+                "Needs Source Check": "bg-yellow-100 text-yellow-800 border-yellow-200",
+                "Verified Authoritative Research": "bg-emerald-100 text-emerald-800 border-emerald-200",
+                "Specialist Review Flag": "bg-red-100 text-red-800 border-red-200"
+            };
+            const baseClass = "px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border inline-block whitespace-nowrap";
+            return `<span class="${baseClass} ${classes[status] || 'bg-slate-100 text-slate-600 border-slate-200'}" title="Indicates workflow state or documentation presence. Not an audited finding or score.">${status}</span>`;
+        };
+
+        const getStrengthBadge = (str) => {
+            if(str.includes("Directly")) return `<span class="text-emerald-700 font-semibold text-xs" title="Item has documented evidence attached for human review."><i class="fas fa-check-circle mr-1"></i>${str}</span>`;
+            if(str.includes("Self-Reported") || str.includes("Needs Context")) return `<span class="text-amber-700 font-semibold text-xs" title="Item requires further contextual validation before use."><i class="fas fa-exclamation-circle mr-1"></i>${str}</span>`;
+            return `<span class="text-slate-600 font-semibold text-xs">${str}</span>`;
+        };
+
+        function init() {
+            document.getElementById('open-sidebar-btn').addEventListener('click', () => { document.getElementById('sidebar').classList.remove('-translate-x-full'); });
+            document.getElementById('close-sidebar-btn').addEventListener('click', () => { document.getElementById('sidebar').classList.add('-translate-x-full'); });
+
+            document.getElementById('handoff-text').value = `[FICTIONAL PROTOTYPE HANDOFF]\n\nPURPOSE:\nReview alignment of documented capability evidence against hypothetical market problems.\n\nSCOPE:\nFictional front-end data only. Excludes legal, compliance, or employment determinations.\n\nEVIDENCE INPUTS:\n- 4 generic capabilities logged.\n\nMARKET SOURCES:\n- 2 generic validation signals logged.\n\nARTIFACT REQ:\n- Tool: Workflow Map.\n- Viewer: Operations Director.\n- Limitation: Demo structure only; not a certified program.\n\nHUMAN REVIEW ITEMS:\n- Verify Specialist Review Flag on AI-assistive note generation.\n\nOPEN QUESTIONS:\n- Next action on unverified capabilities.`;
+
+            renderTables();
+            updateStats();
+            
+            const artContainer = document.getElementById('artifact-types');
+            STATE.artifactTypes.forEach((type, idx) => {
+                const active = idx === 1 ? 'bg-blue-50 border-gcg-blue text-gcg-blue ring-1 ring-gcg-blue font-bold' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 font-medium';
+                artContainer.innerHTML += `<div class="border rounded p-2 text-[10px] uppercase tracking-wider cursor-pointer text-center ${active}">${type}</div>`;
+            });
+        }
+
+        function nav(targetId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${targetId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'text-gcg-blue', 'border-gcg-gold');
+                if (btn.dataset.target === targetId) {
+                    if(targetId === 'org') { btn.classList.add('bg-amber-50', 'text-amber-900', 'border-gcg-gold'); } 
+                    else { btn.classList.add('bg-blue-50', 'text-gcg-blue'); }
+                } else {
+                    btn.classList.add('text-slate-600');
+                    if(btn.dataset.target === 'org') btn.classList.add('border-transparent');
+                }
+            });
+            if(window.innerWidth < 768) { document.getElementById('sidebar').classList.add('-translate-x-full'); }
+        }
+
+        function renderTables() {
+            document.getElementById('tbody-evidence').innerHTML = STATE.evidence.map(e => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="px-4 py-3 text-slate-500 font-mono text-xs">${e.id}</td>
+                    <td class="px-4 py-3 font-medium text-slate-700">${e.cat}</td>
+                    <td class="px-4 py-3 font-bold text-slate-800">${e.skill}</td>
+                    <td class="px-4 py-3">${getStrengthBadge(e.strength)}</td>
+                    <td class="px-4 py-3">${getStatusBadge(e.status)}</td>
+                </tr>`).join('');
+
+            document.getElementById('tbody-market-roles').innerHTML = STATE.marketRoles.map(r => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="px-4 py-3 font-bold text-slate-800">${r.role}</td>
+                    <td class="px-4 py-3 text-slate-600 font-medium">${r.skills}</td>
+                    <td class="px-4 py-3 text-slate-500 text-xs italic">${r.note}</td>
+                    <td class="px-4 py-3">${getStatusBadge(r.status)}</td>
+                </tr>`).join('');
+
+            document.getElementById('tbody-market-buyers').innerHTML = STATE.marketBuyers.map(b => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="px-4 py-3 font-bold text-slate-800">${b.buyer}</td>
+                    <td class="px-4 py-3 text-slate-600 font-medium">${b.problem}</td>
+                    <td class="px-4 py-3 text-slate-600 font-medium">${b.deliverable}</td>
+                    <td class="px-4 py-3">${getStatusBadge(b.status)}</td>
+                </tr>`).join('');
+
+            document.getElementById('tbody-market-sources').innerHTML = STATE.marketSources.map(s => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="px-4 py-3 text-slate-500 font-mono text-xs">${s.id}</td>
+                    <td class="px-4 py-3 font-bold text-slate-800">${s.title}</td>
+                    <td class="px-4 py-3 text-slate-600 text-xs font-medium">${s.type}</td>
+                    <td class="px-4 py-3">${getStatusBadge(s.status)}</td>
+                </tr>`).join('');
+
+            document.getElementById('tbody-org-role').innerHTML = STATE.orgRoles.map(r => `
+                <tr class="hover:bg-amber-50 transition border-b border-amber-100">
+                    <td class="px-4 py-3 font-bold text-slate-800">${r.role}</td>
+                    <td class="px-4 py-3 text-slate-600 font-medium">${r.cap}</td>
+                    <td class="px-4 py-3 text-red-700 text-xs font-bold uppercase tracking-wide">${r.bound}</td>
+                    <td class="px-4 py-3">${getStatusBadge(r.status)}</td>
+                </tr>`).join('');
+
+            document.getElementById('tbody-org-ai').innerHTML = STATE.orgAI.map(a => `
+                <tr class="hover:bg-indigo-50 transition border-b border-indigo-100">
+                    <td class="px-4 py-3 font-bold text-slate-800">${a.wf}</td>
+                    <td class="px-4 py-3 text-slate-700 text-sm font-semibold"><i class="fas fa-check text-emerald-500 mr-2"></i>${a.use}</td>
+                    <td class="px-4 py-3">${a.flag !== 'None' ? getStatusBadge(a.flag) : `<span class="text-slate-400 text-xs font-medium">None</span>`}</td>
+                </tr>`).join('');
+
+            document.getElementById('tbody-actions').innerHTML = STATE.actions.map(a => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="px-4 py-3 text-slate-500 font-mono text-xs">${a.id}</td>
+                    <td class="px-4 py-3 font-bold text-slate-800">${a.desc}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-slate-100 border border-slate-300 text-slate-600 rounded text-[10px] font-bold tracking-wider">${a.prio}</span></td>
+                    <td class="px-4 py-3">${getStatusBadge(a.status)}</td>
+                </tr>`).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('stat-evidence').innerText = STATE.evidence.filter(e=>e.status==='Needs Review').length;
+            document.getElementById('stat-sources').innerText = STATE.marketSources.length;
+            document.getElementById('stat-review').innerText = STATE.actions.filter(a=>a.status==='Needs Review').length;
+        }
+
+        function switchMarketTab(tab, btnElement) {
+            document.querySelectorAll('.market-tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`market-${tab}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active', 'text-slate-500', 'hover:text-slate-700');
+                btn.classList.add('text-slate-500', 'hover:text-slate-700');
+            });
+            btnElement.classList.remove('text-slate-500', 'hover:text-slate-700');
+            btnElement.classList.add('tab-active');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function showClaimSources() {
+            switchMarketTab('sources', document.querySelectorAll('.tab-btn')[2]);
+            const tbody = document.getElementById('tbody-market-sources');
+            tbody.classList.add('bg-yellow-50', 'transition', 'duration-500');
+            setTimeout(() => tbody.classList.remove('bg-yellow-50'), 1500);
+        }
+
+        function exportCSV(tableId, filename) {
+            alert(`Demo Function: Would export fictional ${filename} data to CSV.`);
+        }
+
+        function generateSummary() {
+            const sumContainer = document.getElementById('dynamic-summary');
+            const content = document.getElementById('summary-content');
+            
+            content.innerHTML = `
+                <p><strong>Date Generated:</strong> ${new Date().toLocaleDateString()}</p>
+                <p><strong>Total Evidence Items:</strong> ${STATE.evidence.length}</p>
+                <p><strong>Market Sources Logged:</strong> ${STATE.marketSources.length}</p>
+                <p><strong>Pending Action Items:</strong> ${STATE.actions.length}</p>
+                <p class="mt-4 text-xs font-bold text-red-700 uppercase tracking-wide border-t pt-2">* Contains fictional mapping data only. Not a compliance finding.</p>
+            `;
+            sumContainer.classList.remove('hidden');
+        }
+
+        function copyHandoff() {
+            const text = document.getElementById('handoff-text');
+            text.select();
+            document.execCommand('copy');
+            alert("Copied fictional handoff notes to clipboard.");
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
