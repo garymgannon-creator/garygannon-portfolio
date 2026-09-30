@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organizational Resilience Diagnostic — Illustrative Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-canvas: #F7F9FB;
+    --bg-panel: #FFFFFF;
+    --bg-panel-2: #EEF2F6;
+    --border: #D8DEE4;
+    --text-primary: #14202B;
+    --text-secondary: #4A5A68;
+    --brand-navy: #1B3A5C;
+    --brand-navy-hover: #234A73;
+    --accent: #C9701A;
+    --accent-hover: #DB8330;
+    --status-critical: #B3261E;
+    --status-critical-bg: #FBEAE9;
+    --status-warning: #A15C00;
+    --status-warning-bg: #FDF1E0;
+    --status-ok: #1E6B3A;
+    --status-ok-bg: #E9F5EC;
+    --radius: 3px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  h1, h2, h3 { font-family: 'Source Serif 4', serif; font-weight: 600; margin: 0 0 0.3em 0; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 28px 90px; }
+
+  .banner {
+    background: var(--status-critical-bg);
+    border: 1px solid var(--status-critical);
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    margin-bottom: 32px;
+  }
+  .banner strong { color: var(--status-critical); }
+
+  .kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  header h1 { font-size: 1.85rem; max-width: 640px; }
+  header p { color: var(--text-secondary); max-width: 620px; margin-top: 10px; }
+
+  .frame-note {
+    background: var(--bg-panel-2);
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px;
+    margin: 28px 0 32px;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .frame-note strong { color: var(--text-primary); }
+
+  .category {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .category-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    cursor: pointer;
+  }
+  .category-head:hover { background: rgba(27,58,92,0.04); }
+  .category-title { display: flex; align-items: center; gap: 12px; }
+  .category-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    border: 1px solid var(--accent-hover);
+    border-radius: 50%;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .category-title h3 { font-size: 1.05rem; }
+  .category-status {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: var(--radius);
+    white-space: nowrap;
+  }
+  .category-status.unanswered { color: var(--text-secondary); border: 1px solid var(--border); }
+  .category-status.documented { color: #B7CBB4; background: var(--status-ok-bg); border: 1px solid var(--status-ok); }
+  .category-status.gap { color: #E8B4B0; background: var(--status-critical-bg); border: 1px solid var(--status-critical); }
+  .chevron { color: var(--text-secondary); font-size: 1.02rem; margin-left: 12px; transition: transform 0.2s ease; }
+  .category.open .chevron { transform: rotate(90deg); }
+
+  .category-body {
+    display: none;
+    padding: 0 22px 22px;
+    border-top: 1px solid var(--border);
+  }
+  .category.open .category-body { display: block; }
+  .category-body .example {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 14px 0 18px;
+    padding: 12px 14px;
+    background: var(--bg-canvas);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border);
+  }
+  .category-body .example strong { color: var(--text-primary); }
+
+  label { display: block; font-size: 1rem; color: var(--text-secondary); margin-bottom: 6px; margin-top: 14px; }
+  select, textarea {
+    width: 100%;
+    background: var(--bg-canvas);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1.02rem;
+  }
+  textarea { min-height: 60px; resize: vertical; }
+  select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .summary-section { margin-top: 36px; }
+  .stat-row { display: flex; gap: 32px; margin: 18px 0 24px; flex-wrap: wrap; }
+  .stat .num { font-family: 'Source Serif 4', serif; font-size: 2rem; color: var(--text-primary); }
+  .stat .lbl { font-size: 0.8rem; color: var(--text-secondary); font-family: 'IBM Plex Mono', monospace; }
+
+  .gap-output { list-style: none; margin: 0; padding: 0; }
+  .gap-output li {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    font-size: 1rem;
+  }
+  .gap-output li:last-child { border-bottom: none; }
+  .gap-output .marker { color: var(--status-critical); flex-shrink: 0; }
+
+  button.action {
+    background: var(--accent);
+    color: var(--bg-canvas);
+    border: none;
+    padding: 12px 22px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  button.action:hover { background: var(--accent-hover); }
+
+  .footer-block {
+    margin-top: 44px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .footer-block .cred { color: var(--text-primary); font-weight: 600; margin-bottom: 6px; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 28px 18px 70px; }
+    .stat-row { gap: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="banner">
+    <strong>Demonstration only. Synthetic data.</strong> This tool is not legal, insurance, financial-advisory, or business-continuity certification advice, and does not constitute a formal continuity plan or disaster-recovery audit. Human review and verified organizational data are required before any operational decision. No client-identifiable information should be entered into this prototype.
+  </div>
+
+  <header>
+    <div class="kicker">GCG — ORGANIZATIONAL RESILIENCE DIAGNOSTIC</div>
+    <h1>Most resilience gaps are discovered during the disruption, not before it.</h1>
+    <p>This self-assessment maps your organization against four categories of disruption — financial shock, operational continuity, legal exposure, and technological change — using the same categories a real 29-year, no-structural-advantage operation had to survive in practice.</p>
+  </header>
+
+  <div class="frame-note">
+    <strong>Note on the reference point:</strong> the illustrative case behind this tool's design is one operator's documented 29-year record of continuous revenue growth through the 2008 recession, COVID-19, ongoing litigation, and repeated technological disruption. This is presented as one real, evidenced experience — not a universal template every organization can expect to replicate, and not a guarantee of any outcome.
+  </div>
+
+  <div id="categories"></div>
+
+  <div class="summary-section">
+    <h3>Resilience Gap Summary</h3>
+    <div class="stat-row" id="summaryStats"></div>
+    <ul class="gap-output" id="gapOutput"></ul>
+    <button class="action" type="button" onclick="renderSummary()">Refresh Summary</button>
+  </div>
+
+  <div class="footer-block">
+    <div class="cred">Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA — Gannon Compliance Group</div>
+    This assessment is an illustrative prototype built with synthetic/placeholder data for demonstration purposes. It does not constitute legal advice, insurance or risk-transfer advice, a formal business continuity plan, a disaster-recovery audit, or a guarantee of any outcome. AI may organize and summarize self-reported input; a qualified human is required to validate, approve, and act on any resulting plan. Client remains responsible for its own legal, financial, and operational decisions; specialists should be retained separately for those functions.
+    <br><br>
+    <em>Strategic Intelligence — Not Legal Counsel (CA B&P Sections 6125-6126)</em>
+  </div>
+
+</div>
+
+<script>
+  const categories = [
+    {
+      key: 'financial',
+      title: 'Financial Shock',
+      example: 'Reference pattern: continuous revenue growth sustained through a major recession-level downturn, without headcount collapse.',
+      questions: [
+        { q: 'Do you have a documented, current cash-reserve or credit-access plan for a sustained revenue drop?', field: 'plan1' },
+        { q: 'Describe your most recent real test of this plan, if any.', field: 'notes1', type: 'text' }
+      ]
+    },
+    {
+      key: 'operational',
+      title: 'Operational Disruption',
+      example: 'Reference pattern: maintaining 24/7 service continuity through a pandemic-scale disruption to normal operations.',
+      questions: [
+        { q: 'Do you have a documented plan for maintaining core operations if a large share of staff cannot work on-site?', field: 'plan2' },
+        { q: 'Describe your most recent real test of this plan, if any.', field: 'notes2', type: 'text' }
+      ]
+    },
+    {
+      key: 'legal',
+      title: 'Legal / Litigation Exposure',
+      example: 'Reference pattern: sustained operations through ongoing litigation and 50+ regulatory claims without a single case-driven shutdown.',
+      questions: [
+        { q: 'Do you have a documented process for continuing operations while a legal matter is active?', field: 'plan3' },
+        { q: 'Describe your most recent real test of this process, if any.', field: 'notes3', type: 'text' }
+      ]
+    },
+    {
+      key: 'tech',
+      title: 'Technological Disruption (Including AI Adoption)',
+      example: 'Reference pattern: managing multiple technology transitions inside a continuously-operating business without interrupting service delivery.',
+      questions: [
+        { q: 'Do you have a documented plan for introducing new technology (including AI tools) without disrupting core operations?', field: 'plan4' },
+        { q: 'Describe your most recent real test of this plan, if any.', field: 'notes4', type: 'text' }
+      ]
+    }
+  ];
+
+  const categoryLabels = {
+    financial: 'Financial Shock',
+    operational: 'Operational Disruption',
+    legal: 'Legal / Litigation Exposure',
+    tech: 'Technological Disruption'
+  };
+
+  function renderCategories() {
+    const wrap = document.getElementById('categories');
+    wrap.innerHTML = '';
+    categories.forEach((cat, idx) => {
+      const div = document.createElement('div');
+      div.className = 'category';
+      div.id = 'cat_' + cat.key;
+      div.innerHTML = `
+        <div class="category-head" onclick="toggleCategory('${cat.key}')">
+          <div class="category-title">
+            <span class="category-num">${idx + 1}</span>
+            <h3>${cat.title}</h3>
+          </div>
+          <div style="display:flex; align-items:center;">
+            <span class="category-status unanswered" id="status_${cat.key}">Not yet assessed</span>
+            <span class="chevron">›</span>
+          </div>
+        </div>
+        <div class="category-body">
+          <div class="example"><strong>Illustrative reference:</strong> ${cat.example}</div>
+          <label>${cat.questions[0].q}</label>
+          <select id="${cat.questions[0].field}" onchange="updateStatus('${cat.key}')">
+            <option value="">Select...</option>
+            <option value="documented">Yes — documented and current</option>
+            <option value="informal">Informal only, not written down</option>
+            <option value="none">No plan in place</option>
+          </select>
+          <label>${cat.questions[1].q}</label>
+          <textarea id="${cat.questions[1].field}" placeholder="Optional notes..."></textarea>
+        </div>
+      `;
+      wrap.appendChild(div);
+    });
+  }
+
+  function toggleCategory(key) {
+    document.getElementById('cat_' + key).classList.toggle('open');
+  }
+
+  function updateStatus(key) {
+    const cat = categories.find(c => c.key === key);
+    const val = document.getElementById(cat.questions[0].field).value;
+    const statusEl = document.getElementById('status_' + key);
+    if (val === 'documented') {
+      statusEl.textContent = 'Documented';
+      statusEl.className = 'category-status documented';
+    } else if (val === 'informal' || val === 'none') {
+      statusEl.textContent = val === 'informal' ? 'Informal only' : 'No plan';
+      statusEl.className = 'category-status gap';
+    } else {
+      statusEl.textContent = 'Not yet assessed';
+      statusEl.className = 'category-status unanswered';
+    }
+  }
+
+  function renderSummary() {
+    let documented = 0, gaps = 0, unanswered = 0;
+    const gapList = [];
+    categories.forEach(cat => {
+      const val = document.getElementById(cat.questions[0].field).value;
+      if (val === 'documented') documented++;
+      else if (val === 'informal' || val === 'none') {
+        gaps++;
+        gapList.push({ name: categoryLabels[cat.key], status: val });
+      } else unanswered++;
+    });
+
+    document.getElementById('summaryStats').innerHTML = `
+      <div class="stat"><div class="num">${documented} / 4</div><div class="lbl">CATEGORIES DOCUMENTED</div></div>
+      <div class="stat"><div class="num">${gaps}</div><div class="lbl">GAPS IDENTIFIED</div></div>
+    `;
+
+    const outputEl = document.getElementById('gapOutput');
+    outputEl.innerHTML = '';
+    if (unanswered === 4) {
+      outputEl.innerHTML = '<li style="color:var(--text-secondary);">Assess at least one category above, then refresh this summary.</li>';
+      return;
+    }
+    if (gapList.length === 0) {
+      outputEl.innerHTML = '<li><span class="marker" style="color:var(--status-ok);">✓</span> All assessed categories currently show a documented plan.</li>';
+      return;
+    }
+    gapList.forEach(g => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="marker">▲</span><span><strong>${g.name}</strong> — ${g.status === 'none' ? 'no plan currently in place.' : 'plan exists only informally, not documented.'} Worth prioritizing before the next disruption, not during it.</span>`;
+      outputEl.appendChild(li);
+    });
+  }
+
+  renderCategories();
+  renderSummary();
+</script>
+</body>
+</html>

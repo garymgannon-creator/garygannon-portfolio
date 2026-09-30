@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Houses of Worship Safety Readiness — Illustrative Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-canvas: #F7F9FB;
+    --bg-panel: #FFFFFF;
+    --bg-panel-2: #EEF2F6;
+    --border: #D8DEE4;
+    --text-primary: #14202B;
+    --text-secondary: #4A5A68;
+    --brand-navy: #1B3A5C;
+    --accent: #C9701A;
+    --status-critical: #B3261E;
+    --status-critical-bg: #FBEAE9;
+    --status-warning: #A15C00;
+    --status-warning-bg: #FDF1E0;
+    --status-ok: #1E6B3A;
+    --status-ok-bg: #E9F5EC;
+    --radius: 4px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--bg-canvas); color:var(--text-primary); font-family:'IBM Plex Sans', sans-serif; font-size:17px; line-height:1.6; }
+  h1,h2,h3 { font-family:'Source Serif 4', serif; font-weight:600; margin:0 0 0.4em 0; color: var(--brand-navy); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 26px 90px; }
+
+  .banner { background: var(--status-warning-bg); border: 1px solid var(--status-warning); padding: 14px 18px; border-radius: var(--radius); font-size: 0.95rem; margin-bottom: 30px; }
+  .banner strong { color: var(--status-warning); }
+
+  .kicker { font-family:'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--accent); margin-bottom: 8px; }
+  header h1 { font-size: 1.85rem; max-width: 680px; }
+  header p { color: var(--text-secondary); max-width: 640px; margin-top: 10px; font-size: 1.05rem; }
+
+  .attribution-note {
+    background: var(--bg-panel-2);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 22px 0 34px;
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+  }
+  .attribution-note strong { color: var(--text-primary); }
+
+  .score-summary {
+    display: flex;
+    gap: 30px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 26px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+  .score-summary .stat .num { font-family: 'Source Serif 4', serif; font-size: 1.9rem; }
+  .score-summary .stat .lbl { font-size: 0.8rem; color: var(--text-secondary); font-family: 'IBM Plex Mono', monospace; }
+
+  .element-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .element-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+  }
+  .element-head:hover { background: rgba(27,58,92,0.03); }
+  .element-title { display: flex; align-items: center; gap: 12px; }
+  .element-num {
+    font-family:'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 50%;
+    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .element-title h3 { font-size: 1.05rem; }
+  .element-status {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    padding: 4px 10px; border-radius: var(--radius); white-space: nowrap;
+  }
+  .element-status.unanswered { color: var(--text-secondary); border: 1px solid var(--border); }
+  .element-status.ready { color: var(--status-ok); background: var(--status-ok-bg); border: 1px solid var(--status-ok); }
+  .element-status.gap { color: var(--status-critical); background: var(--status-critical-bg); border: 1px solid var(--status-critical); }
+  .chevron { color: var(--text-secondary); margin-left: 12px; transition: transform 0.2s ease; }
+  .element-card.open .chevron { transform: rotate(90deg); }
+
+  .element-body { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border); }
+  .element-card.open .element-body { display: block; }
+  .element-body .example {
+    font-size: 0.92rem; color: var(--text-secondary); margin: 14px 0;
+    padding: 12px 14px; background: var(--bg-panel-2); border-radius: var(--radius);
+  }
+  .element-body .example strong { color: var(--text-primary); }
+  label { display:block; font-size: 0.9rem; color: var(--text-secondary); margin: 12px 0 6px; }
+  select {
+    width: 100%; background: var(--bg-canvas); border: 1px solid var(--border);
+    color: var(--text-primary); padding: 10px 12px; border-radius: var(--radius); font-size: 1rem;
+  }
+  select:focus { outline: 2px solid var(--accent); }
+
+  .free-resource-box {
+    background: var(--status-ok-bg);
+    border: 1px solid var(--status-ok);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin: 30px 0;
+  }
+  .free-resource-box h3 { color: var(--status-ok); font-size: 1.05rem; }
+  .free-resource-box a { color: var(--brand-navy); font-weight: 600; }
+
+  .footer-block { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.92rem; color: var(--text-secondary); }
+  .footer-block .cred { color: var(--text-primary); font-weight: 600; margin-bottom: 6px; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 28px 16px 70px; }
+    .score-summary { gap: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="banner">
+    <strong>Illustrative self-assessment, offered at no cost.</strong> This tool provides general safety education based on publicly available government sources. It is not affiliated with, endorsed by, or presented on behalf of any federal training program, and does not constitute a security audit, legal advice, or a guarantee of any outcome.
+  </div>
+
+  <header>
+    <div class="kicker">GCG — HOUSES OF WORSHIP SAFETY READINESS</div>
+    <h1>A free, honest look at your congregation's safety readiness — six areas, no jargon.</h1>
+    <p>This self-assessment follows the same framework the U.S. Department of Homeland Security recommends for houses of worship. Answer honestly; there's no wrong answer, only a clearer picture of where to focus next.</p>
+  </header>
+
+  <div class="attribution-note">
+    <strong>Sources used to build this:</strong> CISA, <em>Mitigating Attacks on Houses of Worship Security Guide</em> (Dec. 2020) and <em>Protecting Places of Worship: Six Steps</em>; U.S. Secret Service National Threat Assessment Center, <em>Mass Attacks in Public Spaces</em> research; FBI Active Shooter Attack Prevention and Preparedness guidance; American College of Surgeons/Hartford Consensus, Stop the Bleed. All content below is original, written independently — not affiliated with or reproducing any single training program's copyrighted material.
+  </div>
+
+  <div class="score-summary" id="scoreSummary"></div>
+
+  <div id="elements"></div>
+
+  <div class="free-resource-box">
+    <h3>A Free 5-Minute Skill Worth Having Regardless</h3>
+    <p style="margin:0;">Emergency responders often cannot reach an active scene until it's secured — a real, documented delay. <a href="https://www.stopthebleed.org" target="_blank">Stop the Bleed</a> (American College of Surgeons/Hartford Consensus, completely free) teaches bystanders to control severe bleeding in minutes, including improvising a tourniquet from a belt or bag strap. Not affiliated with this tool — a genuinely separate, worthwhile resource.</p>
+  </div>
+
+  <div class="footer-block">
+    <div class="cred">Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA — Gannon Compliance Group</div>
+    This assessment reflects general, publicly available government safety guidance and is offered as a free community resource. It is not legal advice, a security audit, or a guarantee of any outcome, and is not affiliated with, endorsed by, or presented on behalf of any federal training program or curriculum.
+    <br><br>
+    <em>Strategic Intelligence — Not Legal Counsel (CA B&P Sections 6125-6126)</em>
+  </div>
+
+</div>
+
+<script>
+  const elements = [
+    {
+      title: 'Governance',
+      example: 'A named person or small team owns safety decisions — not left to whoever happens to notice something.',
+      question: 'Is there a specific person or team responsible for safety decisions at your congregation?'
+    },
+    {
+      title: 'Vulnerability Assessment',
+      example: 'A real, honest walkthrough of your actual building and grounds — entry points, sightlines, lighting, blind spots.',
+      question: 'Has anyone done an honest walkthrough of your building specifically for safety gaps in the last year?'
+    },
+    {
+      title: 'Prevention & Reporting Culture',
+      example: 'A simple, low-pressure way for greeters, ushers, or members to flag something that feels off — including a friendly greeting to anyone unfamiliar ("the Power of Hello").',
+      question: 'Do greeters or staff have a simple habit of acknowledging every visitor, and a clear way to report a concern?'
+    },
+    {
+      title: 'Layered Physical Protection',
+      example: 'Outer (parking/grounds), middle (entries), and inner (main hall, child-care areas) each get separate attention — not just the front door.',
+      question: 'Have you thought through your property in layers — outside, entry points, and the innermost areas like childcare?'
+    },
+    {
+      title: 'Emergency & Continuity Plans',
+      example: 'A written plan that specific people actually know exists — not just an idea in the leadership\\'s head.',
+      question: 'Is there a written emergency plan that staff and key volunteers have actually seen?'
+    },
+    {
+      title: 'Exercise & Improvement',
+      example: 'A plan that gets practiced, even briefly, rather than sitting untouched until an actual emergency.',
+      question: 'Has your plan been practiced or walked through, even informally, in the last year?'
+    }
+  ];
+
+  function renderElements() {
+    const wrap = document.getElementById('elements');
+    wrap.innerHTML = '';
+    elements.forEach((el, idx) => {
+      const div = document.createElement('div');
+      div.className = 'element-card';
+      div.id = 'el_' + idx;
+      div.innerHTML = `
+        <div class="element-head" onclick="toggleElement(${idx})">
+          <div class="element-title">
+            <span class="element-num">${idx + 1}</span>
+            <h3>${el.title}</h3>
+          </div>
+          <div style="display:flex; align-items:center;">
+            <span class="element-status unanswered" id="status_${idx}">Not yet assessed</span>
+            <span class="chevron">›</span>
+          </div>
+        </div>
+        <div class="element-body">
+          <div class="example"><strong>What this looks like:</strong> ${el.example}</div>
+          <label>${el.question}</label>
+          <select id="answer_${idx}" onchange="updateStatus(${idx})">
+            <option value="">Select...</option>
+            <option value="ready">Yes — this is in place</option>
+            <option value="partial">Somewhat — informal, not documented</option>
+            <option value="gap">Not yet — this needs attention</option>
+          </select>
+        </div>
+      `;
+      wrap.appendChild(div);
+    });
+  }
+
+  function toggleElement(idx) {
+    document.getElementById('el_' + idx).classList.toggle('open');
+  }
+
+  function updateStatus(idx) {
+    const val = document.getElementById('answer_' + idx).value;
+    const statusEl = document.getElementById('status_' + idx);
+    if (val === 'ready') { statusEl.textContent = 'In place'; statusEl.className = 'element-status ready'; }
+    else if (val === 'partial' || val === 'gap') { statusEl.textContent = val === 'partial' ? 'Informal only' : 'Needs attention'; statusEl.className = 'element-status gap'; }
+    else { statusEl.textContent = 'Not yet assessed'; statusEl.className = 'element-status unanswered'; }
+    renderSummary();
+  }
+
+  function renderSummary() {
+    let ready = 0, gaps = 0;
+    elements.forEach((el, idx) => {
+      const val = document.getElementById('answer_' + idx) ? document.getElementById('answer_' + idx).value : '';
+      if (val === 'ready') ready++;
+      else if (val === 'partial' || val === 'gap') gaps++;
+    });
+    document.getElementById('scoreSummary').innerHTML = `
+      <div class="stat"><div class="num">${ready} / 6</div><div class="lbl">AREAS IN PLACE</div></div>
+      <div class="stat"><div class="num">${gaps}</div><div class="lbl">AREAS NEEDING ATTENTION</div></div>
+    `;
+  }
+
+  renderElements();
+  renderSummary();
+</script>
+</body>
+</html>

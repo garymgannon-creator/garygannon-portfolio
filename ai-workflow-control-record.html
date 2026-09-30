@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>AI Workflow Control Record — Illustrative Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-canvas: #F7F9FB; --bg-panel: #FFFFFF; --bg-panel-2: #EEF2F6; --border: #D8DEE4;
+    --text-primary: #14202B; --text-secondary: #4A5A68;
+    --brand-navy: #1B3A5C; --accent: #C9701A;
+    --status-critical: #B3261E; --status-critical-bg: #FBEAE9;
+    --status-warning: #A15C00; --status-warning-bg: #FDF1E0;
+    --status-ok: #1E6B3A; --status-ok-bg: #E9F5EC;
+    --radius: 4px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--bg-canvas); color:var(--text-primary); font-family:'IBM Plex Sans', sans-serif; font-size:17px; line-height:1.6; }
+  h1,h2,h3 { font-family:'Source Serif 4', serif; font-weight:600; margin:0 0 0.4em 0; color: var(--brand-navy); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 36px 26px 90px; }
+
+  .persistent-banner { background: var(--status-warning-bg); border: 1px solid var(--status-warning); padding: 12px 18px; border-radius: var(--radius); font-size: 0.9rem; margin-bottom: 24px; }
+  .persistent-banner strong { color: var(--status-warning); }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadein 0.25s ease; }
+  @keyframes fadein { from { opacity:0; } to { opacity:1; } }
+
+  .kicker { font-family:'IBM Plex Mono', monospace; font-size: 0.82rem; color: var(--accent); margin-bottom: 8px; }
+  header p { color: var(--text-secondary); margin-top: 8px; max-width: 680px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 22px 0; }
+  .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .kpi-card .kpi-num { font-family: 'Source Serif 4', serif; font-size: 1.5rem; }
+  .kpi-card .kpi-num.warn { color: var(--status-warning); }
+  .kpi-card .kpi-num.crit { color: var(--status-critical); }
+  .kpi-card .kpi-lbl { font-size: 0.76rem; color: var(--text-secondary); font-family: 'IBM Plex Mono', monospace; }
+
+  .matrix-box { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin: 20px 0; position: relative; height: 320px; }
+  .matrix-box .axis-label-x { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); font-size: 0.78rem; color: var(--text-secondary); font-family: 'IBM Plex Mono', monospace; }
+  .matrix-box .axis-label-y { position: absolute; top: 50%; left: -18px; transform: translateY(-50%) rotate(-90deg); font-size: 0.78rem; color: var(--text-secondary); font-family: 'IBM Plex Mono', monospace; }
+  .matrix-plot { position: relative; width: 100%; height: 100%; border-left: 2px solid var(--border); border-bottom: 2px solid var(--border); }
+  .bubble { position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: #fff; font-weight: 600; cursor: default; }
+  .bubble.ok { background: var(--status-ok); }
+  .bubble.warn { background: var(--status-warning); }
+  .bubble.crit { background: var(--status-critical); }
+
+  .workflow-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  .workflow-table th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--text-secondary); padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .workflow-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+  .status-pill { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; padding: 3px 9px; border-radius: var(--radius); }
+  .status-pill.ok { background: var(--status-ok-bg); color: var(--status-ok); border: 1px solid var(--status-ok); }
+  .status-pill.warn { background: var(--status-warning-bg); color: var(--status-warning); border: 1px solid var(--status-warning); }
+  .status-pill.crit { background: var(--status-critical-bg); color: var(--status-critical); border: 1px solid var(--status-critical); }
+
+  button.action { background: var(--accent); color: #fff; border: none; padding: 12px 22px; border-radius: var(--radius); font-weight: 600; font-size: 0.95rem; cursor: pointer; }
+  button.action:hover { background: #DB8330; }
+  button.secondary { background: transparent; border: 1px solid var(--brand-navy); color: var(--brand-navy); padding: 11px 20px; border-radius: var(--radius); font-size: 0.9rem; cursor: pointer; margin-right: 10px; }
+
+  /* Intake wizard */
+  .wizard-step { display: none; }
+  .wizard-step.active { display: block; }
+  .step-indicator { display: flex; gap: 8px; margin-bottom: 20px; }
+  .step-dot { width: 30px; height: 6px; border-radius: 3px; background: var(--border); }
+  .step-dot.done { background: var(--status-ok); }
+  .step-dot.current { background: var(--accent); }
+  label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin: 14px 0 6px; }
+  input[type="text"], select, textarea { width: 100%; background: var(--bg-canvas); border: 1px solid var(--border); color: var(--text-primary); padding: 10px 12px; border-radius: var(--radius); font-size: 0.95rem; }
+  textarea { min-height: 60px; }
+
+  /* Record detail */
+  .tab-bar { display: flex; gap: 4px; border-bottom: 2px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; }
+  .tab-btn { background: none; border: none; padding: 10px 16px; font-size: 0.9rem; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .tab-btn.active { color: var(--brand-navy); border-bottom-color: var(--accent); font-weight: 600; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .detail-row { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+  .detail-row .dr-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--text-secondary); }
+
+  .nav-row { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .footer-block { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.88rem; color: var(--text-secondary); }
+  .footer-block .cred { color: var(--text-primary); font-weight: 600; margin-bottom: 6px; }
+
+  @media (max-width: 700px) {
+    .wrap { padding: 26px 16px 70px; }
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="persistent-banner">
+    <strong>Fictional / Redacted Demonstration Environment — Strategic Operational Intelligence Only.</strong> This is an operational governance register, not a certification of compliance with law, ISO/IEC 42001, NIST AI RMF, or any privacy or security standard.
+  </div>
+
+  <!-- SCREEN 1: PORTFOLIO VIEW -->
+  <div class="screen active" id="wcScreen1">
+    <div class="kicker">GCG — AI WORKFLOW CONTROL RECORD</div>
+    <header><h1>Where does AI enter your work — and who's accountable when it does?</h1>
+    <p>A living register of every AI-touched workflow: what it may do, what a human must verify, who owns the outcome, and what happens when a workflow departs from its approved boundary.</p></header>
+
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="kpi-num">6</div><div class="kpi-lbl">REGISTERED WORKFLOWS</div></div>
+      <div class="kpi-card"><div class="kpi-num">4</div><div class="kpi-lbl">FULLY APPROVED</div></div>
+      <div class="kpi-card"><div class="kpi-num warn">1</div><div class="kpi-lbl">CONDITIONAL / EXPIRING</div></div>
+      <div class="kpi-card"><div class="kpi-num crit">1</div><div class="kpi-lbl">MISSING HUMAN APPROVER</div></div>
+    </div>
+
+    <h3 style="margin-top:26px;">Workflow Risk &amp; Control Matrix</h3>
+    <p style="color:var(--text-secondary); font-size:0.9rem;">Bubble position: consequence (right = higher) vs. data sensitivity (up = higher). Color: control status.</p>
+    <div class="matrix-box">
+      <div class="matrix-plot" id="matrixPlot"></div>
+      <div class="axis-label-x">CONSEQUENCE OF DECISION →</div>
+      <div class="axis-label-y">DATA SENSITIVITY →</div>
+    </div>
+
+    <table class="workflow-table">
+      <thead><tr><th>Workflow</th><th>AI Role</th><th>Human Approver</th><th>Status</th></tr></thead>
+      <tbody id="workflowTableBody"></tbody>
+    </table>
+
+    <div class="nav-row">
+      <button class="action" onclick="goToWC(2)">+ Register New Workflow</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: INTAKE WIZARD -->
+  <div class="screen" id="wcScreen2">
+    <div class="kicker">WORKFLOW INTAKE — NEW REGISTRATION</div>
+    <h2>Describe the Work Before You Describe the Model</h2>
+    <div class="step-indicator" id="stepIndicator"></div>
+
+    <div class="wizard-step active" id="wStep1">
+      <label>Workflow name</label>
+      <input type="text" id="wf_name" placeholder="e.g., Candidate screening summary draft">
+      <label>Business objective</label>
+      <textarea id="wf_objective" placeholder="What is this workflow for?"></textarea>
+      <label>Process owner</label>
+      <input type="text" id="wf_owner" placeholder="Name or role title">
+    </div>
+    <div class="wizard-step" id="wStep2">
+      <label>What does AI do in this workflow?</label>
+      <select id="wf_role">
+        <option>Summarize</option><option>Draft</option><option>Retrieve</option>
+        <option>Classify</option><option>Recommend</option><option>Predict</option>
+        <option>Rank</option><option>Generate content</option><option>Automate administrative routing</option>
+      </select>
+    </div>
+    <div class="wizard-step" id="wStep3">
+      <label>Human must review:</label>
+      <textarea id="wf_review" placeholder="What must a person check before this is used?"></textarea>
+      <label>Human retains final authority over:</label>
+      <textarea id="wf_authority" placeholder="What decision can AI never make alone?"></textarea>
+    </div>
+    <div class="wizard-step" id="wStep4">
+      <label>Permitted data classes</label>
+      <input type="text" id="wf_data_ok" placeholder="e.g., de-identified operational data">
+      <label>Prohibited data classes</label>
+      <input type="text" id="wf_data_no" placeholder="e.g., SSNs, medical records, payment data">
+    </div>
+    <div class="wizard-step" id="wStep5">
+      <label>Human approver (named)</label>
+      <input type="text" id="wf_approver" placeholder="Name or role title — required">
+      <label>Executive accountable owner</label>
+      <input type="text" id="wf_exec" placeholder="Name or role title">
+    </div>
+    <div class="wizard-step" id="wStep6">
+      <label>Review frequency</label>
+      <select id="wf_freq"><option>Monthly</option><option>Quarterly</option><option>Semi-annual</option></select>
+      <label>Escalation trigger</label>
+      <textarea id="wf_trigger" placeholder="What condition means this workflow must be paused and reviewed?"></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="secondary" onclick="wizardBack()">← Back</button>
+      <button class="action" id="wizardNextBtn" onclick="wizardNext()">Next →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: RECORD DETAIL -->
+  <div class="screen" id="wcScreen3">
+    <div class="kicker">WORKFLOW DETAIL RECORD</div>
+    <h2 id="recordTitle">New Workflow Record</h2>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+      <button class="tab-btn" onclick="showTab('decision')">Decision Rights</button>
+      <button class="tab-btn" onclick="showTab('data')">Data Boundaries</button>
+      <button class="tab-btn" onclick="showTab('monitoring')">Monitoring</button>
+    </div>
+    <div class="tab-content active" id="tab-overview"></div>
+    <div class="tab-content" id="tab-decision"></div>
+    <div class="tab-content" id="tab-data"></div>
+    <div class="tab-content" id="tab-monitoring"></div>
+
+    <div class="nav-row">
+      <button class="secondary" onclick="goToWC(1)">← Back to Portfolio</button>
+    </div>
+  </div>
+
+  <div class="footer-block">
+    <div class="cred">Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA — Gannon Compliance Group</div>
+    This is an illustrative prototype using fictional/synthetic data. It does not constitute a certification of legal, ISO/IEC 42001, NIST AI RMF, privacy, or security compliance. AI may draft, organize, or flag information; a named, qualified human is required to validate, approve, and act on any resulting workflow decision.
+    <br><br>
+    <em>Strategic Intelligence — Not Legal Counsel (CA B&P Sections 6125-6126)</em>
+  </div>
+</div>
+
+<script>
+  const sampleWorkflows = [
+    { name: 'Candidate screening summary', role: 'Summarize', approver: 'HR Director', status: 'ok', x: 30, y: 40 },
+    { name: 'Customer inquiry routing', role: 'Classify', approver: 'Ops Manager', status: 'ok', x: 20, y: 20 },
+    { name: 'Contract clause drafting', role: 'Draft', approver: 'Legal Counsel', status: 'ok', x: 55, y: 60 },
+    { name: 'Incident report drafting', role: 'Draft', approver: 'Safety Manager', status: 'ok', x: 45, y: 50 },
+    { name: 'Performance review drafting', role: 'Draft', approver: 'Pending renewal', status: 'warn', x: 65, y: 70 },
+    { name: 'Automated pricing recommendation', role: 'Recommend', approver: 'Not yet assigned', status: 'crit', x: 80, y: 35 }
+  ];
+
+  function renderPortfolio() {
+    const plot = document.getElementById('matrixPlot');
+    plot.innerHTML = '';
+    sampleWorkflows.forEach(w => {
+      const b = document.createElement('div');
+      b.className = 'bubble ' + w.status;
+      const size = 46;
+      b.style.width = size + 'px';
+      b.style.height = size + 'px';
+      b.style.left = w.x + '%';
+      b.style.bottom = w.y + '%';
+      b.textContent = w.name.split(' ')[0];
+      b.title = w.name;
+      plot.appendChild(b);
+    });
+
+    const body = document.getElementById('workflowTableBody');
+    body.innerHTML = '';
+    sampleWorkflows.forEach(w => {
+      const tr = document.createElement('tr');
+      const statusLabel = w.status === 'ok' ? 'Approved' : w.status === 'warn' ? 'Expiring' : 'Missing Approver';
+      tr.innerHTML = `<td>${w.name}</td><td>${w.role}</td><td>${w.approver}</td><td><span class="status-pill ${w.status}">${statusLabel}</span></td>`;
+      body.appendChild(tr);
+    });
+  }
+
+  let currentStep = 1;
+  const totalSteps = 6;
+
+  function renderStepIndicator() {
+    const ind = document.getElementById('stepIndicator');
+    ind.innerHTML = '';
+    for (let i = 1; i <= totalSteps; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'step-dot' + (i < currentStep ? ' done' : i === currentStep ? ' current' : '');
+      ind.appendChild(dot);
+    }
+  }
+
+  function wizardNext() {
+    if (currentStep < totalSteps) {
+      document.getElementById('wStep' + currentStep).classList.remove('active');
+      currentStep++;
+      document.getElementById('wStep' + currentStep).classList.add('active');
+      renderStepIndicator();
+      if (currentStep === totalSteps) document.getElementById('wizardNextBtn').textContent = 'Finish & Generate Record →';
+    } else {
+      generateRecord();
+      goToWC(3);
+    }
+  }
+
+  function wizardBack() {
+    if (currentStep > 1) {
+      document.getElementById('wStep' + currentStep).classList.remove('active');
+      currentStep--;
+      document.getElementById('wStep' + currentStep).classList.add('active');
+      renderStepIndicator();
+      document.getElementById('wizardNextBtn').textContent = 'Next →';
+    } else {
+      goToWC(1);
+    }
+  }
+
+  function generateRecord() {
+    const name = document.getElementById('wf_name').value || 'Untitled Workflow';
+    document.getElementById('recordTitle').textContent = name;
+
+    document.getElementById('tab-overview').innerHTML = `
+      <div class="detail-row"><div class="dr-label">BUSINESS OBJECTIVE</div>${document.getElementById('wf_objective').value || '—'}</div>
+      <div class="detail-row"><div class="dr-label">PROCESS OWNER</div>${document.getElementById('wf_owner').value || '—'}</div>
+      <div class="detail-row"><div class="dr-label">AI ROLE</div>${document.getElementById('wf_role').value}</div>
+    `;
+    document.getElementById('tab-decision').innerHTML = `
+      <div class="detail-row"><div class="dr-label">HUMAN MUST REVIEW</div>${document.getElementById('wf_review').value || '—'}</div>
+      <div class="detail-row"><div class="dr-label">HUMAN RETAINS FINAL AUTHORITY OVER</div>${document.getElementById('wf_authority').value || '—'}</div>
+      <div class="detail-row"><div class="dr-label">NAMED HUMAN APPROVER</div>${document.getElementById('wf_approver').value || '<span style="color:var(--status-critical);">Not yet assigned — required before approval</span>'}</div>
+      <div class="detail-row"><div class="dr-label">EXECUTIVE ACCOUNTABLE OWNER</div>${document.getElementById('wf_exec').value || '—'}</div>
+    `;
+    document.getElementById('tab-data').innerHTML = `
+      <div class="detail-row"><div class="dr-label">PERMITTED DATA</div>${document.getElementById('wf_data_ok').value || '—'}</div>
+      <div class="detail-row"><div class="dr-label">PROHIBITED DATA</div>${document.getElementById('wf_data_no').value || '—'}</div>
+    `;
+    document.getElementById('tab-monitoring').innerHTML = `
+      <div class="detail-row"><div class="dr-label">REVIEW FREQUENCY</div>${document.getElementById('wf_freq').value}</div>
+      <div class="detail-row"><div class="dr-label">ESCALATION TRIGGER</div>${document.getElementById('wf_trigger').value || '—'}</div>
+    `;
+  }
+
+  function showTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+
+  function goToWC(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('wcScreen' + n).classList.add('active');
+    window.scrollTo(0, 0);
+    if (n === 2) { currentStep = 1; renderStepIndicator(); document.querySelectorAll('.wizard-step').forEach((s,i) => s.classList.toggle('active', i === 0)); document.getElementById('wizardNextBtn').textContent = 'Next →'; }
+  }
+
+  renderPortfolio();
+  renderStepIndicator();
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>California Workforce AI Impact Tracker — Illustrative Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-canvas: #F7F9FB; --bg-panel: #FFFFFF; --bg-panel-2: #EEF2F6; --border: #D8DEE4;
+    --text-primary: #14202B; --text-secondary: #4A5A68;
+    --brand-navy: #1B3A5C; --accent: #C9701A;
+    --status-critical: #B3261E; --status-critical-bg: #FBEAE9;
+    --status-warning: #A15C00; --status-warning-bg: #FDF1E0;
+    --status-ok: #1E6B3A; --status-ok-bg: #E9F5EC;
+    --radius: 4px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--bg-canvas); color:var(--text-primary); font-family:'IBM Plex Sans', sans-serif; font-size:17px; line-height:1.6; }
+  h1,h2,h3 { font-family:'Source Serif 4', serif; font-weight:600; margin:0 0 0.4em 0; color: var(--brand-navy); }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 36px 26px 90px; }
+
+  .persistent-banner { background: var(--status-warning-bg); border: 1px solid var(--status-warning); padding: 14px 18px; border-radius: var(--radius); font-size: 0.92rem; margin-bottom: 24px; }
+  .persistent-banner strong { color: var(--status-warning); }
+
+  .kicker { font-family:'IBM Plex Mono', monospace; font-size: 0.82rem; color: var(--accent); margin-bottom: 8px; }
+  header p { color: var(--text-secondary); margin-top: 8px; max-width: 700px; }
+
+  .eo-note {
+    background: var(--bg-panel-2); border-radius: var(--radius); padding: 14px 18px;
+    margin: 20px 0 28px; font-size: 0.9rem; color: var(--text-secondary);
+  }
+  .eo-note strong { color: var(--text-primary); }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 22px 0; }
+  .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .kpi-card .kpi-num { font-family: 'Source Serif 4', serif; font-size: 1.5rem; }
+  .kpi-card .kpi-lbl { font-size: 0.75rem; color: var(--text-secondary); font-family: 'IBM Plex Mono', monospace; }
+
+  .control-panel {
+    background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px 24px; margin: 24px 0;
+  }
+  .control-panel label { display: block; font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 8px; }
+  .slider-row { display: flex; align-items: center; gap: 16px; }
+  input[type="range"] { flex: 1; accent-color: var(--accent); }
+  .slider-val { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--accent); min-width: 46px; }
+
+  .waterfall-box { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; margin: 20px 0; }
+  .waterfall-bar-row { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .wf-label { width: 200px; font-size: 0.85rem; color: var(--text-secondary); flex-shrink: 0; }
+  .wf-track { flex: 1; background: var(--bg-panel-2); border-radius: 3px; height: 22px; position: relative; overflow: hidden; }
+  .wf-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.72rem; color: #fff; font-family: 'IBM Plex Mono', monospace; }
+  .wf-fill.reduce { background: var(--status-ok); }
+  .wf-fill.review { background: var(--status-warning); }
+  .wf-fill.qa { background: var(--accent); }
+  .wf-fill.highvalue { background: var(--brand-navy); }
+  .wf-net { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 0.95rem; }
+  .wf-net .net-val { font-weight: 700; }
+  .wf-net .net-val.pos { color: var(--status-critical); }
+  .wf-net .net-val.neg { color: var(--status-ok); }
+
+  .impact-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  .impact-table th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text-secondary); padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .impact-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .signal-pill { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; padding: 3px 8px; border-radius: var(--radius); }
+  .signal-pill.ok { background: var(--status-ok-bg); color: var(--status-ok); border: 1px solid var(--status-ok); }
+  .signal-pill.warn { background: var(--status-warning-bg); color: var(--status-warning); border: 1px solid var(--status-warning); }
+  .signal-pill.crit { background: var(--status-critical-bg); color: var(--status-critical); border: 1px solid var(--status-critical); }
+
+  .action-queue { margin-top: 24px; }
+  .action-item { background: var(--bg-panel); border-left: 3px solid var(--status-warning); border: 1px solid var(--border); border-left-width: 3px; border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 16px; margin-bottom: 8px; font-size: 0.92rem; }
+
+  .footer-block { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.88rem; color: var(--text-secondary); }
+  .footer-block .cred { color: var(--text-primary); font-weight: 600; margin-bottom: 6px; }
+
+  @media (max-width: 700px) {
+    .wrap { padding: 26px 16px 70px; }
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+    .wf-label { width: 120px; font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="persistent-banner">
+    <strong>Fictional / Redacted Demonstration Environment.</strong> This prototype supports internal workforce-planning and change-management conversations. It does not determine legal obligations, establish compliance, make employment decisions, conduct disparate-impact analysis, or replace advice from qualified legal, HR, privacy, labor-relations, data-science, or safety professionals.
+  </div>
+
+  <div class="kicker">GCG — CALIFORNIA WORKFORCE AI IMPACT TRACKER</div>
+  <header><h1 style="font-family:'Source Serif 4', serif; font-size:1.75rem; color:var(--brand-navy);">Is AI changing your workload, quality, and training needs — and are you responding before it becomes unmanaged?</h1>
+  <p>This tracker measures work redesign, not headcount reduction: adoption, task exposure, real impact on time and quality, and organizational response — side by side.</p></header>
+
+  <div class="eo-note">
+    <strong>California context:</strong> Executive Order N-6-26 (May 21, 2026) directs state agencies to study AI-related workforce impacts, early-warning signals, and workforce training needs, and directs the EDD to build a sector-level employment-impact dashboard. The order creates no enforceable private-employer rights or obligations — it is a state research and policy directive, not a compliance mandate.
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-num" id="kpiWorkflows">4</div><div class="kpi-lbl">AI-AFFECTED WORKFLOWS</div></div>
+    <div class="kpi-card"><div class="kpi-num" id="kpiEmployees">62</div><div class="kpi-lbl">EMPLOYEES IN AFFECTED JOB FAMILIES</div></div>
+    <div class="kpi-card"><div class="kpi-num" id="kpiReview">+<span id="kpiReviewVal">14</span>%</div><div class="kpi-lbl">HUMAN-REVIEW HOURS ADDED</div></div>
+    <div class="kpi-card"><div class="kpi-num" id="kpiTraining">58%</div><div class="kpi-lbl">TRAINING COMPLETION RATE</div></div>
+  </div>
+
+  <div class="control-panel">
+    <label>Simulate AI use intensity for this job family (illustrative — drag to see how workload signals respond)</label>
+    <div class="slider-row">
+      <input type="range" id="intensitySlider" min="0" max="100" value="40" oninput="updateSimulation()">
+      <div class="slider-val" id="intensityVal">40%</div>
+    </div>
+  </div>
+
+  <div class="waterfall-box">
+    <h3 style="font-size:1.1rem;">Task-Shift Waterfall — Claims Intake Specialist (Illustrative)</h3>
+    <div class="waterfall-bar-row"><div class="wf-label">Hours automated/reduced</div><div class="wf-track"><div class="wf-fill reduce" id="barReduce"></div></div></div>
+    <div class="waterfall-bar-row"><div class="wf-label">Hours moved to review</div><div class="wf-track"><div class="wf-fill review" id="barReview"></div></div></div>
+    <div class="waterfall-bar-row"><div class="wf-label">Hours added for QA</div><div class="wf-track"><div class="wf-fill qa" id="barQA"></div></div></div>
+    <div class="waterfall-bar-row"><div class="wf-label">Hours shifted to higher-value work</div><div class="wf-track"><div class="wf-fill highvalue" id="barHighValue"></div></div></div>
+    <div class="wf-net">Net workload change: <span class="net-val" id="netChange">—</span></div>
+  </div>
+
+  <h3>Impact Signals by Job Family (Illustrative)</h3>
+  <table class="impact-table">
+    <thead><tr><th>Job Family</th><th>Adoption</th><th>Task Exposure</th><th>Error/Rework Trend</th><th>Training Readiness</th></tr></thead>
+    <tbody>
+      <tr><td>Claims Intake Specialist</td><td>High</td><td>High</td><td><span class="signal-pill warn">Rising</span></td><td><span class="signal-pill warn">58% complete</span></td></tr>
+      <tr><td>Customer Support Rep</td><td>Medium</td><td>Medium</td><td><span class="signal-pill ok">Stable</span></td><td><span class="signal-pill ok">89% complete</span></td></tr>
+      <tr><td>Compliance Analyst</td><td>Low</td><td>Low</td><td><span class="signal-pill ok">Stable</span></td><td><span class="signal-pill ok">95% complete</span></td></tr>
+      <tr><td>Data Entry / Records</td><td>High</td><td>High</td><td><span class="signal-pill crit">Rising, unaddressed</span></td><td><span class="signal-pill crit">31% complete</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="action-queue">
+    <h3>Action Queue</h3>
+    <div class="action-item">Data Entry/Records: high AI use, lowest training completion (31%) — process redesign and training rollout needed before workload pressure compounds.</div>
+    <div class="action-item">Claims Intake Specialist: rework trend rising alongside high task exposure — review whether QA hours added are sufficient to offset error rate.</div>
+    <div class="action-item">Compliance Analyst: low current exposure — good candidate for a documented baseline before any future AI rollout in this job family.</div>
+  </div>
+
+  <div class="footer-block">
+    <div class="cred">Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA — Gannon Compliance Group</div>
+    This tracker uses entirely fictional/illustrative data. It does not determine legal obligations, establish compliance, make employment decisions, conduct disparate-impact analysis, or replace advice from qualified legal, HR, privacy, labor-relations, data-science, or safety professionals.
+    <br><br>
+    <em>Strategic Intelligence — Not Legal Counsel (CA B&P Sections 6125-6126)</em>
+  </div>
+</div>
+
+<script>
+  function updateSimulation() {
+    const intensity = parseInt(document.getElementById('intensitySlider').value);
+    document.getElementById('intensityVal').textContent = intensity + '%';
+
+    const reduce = Math.round(intensity * 0.6);
+    const review = Math.round(intensity * 0.35);
+    const qa = Math.round(intensity * 0.25);
+    const highvalue = Math.round(intensity * 0.3);
+    const net = highvalue - (review + qa) + (reduce * 0.1);
+
+    document.getElementById('barReduce').style.width = reduce + '%';
+    document.getElementById('barReduce').textContent = '-' + reduce + '%';
+    document.getElementById('barReview').style.width = review + '%';
+    document.getElementById('barReview').textContent = '+' + review + '%';
+    document.getElementById('barQA').style.width = qa + '%';
+    document.getElementById('barQA').textContent = '+' + qa + '%';
+    document.getElementById('barHighValue').style.width = highvalue + '%';
+    document.getElementById('barHighValue').textContent = '+' + highvalue + '%';
+
+    const netEl = document.getElementById('netChange');
+    if (net > 5) {
+      netEl.textContent = `Workload increasing (+${Math.round(net)}%) — review hours outpacing time saved`;
+      netEl.className = 'net-val pos';
+    } else if (net < -5) {
+      netEl.textContent = `Workload decreasing (${Math.round(net)}%) — automation gains exceeding added oversight cost`;
+      netEl.className = 'net-val neg';
+    } else {
+      netEl.textContent = 'Roughly neutral — oversight cost offsetting automation gains';
+      netEl.className = 'net-val';
+    }
+
+    document.getElementById('kpiReviewVal').textContent = review;
+  }
+
+  updateSimulation();
+</script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Human-AI Work Simulation Kit — Illustrative Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-canvas: #F7F9FB; --bg-panel: #FFFFFF; --bg-panel-2: #EEF2F6; --border: #D8DEE4;
+    --text-primary: #14202B; --text-secondary: #4A5A68;
+    --brand-navy: #1B3A5C; --accent: #C9701A;
+    --status-critical: #B3261E; --status-critical-bg: #FBEAE9;
+    --status-warning: #A15C00; --status-warning-bg: #FDF1E0;
+    --status-ok: #1E6B3A; --status-ok-bg: #E9F5EC;
+    --radius: 4px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--bg-canvas); color:var(--text-primary); font-family:'IBM Plex Sans', sans-serif; font-size:17px; line-height:1.6; }
+  h1,h2,h3 { font-family:'Source Serif 4', serif; font-weight:600; margin:0 0 0.4em 0; color: var(--brand-navy); }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 36px 26px 90px; }
+
+  .persistent-banner {
+    background: var(--status-warning-bg); border: 1px solid var(--status-warning);
+    padding: 12px 18px; border-radius: var(--radius); font-size: 0.9rem; margin-bottom: 24px;
+  }
+  .persistent-banner strong { color: var(--status-warning); }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadein 0.25s ease; }
+  @keyframes fadein { from { opacity:0; } to { opacity:1; } }
+
+  .kicker { font-family:'IBM Plex Mono', monospace; font-size: 0.82rem; color: var(--accent); margin-bottom: 8px; }
+  header h1 { font-size: 1.7rem; }
+  header p { color: var(--text-secondary); margin-top: 8px; }
+
+  /* Screen 1: landing */
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 26px 0; }
+  .metric-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+  .metric-card .metric-num { font-family: 'Source Serif 4', serif; font-size: 1.8rem; }
+  .metric-card .metric-lbl { font-size: 0.85rem; color: var(--text-secondary); font-family: 'IBM Plex Mono', monospace; }
+
+  button.action { background: var(--accent); color: #fff; border: none; padding: 12px 22px; border-radius: var(--radius); font-weight: 600; font-size: 0.95rem; cursor: pointer; }
+  button.action:hover { background: #DB8330; }
+  button.secondary { background: transparent; border: 1px solid var(--brand-navy); color: var(--brand-navy); padding: 11px 20px; border-radius: var(--radius); font-size: 0.9rem; cursor: pointer; margin-right: 10px; }
+
+  /* Screen 2: briefing */
+  .briefing-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; margin: 20px 0; }
+  .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
+  .panel h3 { font-size: 1.05rem; }
+  .field-row { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+  .field-row:last-child { border-bottom: none; }
+  .field-row .fr-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--text-secondary); }
+  .ai-draft-tag { display: inline-block; background: var(--status-warning-bg); color: var(--status-warning); border: 1px solid var(--status-warning); font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; padding: 3px 8px; border-radius: var(--radius); margin-bottom: 8px; }
+  .attachment-item { background: var(--bg-panel-2); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 8px; font-size: 0.92rem; }
+  .constraint-list { list-style: none; margin: 0; padding: 0; }
+  .constraint-list li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.92rem; }
+  .constraint-list li:last-child { border-bottom: none; }
+
+  /* Screen 3: evidence classification */
+  .evidence-item { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px; }
+  .evidence-text { font-size: 0.98rem; margin-bottom: 12px; }
+  .classify-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+  .classify-btn { background: var(--bg-canvas); border: 1px solid var(--border); color: var(--text-secondary); padding: 7px 14px; border-radius: var(--radius); font-size: 0.85rem; cursor: pointer; }
+  .classify-btn:hover { border-color: var(--brand-navy); }
+  .classify-btn.selected { background: var(--brand-navy); color: #fff; border-color: var(--brand-navy); }
+  .evidence-result { margin-top: 10px; font-size: 0.88rem; padding: 8px 12px; border-radius: var(--radius); display: none; }
+  .evidence-result.correct { background: var(--status-ok-bg); color: var(--status-ok); display: block; }
+  .evidence-result.incorrect { background: var(--status-critical-bg); color: var(--status-critical); display: block; }
+
+  /* Screen 4: escalation */
+  .escalation-option { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 10px; cursor: pointer; }
+  .escalation-option:hover { border-color: var(--accent); }
+  .escalation-option.selected { border-color: var(--brand-navy); border-width: 2px; background: var(--bg-panel-2); }
+
+  /* Screen 5: scorecard */
+  .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 22px 0; }
+  .score-item { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; }
+  .score-item .score-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 6px; }
+  .score-item .score-val { font-size: 1.05rem; font-weight: 600; }
+  .score-item .score-val.pass { color: var(--status-ok); }
+  .score-item .score-val.gap { color: var(--status-critical); }
+
+  .nav-row { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+  .footer-block { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.88rem; color: var(--text-secondary); }
+  .footer-block .cred { color: var(--text-primary); font-weight: 600; margin-bottom: 6px; }
+
+  @media (max-width: 700px) {
+    .wrap { padding: 26px 16px 70px; }
+    .card-grid, .briefing-grid, .score-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="persistent-banner">
+    <strong>Fictional / Redacted Demonstration Environment — Strategic Operational Intelligence Only.</strong> Human review is required. No automated employment, discipline, promotion, safety, or legal determination is made or implied by this tool.
+  </div>
+
+  <!-- SCREEN 1: LANDING -->
+  <div class="screen active" id="screen1">
+    <div class="kicker">GCG — HUMAN-AI WORK SIMULATION KIT</div>
+    <header><h1>Can your team make sound decisions when AI is in the room?</h1>
+    <p>A realistic, fictional scenario testing four capabilities: cognitive judgment, AI literacy, evidence discipline, and escalation behavior — not an AI trivia quiz.</p></header>
+
+    <div class="card-grid">
+      <div class="metric-card"><div class="metric-num">1</div><div class="metric-lbl">ACTIVE SIMULATION</div></div>
+      <div class="metric-card"><div class="metric-num">4</div><div class="metric-lbl">CAPABILITIES TESTED</div></div>
+      <div class="metric-card"><div class="metric-num">0</div><div class="metric-lbl">DECISION GAPS FOUND (SO FAR)</div></div>
+      <div class="metric-card"><div class="metric-num">—</div><div class="metric-lbl">ESCALATION OUTCOME (PENDING)</div></div>
+    </div>
+
+    <button class="action" onclick="goToScreen(2)">Launch Simulation →</button>
+  </div>
+
+  <!-- SCREEN 2: BRIEFING -->
+  <div class="screen" id="screen2">
+    <div class="kicker">SCENARIO BRIEFING</div>
+    <h2>After-Hours Intake Report — Fictional Company</h2>
+    <div class="briefing-grid">
+      <div class="panel">
+        <h3>Case Packet</h3>
+        <div class="field-row"><div class="fr-label">INTAKE TIMESTAMP</div>11:47 PM, via internal reporting channel</div>
+        <div class="field-row"><div class="fr-label">REPORTER CHANNEL</div>Anonymous internal intake form</div>
+        <div class="field-row">
+          <div class="fr-label">AI-GENERATED SUMMARY</div>
+          <span class="ai-draft-tag">AI-GENERATED DRAFT — NOT VERIFIED</span>
+          <div>"Employee reports ongoing conflict with a coworker, escalating over several weeks. Pattern suggests retaliation risk following a prior complaint. Recommend immediate priority escalation."</div>
+        </div>
+        <div class="attachment-item"><strong>Attachment 1:</strong> Employee statement excerpt — describes a disagreement over a shift swap and a raised voice in a hallway.</div>
+        <div class="attachment-item"><strong>Attachment 2:</strong> Supervisor email excerpt — notes the two employees "have a history" but no prior formal complaint on file.</div>
+        <div class="attachment-item"><strong>Attachment 3:</strong> Time-stamped message record — one message reads "I don't feel safe working with him," sent the same day.</div>
+      </div>
+      <div class="panel">
+        <h3>Operating Constraints</h3>
+        <ul class="constraint-list">
+          <li>No automated conclusions permitted</li>
+          <li>Do not enter personal or sensitive data into unapproved external AI systems</li>
+          <li>Identify uncertainties and evidence gaps</li>
+          <li>Escalate under the stated fictional organizational protocol</li>
+          <li>Preserve the basis for material decisions</li>
+        </ul>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="secondary" onclick="goToScreen(1)">← Back</button>
+      <button class="action" onclick="goToScreen(3)">Begin Review →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: EVIDENCE CLASSIFICATION -->
+  <div class="screen" id="screen3">
+    <div class="kicker">EVIDENCE CLASSIFICATION WORKSPACE</div>
+    <h2>Classify Each Item — What Is It, Really?</h2>
+    <p style="color:var(--text-secondary);">For each item, select the correct classification. There is a right answer for each.</p>
+
+    <div id="evidenceList"></div>
+
+    <div class="nav-row">
+      <button class="secondary" onclick="goToScreen(2)">← Back</button>
+      <button class="action" onclick="goToScreen(4)">Continue to Escalation Decision →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: ESCALATION -->
+  <div class="screen" id="screen4">
+    <div class="kicker">ESCALATION DECISION</div>
+    <h2>What Do You Do Next?</h2>
+    <p style="color:var(--text-secondary);">The AI summary recommended "immediate priority escalation" based partly on an unsupported inference. Given what you actually know, what's the right next step?</p>
+
+    <div id="escalationOptions"></div>
+
+    <div class="nav-row">
+      <button class="secondary" onclick="goToScreen(3)">← Back</button>
+      <button class="action" onclick="renderScorecard(); goToScreen(5)">See Results →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: SCORECARD -->
+  <div class="screen" id="screen5">
+    <div class="kicker">TEAM READINESS SCORECARD</div>
+    <h2>Results — This Simulation Run</h2>
+    <div class="score-grid" id="scorecardGrid"></div>
+    <div class="panel" style="margin-top:20px;">
+      <h3>What This Demonstrates</h3>
+      <p style="color:var(--text-secondary); font-size:0.95rem;">This scenario tested whether a human reviewer catches an AI's unsupported inference (retaliation pattern, asserted without supporting evidence) and an omitted material fact (no prior formal complaint exists), then routes the matter appropriately rather than accepting the AI's recommendation at face value.</p>
+    </div>
+    <div class="nav-row">
+      <button class="secondary" onclick="resetSimulation()">↺ Run Again</button>
+    </div>
+  </div>
+
+  <div class="footer-block">
+    <div class="cred">Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA — Gannon Compliance Group</div>
+    This is an illustrative training simulation using entirely fictional data. It does not constitute legal, HR, safety, or investigative advice, and does not simulate a real legal or safety determination. AI may draft, summarize, or flag information; a qualified human is required to validate, verify, and act on any real workplace matter.
+    <br><br>
+    <em>Strategic Intelligence — Not Legal Counsel (CA B&P Sections 6125-6126)</em>
+  </div>
+</div>
+
+<script>
+  const evidenceItems = [
+    { text: '"Pattern suggests retaliation risk following a prior complaint" (from the AI summary)', correct: 'inference', options: ['observation', 'allegation', 'inference', 'conclusion'] },
+    { text: '"I don\\'t feel safe working with him" (direct quote, time-stamped message)', correct: 'observation', options: ['observation', 'allegation', 'inference', 'conclusion'] },
+    { text: '"Employee reports ongoing conflict... escalating over several weeks" (AI summary characterization)', correct: 'allegation', options: ['observation', 'allegation', 'inference', 'conclusion'] },
+    { text: 'No prior formal complaint exists on file (supervisor email excerpt) — a fact the AI summary omitted entirely', correct: 'unverified-gap', options: ['known fact', 'unknown/unverifiable', 'unverified-gap', 'source-supported'] }
+  ];
+
+  let evidenceAnswers = {};
+  let escalationChoice = null;
+
+  function renderEvidence() {
+    const wrap = document.getElementById('evidenceList');
+    wrap.innerHTML = '';
+    evidenceItems.forEach((item, idx) => {
+      const div = document.createElement('div');
+      div.className = 'evidence-item';
+      const btns = item.options.map(opt =>
+        `<button class="classify-btn" data-idx="${idx}" data-val="${opt}" onclick="classify(${idx}, '${opt}')">${opt}</button>`
+      ).join('');
+      div.innerHTML = `
+        <div class="evidence-text">${item.text}</div>
+        <div class="classify-buttons" id="btns_${idx}">${btns}</div>
+        <div class="evidence-result" id="result_${idx}"></div>
+      `;
+      wrap.appendChild(div);
+    });
+  }
+
+  function classify(idx, val) {
+    evidenceAnswers[idx] = val;
+    document.querySelectorAll(`#btns_${idx} .classify-btn`).forEach(b => b.classList.remove('selected'));
+    document.querySelector(`#btns_${idx} [data-val="${val}"]`).classList.add('selected');
+    const resultEl = document.getElementById('result_' + idx);
+    if (val === evidenceItems[idx].correct) {
+      resultEl.textContent = 'Correct — this is the accurate classification.';
+      resultEl.className = 'evidence-result correct';
+    } else {
+      resultEl.textContent = `Not quite — the accurate classification is "${evidenceItems[idx].correct}."`;
+      resultEl.className = 'evidence-result incorrect';
+    }
+  }
+
+  const escalationOptionsData = [
+    { id: 'a', text: 'Accept the AI\\'s "immediate priority escalation" recommendation as-is and forward it to leadership.', correct: false },
+    { id: 'b', text: 'Route to a trained human reviewer with the identified gap (no prior complaint on file) and the unsupported inference flagged explicitly, before any priority is assigned.', correct: true },
+    { id: 'c', text: 'Take no action since the AI already flagged it as high priority.', correct: false },
+    { id: 'd', text: 'Quietly lower the priority without documenting why.', correct: false }
+  ];
+
+  function renderEscalation() {
+    const wrap = document.getElementById('escalationOptions');
+    wrap.innerHTML = '';
+    escalationOptionsData.forEach(opt => {
+      const div = document.createElement('div');
+      div.className = 'escalation-option';
+      div.id = 'esc_' + opt.id;
+      div.textContent = opt.text;
+      div.onclick = () => selectEscalation(opt.id);
+      wrap.appendChild(div);
+    });
+  }
+
+  function selectEscalation(id) {
+    escalationChoice = id;
+    document.querySelectorAll('.escalation-option').forEach(el => el.classList.remove('selected'));
+    document.getElementById('esc_' + id).classList.add('selected');
+  }
+
+  function renderScorecard() {
+    let correctCount = 0;
+    evidenceItems.forEach((item, idx) => { if (evidenceAnswers[idx] === item.correct) correctCount++; });
+    const escalationCorrect = escalationChoice === 'b';
+
+    document.getElementById('scorecardGrid').innerHTML = `
+      <div class="score-item"><div class="score-label">EVIDENCE DISCIPLINE</div><div class="score-val ${correctCount === evidenceItems.length ? 'pass' : 'gap'}">${correctCount} of ${evidenceItems.length} correctly classified</div></div>
+      <div class="score-item"><div class="score-label">ESCALATION BEHAVIOR</div><div class="score-val ${escalationCorrect ? 'pass' : 'gap'}">${escalationChoice ? (escalationCorrect ? 'Correctly routed to human review' : 'Did not route correctly — review needed') : 'Not yet answered'}</div></div>
+      <div class="score-item"><div class="score-label">AI LITERACY</div><div class="score-val ${correctCount >= 3 ? 'pass' : 'gap'}">${correctCount >= 3 ? 'Identified AI limitations' : 'Some AI-generated claims accepted uncritically'}</div></div>
+      <div class="score-item"><div class="score-label">COGNITIVE JUDGMENT</div><div class="score-val ${correctCount >= 3 && escalationCorrect ? 'pass' : 'gap'}">${correctCount >= 3 && escalationCorrect ? 'Distinguished fact from inference reliably' : 'Some observation/inference confusion present'}</div></div>
+    `;
+  }
+
+  function goToScreen(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen' + n).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function resetSimulation() {
+    evidenceAnswers = {};
+    escalationChoice = null;
+    renderEvidence();
+    renderEscalation();
+    goToScreen(1);
+  }
+
+  renderEvidence();
+  renderEscalation();
+</script>
+</body>
+</html>

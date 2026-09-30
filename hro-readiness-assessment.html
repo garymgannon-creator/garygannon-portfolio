@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HRO-Based AI Implementation Readiness Assessment — Illustrative Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-canvas: #F7F9FB;
+    --bg-panel: #FFFFFF;
+    --bg-panel-2: #EEF2F6;
+    --border: #D8DEE4;
+    --text-primary: #14202B;
+    --text-secondary: #4A5A68;
+    --brand-navy: #1B3A5C;
+    --brand-navy-hover: #234A73;
+    --accent: #C9701A;
+    --accent-hover: #DB8330;
+    --status-critical: #B3261E;
+    --status-critical-bg: #FBEAE9;
+    --status-warning: #A15C00;
+    --status-warning-bg: #FDF1E0;
+    --status-ok: #1E6B3A;
+    --status-ok-bg: #E9F5EC;
+    --radius: 3px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  h1, h2, h3 {
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    margin: 0 0 0.3em 0;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+  }
+  /* ---- Left rail: control panel ---- */
+  .rail {
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .rail-brand {
+    font-family: 'Source Serif 4', serif;
+    font-size: 1.05rem;
+    line-height: 1.3;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .rail-brand small {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    margin-top: 6px;
+  }
+  .module-list { list-style: none; margin: 0; padding: 0; }
+  .module-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 10px;
+    margin-bottom: 4px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .module-item:hover { background: rgba(27,58,92,0.05); }
+  .module-item.active {
+    background: rgba(201,112,26,0.10);
+    border-left: 2px solid var(--accent);
+  }
+  .module-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+    background: var(--brand-navy);
+    border: 1px solid var(--text-secondary);
+  }
+  .module-item.complete .module-dot { background: var(--status-ok); border-color: var(--status-ok); }
+  .module-item.active .module-dot { background: var(--accent); border-color: var(--accent); }
+  .module-label {
+    font-size: 1rem;
+    color: var(--text-secondary);
+  }
+  .module-item.active .module-label, .module-item.complete .module-label { color: var(--text-primary); }
+  .rail-footer {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.6;
+  }
+
+  /* ---- Main deck ---- */
+  .deck { padding: 32px 48px 80px; max-width: 900px; }
+  .banner {
+    background: var(--status-critical-bg);
+    border: 1px solid var(--status-critical);
+    color: var(--text-primary);
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    margin-bottom: 32px;
+    line-height: 1.5;
+  }
+  .banner strong { color: var(--status-critical); }
+
+  .header-block { margin-bottom: 36px; }
+  .header-block .kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .header-block h1 { font-size: 1.9rem; max-width: 640px; }
+  .header-block p { color: var(--text-secondary); max-width: 620px; margin-top: 10px; }
+
+  .section { display: none; }
+  .section.active { display: block; animation: reveal 0.28s ease; }
+  @keyframes reveal { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+    margin-bottom: 20px;
+  }
+  .card h3 { font-size: 1.15rem; margin-bottom: 12px; }
+  .card .desc { color: var(--text-secondary); font-size: 1rem; margin-bottom: 18px; max-width: 560px; }
+
+  label { display: block; font-size: 1rem; color: var(--text-secondary); margin-bottom: 6px; }
+  input[type="text"], textarea, select {
+    width: 100%;
+    background: var(--bg-canvas);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1.02rem;
+    margin-bottom: 16px;
+  }
+  textarea { min-height: 64px; resize: vertical; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .task-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .task-row:last-child { border-bottom: none; }
+  .remove-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    width: 34px; height: 38px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .remove-btn:hover { border-color: var(--status-critical); color: var(--status-critical); }
+
+  button.action {
+    background: var(--accent);
+    color: var(--bg-canvas);
+    border: none;
+    padding: 11px 20px;
+    border-radius: var(--radius);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button.action:hover { background: var(--accent-hover); }
+  button.secondary {
+    background: transparent;
+    border: 1px solid var(--brand-navy);
+    color: var(--text-primary);
+    padding: 11px 20px;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  button.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .row-actions { display: flex; margin-top: 4px; }
+
+  /* Gap map */
+  .gap-list { list-style: none; margin: 0; padding: 0; }
+  .gap-entry {
+    display: grid;
+    grid-template-columns: 22px 1.4fr 1fr 1fr;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 1rem;
+  }
+  .gap-entry:last-child { border-bottom: none; }
+  .status-flag {
+    width: 12px; height: 12px; border-radius: 50%;
+  }
+  .status-flag.gap { background: var(--status-critical); }
+  .status-flag.ok { background: var(--status-ok); }
+  .tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: var(--radius);
+  }
+  .tag.gap { background: var(--status-critical-bg); color: #E8B4B0; border: 1px solid var(--status-critical); }
+  .tag.ok { background: var(--status-ok-bg); color: #B7CBB4; border: 1px solid var(--status-ok); }
+
+  .checklist-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .checklist-item:last-child { border-bottom: none; }
+  .checklist-item input[type="checkbox"] {
+    margin-top: 3px;
+    width: 16px; height: 16px;
+    accent-color: var(--accent);
+  }
+  .checklist-item .ci-text { font-size: 1.02rem; }
+  .checklist-item .ci-sub { font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px; }
+
+  /* Output */
+  .matrix-table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+  .matrix-table th {
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .matrix-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .empty-state {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    padding: 20px 0;
+    text-align: left;
+  }
+
+  .stat-row { display: flex; gap: 28px; margin-bottom: 6px; }
+  .stat { }
+  .stat .num { font-family: 'Source Serif 4', serif; font-size: 1.9rem; color: var(--text-primary); }
+  .stat .lbl { font-size: 0.82rem; color: var(--text-secondary); font-family: 'IBM Plex Mono', monospace; }
+
+  .footer-block {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    max-width: 640px;
+    line-height: 1.7;
+  }
+  .footer-block .cred { color: var(--text-primary); font-weight: 600; margin-bottom: 6px; }
+
+  @media (max-width: 820px) {
+    .layout { grid-template-columns: 1fr; }
+    .rail { position: static; height: auto; }
+    .deck { padding: 24px 20px 60px; }
+    .task-row { grid-template-columns: 1fr; }
+    .gap-entry { grid-template-columns: 18px 1fr; }
+    .gap-entry .tag { grid-column: 2; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <nav class="rail" aria-label="Assessment modules">
+    <div class="rail-brand">
+      HRO-Based AI Implementation Readiness Assessment
+      <small>ILLUSTRATIVE PROTOTYPE</small>
+    </div>
+    <ul class="module-list" id="moduleList">
+      <li class="module-item active" data-module="intake"><span class="module-dot"></span><span class="module-label">1. Workflow Intake</span></li>
+      <li class="module-item" data-module="gapmap"><span class="module-dot"></span><span class="module-label">2. Deference-to-Expertise Gap Map</span></li>
+      <li class="module-item" data-module="controls"><span class="module-dot"></span><span class="module-label">3. Engineered-Control Checklist</span></li>
+      <li class="module-item" data-module="output"><span class="module-dot"></span><span class="module-label">4. Role Authorization Output</span></li>
+    </ul>
+    <div class="rail-footer">
+      Gannon Compliance Group<br>
+      Synthetic demonstration data only.<br>
+      Not a deployment authorization.
+    </div>
+  </nav>
+
+  <main class="deck">
+
+    <div class="banner">
+      <strong>Demonstration only. Synthetic data.</strong> This tool is not legal, payroll, insurance, tax, or employment advice, and does not constitute a technical AI audit, cybersecurity assessment, or compliance certification. Human review and verified source data are required before any operational decision. No client-identifiable information should be entered into this prototype.
+    </div>
+
+    <div class="header-block">
+      <div class="kicker">GCG — AI IMPLEMENTATION READINESS</div>
+      <h1>Who is qualified to act on this AI output — and how would you know?</h1>
+      <p>A frontline operation adopting AI carries the same risk shape as a flight deck: one unqualified action can turn a small error into a large failure. This assessment maps whether your AI-adoption plan has a named, qualified human behind every point where AI output could drive a real decision — informed by high-reliability-organizing (HRO) practice and the deference-to-expertise principle.</p>
+    </div>
+
+    <!-- MODULE 1: INTAKE -->
+    <section class="section active" id="intake">
+      <div class="card">
+        <h3>Workflow Intake</h3>
+        <p class="desc">List each workflow where AI currently assists, or is planned to assist. Add as many as apply.</p>
+
+        <div id="taskRows"></div>
+
+        <div class="row-actions">
+          <button class="secondary" type="button" onclick="addTaskRow()">+ Add workflow</button>
+        </div>
+      </div>
+      <div class="row-actions">
+        <button class="action" type="button" onclick="goTo('gapmap')">Continue to Gap Map →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 2: GAP MAP -->
+    <section class="section" id="gapmap">
+      <div class="card">
+        <h3>Deference-to-Expertise Gap Map</h3>
+        <p class="desc">Every workflow you entered is checked for one thing: is a specific, named, qualified reviewer attached to it? A workflow with no reviewer is flagged, regardless of how low-stakes it may seem.</p>
+
+        <div class="stat-row" id="gapStats"></div>
+
+        <ul class="gap-list" id="gapList"></ul>
+        <div class="empty-state" id="gapEmpty" style="display:none;">No workflows entered yet. Return to Workflow Intake to add at least one.</div>
+      </div>
+      <div class="row-actions">
+        <button class="secondary" type="button" onclick="goTo('intake')">← Back</button>
+        <button class="action" type="button" onclick="goTo('controls')">Continue to Controls →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 3: CONTROLS -->
+    <section class="section" id="controls">
+      <div class="card">
+        <h3>Engineered-Control Checklist</h3>
+        <p class="desc">HRO environments don't rely on good intentions alone — they build visible, physical controls (a locked panel, a color-coded role) that make the correct behavior the easy behavior. Check off which of these your organization currently has in place, in general, independent of any single workflow.</p>
+
+        <div id="controlChecklist"></div>
+      </div>
+      <div class="row-actions">
+        <button class="secondary" type="button" onclick="goTo('gapmap')">← Back</button>
+        <button class="action" type="button" onclick="renderOutput(); goTo('output')">Generate Authorization Output →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 4: OUTPUT -->
+    <section class="section" id="output">
+      <div class="card">
+        <h3>Role Authorization Matrix — Draft</h3>
+        <p class="desc">A starting draft only. A named, qualified human must review and approve this matrix before it governs any real workflow.</p>
+        <table class="matrix-table" id="outputTable">
+          <thead>
+            <tr><th>Workflow</th><th>AI Role</th><th>Named Reviewer</th><th>Status</th></tr>
+          </thead>
+          <tbody id="outputBody"></tbody>
+        </table>
+        <div class="empty-state" id="outputEmpty" style="display:none;">Enter at least one workflow in Module 1 to generate a draft matrix.</div>
+      </div>
+
+      <div class="card">
+        <h3>Control Coverage Summary</h3>
+        <div class="stat-row" id="controlStats"></div>
+        <p class="desc" style="margin-top:12px;">Unchecked controls above represent engineered safeguards not yet in place — worth addressing before, not after, a workflow is flagged as a gap in Module 2.</p>
+      </div>
+
+      <div class="row-actions">
+        <button class="secondary" type="button" onclick="goTo('controls')">← Back to Controls</button>
+      </div>
+    </section>
+
+    <div class="footer-block">
+      <div class="cred">Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA — Gannon Compliance Group</div>
+      This assessment is an illustrative prototype built with synthetic/placeholder data for demonstration purposes. It does not constitute legal advice, a compliance certification, a technical AI audit, a cybersecurity assessment, or a guarantee of any outcome. AI may draft, organize, or flag information; a qualified human is required to validate, approve, and act on any resulting decision. Client remains responsible for its own legal, technical, and operational decisions; specialists should be retained separately for those functions.
+      <br><br>
+      <em>Strategic Intelligence — Not Legal Counsel (CA B&P Sections 6125-6126)</em>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  let taskCount = 0;
+  const controlItems = [
+    { key: 'visibleRoles', text: 'Visible role identification for who is authorized to act on AI output', sub: 'e.g., a badge, a system permission tag, a listed name on a workflow doc — something visible, not assumed' },
+    { key: 'stopAuthority', text: 'A clear, known way for any employee to pause or flag an AI-assisted process they believe is wrong', sub: 'Modeled on the flight-deck principle that rank does not override a safety-critical observation' },
+    { key: 'reviewCadence', text: 'A defined, recurring cadence for reviewing AI output quality, not just a one-time setup check', sub: '' },
+    { key: 'escalationPath', text: 'A named escalation path when an AI-flagged issue needs a decision above the frontline reviewer', sub: '' },
+    { key: 'noAutoAction', text: 'Confirmation that no AI system independently takes a consequential action without human approval', sub: 'Employment, payroll, financial, safety, or client-commitment actions specifically' },
+    { key: 'trainingRecord', text: 'Documented training for every person granted reviewer authority under this matrix', sub: '' }
+  ];
+
+  function addTaskRow(prefill) {
+    taskCount++;
+    const id = 'task_' + taskCount;
+    const wrap = document.createElement('div');
+    wrap.className = 'task-row';
+    wrap.id = 'row_' + id;
+    wrap.innerHTML = `
+      <div>
+        <label>Workflow / Task</label>
+        <input type="text" id="${id}_name" placeholder="e.g., Draft candidate screening summaries" value="${prefill ? prefill.name : ''}">
+      </div>
+      <div>
+        <label>What AI does here</label>
+        <select id="${id}_role">
+          <option value="Draft/Summarize" ${prefill && prefill.role==='Draft/Summarize' ? 'selected':''}>Draft / Summarize</option>
+          <option value="Flag/Classify" ${prefill && prefill.role==='Flag/Classify' ? 'selected':''}>Flag / Classify</option>
+          <option value="Recommend" ${prefill && prefill.role==='Recommend' ? 'selected':''}>Recommend an action</option>
+          <option value="Decide/Act" ${prefill && prefill.role==='Decide/Act' ? 'selected':''}>Decide or act autonomously</option>
+        </select>
+      </div>
+      <div>
+        <label>Named human reviewer</label>
+        <input type="text" id="${id}_reviewer" placeholder="Name or role title, or leave blank" value="${prefill ? prefill.reviewer : ''}">
+      </div>
+      <div>
+        <button class="remove-btn" type="button" onclick="removeRow('${id}')" aria-label="Remove workflow">&times;</button>
+      </div>
+    `;
+    document.getElementById('taskRows').appendChild(wrap);
+  }
+
+  function removeRow(id) {
+    const el = document.getElementById('row_' + id);
+    if (el) el.remove();
+  }
+
+  function getTasks() {
+    const rows = document.querySelectorAll('#taskRows .task-row');
+    const tasks = [];
+    rows.forEach(row => {
+      const idBase = row.id.replace('row_', '');
+      const name = document.getElementById(idBase + '_name').value.trim();
+      const role = document.getElementById(idBase + '_role').value;
+      const reviewer = document.getElementById(idBase + '_reviewer').value.trim();
+      if (name) tasks.push({ name, role, reviewer });
+    });
+    return tasks;
+  }
+
+  function goTo(moduleName) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(moduleName).classList.add('active');
+    document.querySelectorAll('.module-item').forEach(m => m.classList.remove('active'));
+    const navItem = document.querySelector(`.module-item[data-module="${moduleName}"]`);
+    if (navItem) navItem.classList.add('active');
+    if (moduleName === 'gapmap') renderGapMap();
+    if (moduleName === 'controls') { /* checklist is static, rendered once on load */ }
+    if (moduleName === 'output') renderOutput();
+  }
+
+  document.querySelectorAll('.module-item').forEach(item => {
+    item.addEventListener('click', () => goTo(item.dataset.module));
+  });
+
+  function renderGapMap() {
+    const tasks = getTasks();
+    const list = document.getElementById('gapList');
+    const empty = document.getElementById('gapEmpty');
+    const statsWrap = document.getElementById('gapStats');
+    list.innerHTML = '';
+    if (tasks.length === 0) {
+      empty.style.display = 'block';
+      statsWrap.innerHTML = '';
+      markModuleComplete('gapmap', false);
+      return;
+    }
+    empty.style.display = 'none';
+    let gapCount = 0;
+    tasks.forEach(t => {
+      const hasReviewer = t.reviewer.length > 0;
+      if (!hasReviewer) gapCount++;
+      const li = document.createElement('li');
+      li.className = 'gap-entry';
+      li.innerHTML = `
+        <span class="status-flag ${hasReviewer ? 'ok' : 'gap'}"></span>
+        <span>${escapeHtml(t.name)}</span>
+        <span style="color:var(--text-secondary); font-size: 1rem;">${t.role}</span>
+        <span class="tag ${hasReviewer ? 'ok' : 'gap'}">${hasReviewer ? 'Reviewer named' : 'No named reviewer'}</span>
+      `;
+      list.appendChild(li);
+    });
+    statsWrap.innerHTML = `
+      <div class="stat"><div class="num">${tasks.length}</div><div class="lbl">WORKFLOWS ENTERED</div></div>
+      <div class="stat"><div class="num">${gapCount}</div><div class="lbl">MISSING A NAMED REVIEWER</div></div>
+    `;
+    markModuleComplete('intake', true);
+    markModuleComplete('gapmap', gapCount === 0 && tasks.length > 0);
+  }
+
+  function renderControlChecklist() {
+    const wrap = document.getElementById('controlChecklist');
+    wrap.innerHTML = '';
+    controlItems.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'checklist-item';
+      div.innerHTML = `
+        <input type="checkbox" id="ctrl_${c.key}">
+        <div>
+          <div class="ci-text">${c.text}</div>
+          ${c.sub ? `<div class="ci-sub">${c.sub}</div>` : ''}
+        </div>
+      `;
+      wrap.appendChild(div);
+    });
+  }
+
+  function getControlCoverage() {
+    let checked = 0;
+    controlItems.forEach(c => {
+      const box = document.getElementById('ctrl_' + c.key);
+      if (box && box.checked) checked++;
+    });
+    return { checked, total: controlItems.length };
+  }
+
+  function renderOutput() {
+    const tasks = getTasks();
+    const body = document.getElementById('outputBody');
+    const empty = document.getElementById('outputEmpty');
+    body.innerHTML = '';
+    if (tasks.length === 0) {
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      tasks.forEach(t => {
+        const hasReviewer = t.reviewer.length > 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(t.name)}</td>
+          <td>${t.role}</td>
+          <td>${hasReviewer ? escapeHtml(t.reviewer) : '<span style="color:var(--status-critical);">Not yet assigned</span>'}</td>
+          <td><span class="tag ${hasReviewer ? 'ok' : 'gap'}">${hasReviewer ? 'Draft complete' : 'Needs assignment'}</span></td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+    const cov = getControlCoverage();
+    document.getElementById('controlStats').innerHTML = `
+      <div class="stat"><div class="num">${cov.checked} / ${cov.total}</div><div class="lbl">ENGINEERED CONTROLS IN PLACE</div></div>
+    `;
+    markModuleComplete('controls', true);
+  }
+
+  function markModuleComplete(moduleName, isComplete) {
+    const item = document.querySelector(`.module-item[data-module="${moduleName}"]`);
+    if (!item) return;
+    if (isComplete) item.classList.add('complete');
+    else item.classList.remove('complete');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // Seed with two illustrative, fictional example rows
+  addTaskRow({ name: 'Draft applicant screening summaries', role: 'Draft/Summarize', reviewer: '' });
+  addTaskRow({ name: 'Flag possible wage-and-hour recordkeeping gaps', role: 'Flag/Classify', reviewer: 'HR Director (fictional)' });
+  renderControlChecklist();
+</script>
+
+</body>
+</html>

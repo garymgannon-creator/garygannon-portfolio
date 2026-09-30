@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPOCH Human/AI Task Division Mapper — Illustrative Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-canvas: #F7F9FB;
+    --bg-panel: #FFFFFF;
+    --bg-panel-2: #EEF2F6;
+    --border: #D8DEE4;
+    --text-primary: #14202B;
+    --text-secondary: #4A5A68;
+    --brand-navy: #1B3A5C;
+    --brand-navy-hover: #234A73;
+    --accent: #C9701A;
+    --accent-hover: #DB8330;
+    --status-critical: #B3261E;
+    --status-critical-bg: #FBEAE9;
+    --status-warning: #A15C00;
+    --status-warning-bg: #FDF1E0;
+    --status-ok: #1E6B3A;
+    --status-ok-bg: #E9F5EC;
+    --radius: 3px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  h1, h2, h3 { font-family: 'Source Serif 4', serif; font-weight: 600; margin: 0 0 0.3em 0; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 40px 28px 90px; }
+
+  .banner {
+    background: var(--status-warning-bg);
+    border: 1px solid var(--accent-hover);
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    margin-bottom: 32px;
+  }
+  .banner strong { color: var(--status-warning); }
+
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--brand-navy-hover); margin-bottom: 8px; letter-spacing: 0.01em; }
+  header h1 { font-size: 1.85rem; max-width: 680px; }
+  header p { color: var(--text-secondary); max-width: 640px; margin-top: 10px; font-size: 1.05rem; }
+
+  .citation-note {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .intake-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+    margin: 32px 0;
+  }
+  .intake-row { display: grid; grid-template-columns: 1fr 200px auto; gap: 14px; align-items: end; }
+  label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 6px; }
+  input[type="text"], select {
+    width: 100%;
+    background: var(--bg-canvas);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    font-size: 1.02rem;
+  }
+  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button.action {
+    background: var(--accent);
+    color: var(--bg-canvas);
+    border: none;
+    padding: 11px 20px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  button.action:hover { background: var(--accent-hover); }
+
+  /* Spectrum */
+  .spectrum-section { margin: 40px 0; }
+  .spectrum-labels { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px; }
+  .spectrum-labels .left { color: var(--brand-navy-hover); }
+  .spectrum-labels .right { color: var(--accent); }
+  .spectrum-track {
+    position: relative;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, var(--brand-navy) 0%, var(--bg-panel-2) 50%, var(--accent) 100%);
+    margin-bottom: 30px;
+  }
+  .marker {
+    position: absolute;
+    top: -14px;
+    width: 3px;
+    height: 38px;
+    background: var(--text-primary);
+    border-radius: 2px;
+    transform: translateX(-50%);
+    transition: left 0.4s ease;
+  }
+  .marker-label {
+    position: absolute;
+    top: -46px;
+    transform: translateX(-50%);
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: var(--radius);
+    font-size: 0.82rem;
+    white-space: nowrap;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .zone-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); }
+
+  .result-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+    margin-bottom: 16px;
+  }
+  .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
+  .result-block h4 { font-size: 0.85rem; font-family: 'IBM Plex Mono', monospace; color: var(--brand-navy-hover); text-transform: none; margin-bottom: 8px; letter-spacing: 0.01em; }
+  .result-block p { font-size: 1.02rem; margin: 0; }
+  .epoch-tag {
+    display: inline-block;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--brand-navy-hover);
+    color: var(--text-primary);
+    padding: 5px 12px;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    margin-top: 4px;
+  }
+
+  .log-section { margin-top: 40px; }
+  .log-table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+  .log-table th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--brand-navy-hover); padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .log-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); }
+  .empty-state { color: var(--text-secondary); font-size: 1rem; padding: 16px 0; }
+
+  .caveat-block {
+    background: var(--bg-panel-2);
+    border-left: 3px solid var(--accent-hover);
+    padding: 16px 20px;
+    margin-top: 36px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 1rem;
+    color: var(--text-secondary);
+  }
+  .caveat-block strong { color: var(--text-primary); }
+
+  .footer-block {
+    margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--border);
+    font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7;
+  }
+  .footer-block .cred { color: var(--text-primary); font-weight: 600; margin-bottom: 6px; }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 28px 18px 70px; }
+    .intake-row { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="banner">
+    <strong>Demonstration only. Synthetic data.</strong> This tool offers an illustrative classification, not a technical AI audit, legal opinion, or employment-decision authority. Human review is required before any workflow is actually reassigned between AI and staff.
+  </div>
+
+  <header>
+    <div class="kicker">GCG — EPOCH HUMAN/AI TASK DIVISION MAPPER</div>
+    <h1>Where does a task actually sit between AI-suitable and human-exclusive — and why?</h1>
+    <p>Enter a real task from your operation. This tool classifies it along a spectrum from structured, AI-suitable work to human-exclusive judgment, using the EPOCH framework's five dimensions of human complementarity — empathy, presence, opinion/judgment, creativity, and hope/leadership.</p>
+    <div class="citation-note">
+      Framework source: Loaiza, I., &amp; Rigobon, R. (November 2024). <em>The EPOCH of AI: Human-Machine Complementarities at Work.</em> MIT Sloan School of Management working paper. E = Empathy &amp; Emotional Intelligence · P = Presence, Networking &amp; Connectedness · O = Opinion, Judgment &amp; Ethics · C = Creativity &amp; Imagination · H = Hope, Vision &amp; Leadership.
+    </div>
+  </header>
+
+  <div class="intake-card">
+    <div class="intake-row">
+      <div>
+        <label>Describe a task or workflow</label>
+        <input type="text" id="taskInput" placeholder="e.g., Deciding whether to terminate an underperforming employee">
+      </div>
+      <div>
+        <label>Dominant human quality it requires</label>
+        <select id="epochSelect">
+          <option value="E">E — Empathy &amp; Emotional Intelligence</option>
+          <option value="P">P — Presence &amp; Connectedness</option>
+          <option value="O">O — Opinion, Judgment &amp; Ethics</option>
+          <option value="C">C — Creativity &amp; Imagination</option>
+          <option value="H">H — Hope, Vision &amp; Leadership</option>
+          <option value="none">None — mostly structured/repeatable</option>
+        </select>
+      </div>
+      <div>
+        <button class="action" type="button" onclick="classifyTask()">Classify</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="spectrum-section" id="spectrumSection" style="display:none;">
+    <div class="spectrum-labels">
+      <span class="left">A — AI-SUITABLE, STRUCTURED</span>
+      <span class="right">C — HUMAN-EXCLUSIVE</span>
+    </div>
+    <div class="spectrum-track">
+      <div class="marker" id="marker"></div>
+      <div class="marker-label" id="markerLabel"></div>
+    </div>
+  </div>
+
+  <div class="result-card" id="resultCard" style="display:none;">
+    <h3 id="resultTitle"></h3>
+    <div class="result-grid">
+      <div class="result-block">
+        <h4>EPOCH DIMENSION</h4>
+        <span class="epoch-tag" id="epochTagOut"></span>
+      </div>
+      <div class="result-block">
+        <h4>NIST AI RMF FUNCTION</h4>
+        <p id="nistOut"></p>
+      </div>
+      <div class="result-block">
+        <h4>SUGGESTED CATEGORY</h4>
+        <p id="categoryOut"></p>
+      </div>
+      <div class="result-block">
+        <h4>WHY</h4>
+        <p id="whyOut"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="log-section">
+    <h3>Task Log</h3>
+    <table class="log-table" id="logTable">
+      <thead><tr><th>Task</th><th>Dimension</th><th>Category</th></tr></thead>
+      <tbody id="logBody"></tbody>
+    </table>
+    <div class="empty-state" id="logEmpty">Classify a task above to begin building your log.</div>
+  </div>
+
+  <div class="caveat-block">
+    <strong>Honest limitation, stated plainly:</strong> current research shows a genuine, evidenced human advantage on EPOCH-dimension tasks today, but the boundary is actively moving — AI task-completion capability has been doubling roughly every 7 months in some domains since 2019, strongest so far in structured/coding work, not yet established for relational, ethical, or leadership work. This classification reflects current evidence, not a permanent guarantee. Re-check periodically as capability shifts.
+  </div>
+
+  <div class="footer-block">
+    <div class="cred">Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA — Gannon Compliance Group</div>
+    This tool is an illustrative prototype for demonstration purposes, built with synthetic/placeholder inputs. It does not constitute a technical AI audit, legal advice, an employment-decision determination, or a compliance certification. AI may assist with organizing and classifying self-reported input; a qualified human is required to validate, approve, and act on any resulting workflow decision. Client remains responsible for its own legal, technical, and operational decisions; specialists should be retained separately for those functions.
+    <br><br>
+    <em>Strategic Intelligence — Not Legal Counsel (CA B&P Sections 6125-6126)</em>
+  </div>
+
+</div>
+
+<script>
+  const epochInfo = {
+    E: { label: 'E — Empathy & Emotional Intelligence', nist: 'GOVERN — human oversight of decisions affecting people', why: 'Requires reading emotional context and responding with genuine care — not yet reliably replicable by AI.' },
+    P: { label: 'P — Presence & Connectedness', nist: 'GOVERN — accountable human relationships and trust', why: 'Requires an ongoing, trusted human relationship — AI can support communication but cannot hold the relationship itself.' },
+    O: { label: 'O — Opinion, Judgment & Ethics', nist: 'MANAGE — human-owned high-stakes decisions', why: 'Involves weighing competing values or consequences — a judgment call, not a calculation.' },
+    C: { label: 'C — Creativity & Imagination', nist: 'MAP — human framing of novel problems', why: 'Requires originating a genuinely new approach, not recombining existing patterns.' },
+    H: { label: 'H — Hope, Vision & Leadership', nist: 'GOVERN — organizational direction-setting', why: 'Requires setting direction and inspiring commitment — an act of leadership, not information processing.' },
+    none: { label: 'No dominant EPOCH dimension identified', nist: 'MEASURE — routine monitoring and structured processing', why: 'Described as mostly repeatable or rule-based — a strong candidate for AI-assisted handling, with human spot-checking.' }
+  };
+
+  let taskLog = [];
+
+  function classifyTask() {
+    const task = document.getElementById('taskInput').value.trim();
+    const dim = document.getElementById('epochSelect').value;
+    if (!task) return;
+
+    const info = epochInfo[dim];
+    let position, category, title;
+
+    if (dim === 'none') {
+      position = 12;
+      category = 'A — AI-Suitable, Structured';
+      title = 'Likely AI-Suitable — Human Spot-Check Recommended';
+    } else if (dim === 'O' || dim === 'H') {
+      position = 88;
+      category = 'C — Human-Exclusive';
+      title = 'Human-Exclusive — AI Should Not Decide or Act Here';
+    } else {
+      position = 62;
+      category = 'B — AI-Assisted, Human Decision';
+      title = 'AI Can Assist — A Named Human Must Decide';
+    }
+
+    document.getElementById('spectrumSection').style.display = 'block';
+    document.getElementById('resultCard').style.display = 'block';
+    document.getElementById('marker').style.left = position + '%';
+    document.getElementById('markerLabel').style.left = position + '%';
+    document.getElementById('markerLabel').textContent = category.split(' — ')[0];
+    document.getElementById('resultTitle').textContent = title;
+    document.getElementById('epochTagOut').textContent = info.label;
+    document.getElementById('nistOut').textContent = info.nist;
+    document.getElementById('categoryOut').textContent = category;
+    document.getElementById('whyOut').textContent = info.why;
+
+    taskLog.unshift({ task, dim: info.label.split(' — ')[0], category: category.split(' — ')[0] });
+    renderLog();
+    document.getElementById('taskInput').value = '';
+  }
+
+  function renderLog() {
+    const body = document.getElementById('logBody');
+    const empty = document.getElementById('logEmpty');
+    body.innerHTML = '';
+    if (taskLog.length === 0) {
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    taskLog.forEach(entry => {
+      const tr = document.createElement('tr');
+      const div = document.createElement('div');
+      div.textContent = entry.task;
+      tr.innerHTML = `<td></td><td>${entry.dim}</td><td>${entry.category}</td>`;
+      tr.children[0].textContent = entry.task;
+      body.appendChild(tr);
+    });
+  }
+
+  // Seed one illustrative example
+  document.getElementById('taskInput').value = 'Deciding whether to terminate an underperforming employee';
+  document.getElementById('epochSelect').value = 'O';
+</script>
+</body>
+</html>
