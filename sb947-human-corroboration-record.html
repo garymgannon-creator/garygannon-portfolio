@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>SB 947 Human Corroboration Record (prototype)</title>
+<style>
+  :root {
+    --bg-canvas: #F7F9FB; --bg-panel: #FFFFFF; --bg-panel-2: #EEF2F6; --border: #D8DEE4;
+    --text-primary: #14202B; --text-secondary: #4A5A68;
+    --brand-navy: #1B3A5C; --accent: #C9701A;
+    --status-warning: #A15C00; --status-warning-bg: #FDF1E0;
+    --status-ok: #1E6B3A; --status-ok-bg: #E9F5EC;
+    --status-critical: #B3261E; --status-critical-bg: #FBEAE9;
+    --radius: 4px;
+    --serif: Georgia, 'Times New Roman', serif;
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--bg-canvas); color:var(--text-primary); font-family:var(--sans); font-size:17px; line-height:1.6; }
+  h1, h2 { font-family:var(--serif); font-weight:600; margin:0 0 0.4em 0; color:var(--brand-navy); }
+  h1 { font-size:1.7rem; line-height:1.25; }
+  h2 { font-size:1.15rem; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 30px 20px 70px; }
+
+  .persistent-banner { background: var(--status-warning-bg); border: 1px solid var(--status-warning); color: var(--status-warning); padding: 12px 18px; border-radius: var(--radius); font-size: 0.92rem; font-weight: 600; margin-bottom: 24px; }
+
+  .kicker { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.04em; color: var(--accent); margin-bottom: 8px; }
+  header p.sub { color: var(--text-secondary); margin: 8px 0 18px; max-width: 700px; }
+  .statusline { background: var(--bg-panel); border: 1px solid var(--border); border-left: 4px solid var(--brand-navy); border-radius: var(--radius); padding: 10px 14px; font-size: 0.92rem; margin: 0 0 24px; }
+
+  section.card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 20px 22px; margin: 0 0 22px; }
+  .limits { background: var(--status-critical-bg); border-color: var(--status-critical); }
+  .limits h2 { color: var(--status-critical); }
+  .limits ul { margin: 0; padding-left: 20px; }
+  .limits li { margin: 5px 0; font-size: 0.95rem; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 22px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  label, .lbl { display: block; font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); margin: 14px 0 6px; }
+  .hint { display: block; font-weight: 400; font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+  input[type="text"], input[type="date"], select, textarea { width: 100%; background: var(--bg-canvas); border: 1px solid var(--border); color: var(--text-primary); padding: 10px 12px; border-radius: var(--radius); font-size: 0.95rem; font-family: var(--sans); }
+  textarea { min-height: 80px; resize: vertical; }
+  input:focus, select:focus, textarea:focus, button:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  fieldset { border: 1px solid var(--border); border-radius: var(--radius); margin: 16px 0 0; padding: 10px 14px 14px; }
+  legend { font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); padding: 0 6px; }
+  .choice { display: flex; align-items: flex-start; gap: 9px; margin: 7px 0 0; font-size: 0.95rem; font-weight: 400; color: var(--text-primary); }
+  .choice input { margin-top: 4px; }
+  .inline-choices { display: flex; gap: 24px; flex-wrap: wrap; }
+
+  ul.corro-list { list-style: none; margin: 0 0 14px; padding: 0; }
+  ul.corro-list li { position: relative; padding-left: 28px; margin: 7px 0; color: var(--text-secondary); font-size: 0.95rem; }
+  ul.corro-list li::before { content: "○"; position: absolute; left: 4px; color: var(--text-secondary); }
+  ul.corro-list li[data-ok="true"] { color: var(--text-primary); }
+  ul.corro-list li[data-ok="true"]::before { content: "✓"; color: var(--status-ok); font-weight: 700; }
+  .status-pill { display: inline-block; font-family: var(--mono); font-size: 0.85rem; font-weight: 600; padding: 8px 14px; border-radius: var(--radius); background: var(--status-warning-bg); color: var(--status-warning); border: 1px solid var(--status-warning); }
+  .status-pill.ok { background: var(--status-ok-bg); color: var(--status-ok); border-color: var(--status-ok); }
+
+  button.action { background: var(--accent); color: #fff; border: none; padding: 11px 20px; border-radius: var(--radius); font-weight: 600; font-size: 0.95rem; cursor: pointer; font-family: var(--sans); }
+  button.action:hover { background: #DB8330; }
+  .copy-msg { margin-left: 12px; font-size: 0.88rem; color: var(--text-secondary); }
+  #record-out { margin-top: 10px; min-height: 240px; font-family: var(--mono); font-size: 0.8rem; line-height: 1.5; }
+  .smallprint { font-size: 0.82rem; color: var(--text-secondary); margin: 10px 0 0; }
+
+  .footer-block { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--text-secondary); }
+  .footer-block .cred { color: var(--text-primary); font-weight: 600; margin: 0 0 6px; }
+  .footer-block p { margin: 0 0 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="persistent-banner" role="note">Prototype on fictional data. Human review required. Not legal advice or compliance certification. Release-review status: not released.</div>
+
+  <header>
+    <div class="kicker">GANNON COMPLIANCE GROUP · ILLUSTRATIVE PROTOTYPE</div>
+    <h1>SB 947 Human Corroboration Record <span style="font-family:var(--sans);font-size:1rem;color:var(--text-secondary);font-weight:400;">(prototype)</span></h1>
+    <p class="sub">Employer-side form for documenting that a human corroborated an AI-assisted input before a discipline or termination decision. Front-end demonstration only; every entry is fictional.</p>
+    <p class="statusline">California SB 947: enacted Sept 30, 2026; operative July 1, 2027 (Verified Current Requirement, future date). Chapter number and statutory wording: Verify - do not publish.</p>
+  </header>
+
+  <main>
+    <section class="card limits" aria-labelledby="limits-h">
+      <h2 id="limits-h">Limitations</h2>
+      <ul>
+        <li>This prototype does not decide whether any law applies to a particular employer, worker, or decision.</li>
+        <li>It does not assess any AI tool, and it does not test or evaluate any AI tool for bias.</li>
+        <li>Use qualified legal counsel for legal questions.</li>
+        <li>In-memory only: nothing is saved. This page makes no network calls and uses no cookies or browser storage; closing or reloading it clears every entry.</li>
+      </ul>
+    </section>
+
+    <form id="record-form" autocomplete="off">
+      <section class="card" aria-labelledby="entry-h">
+        <h2 id="entry-h">Record entry (fictional data only)</h2>
+
+        <div class="grid">
+          <div>
+            <label for="case-id">Fictional case ID</label>
+            <input type="text" id="case-id" placeholder="e.g., FIC-2027-014">
+          </div>
+          <div>
+            <label for="decision-type">Decision type</label>
+            <select id="decision-type">
+              <option value="">Select…</option>
+              <option>Discipline</option>
+              <option>Termination</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="ai-tool">AI tool or system used</label>
+        <input type="text" id="ai-tool" placeholder="e.g., attendance-pattern assistant (fictional)">
+
+        <label for="ai-output">What the AI output said
+          <span class="hint">Summarize the output in plain words. Fictional content only; do not paste real employee data.</span>
+        </label>
+        <textarea id="ai-output"></textarea>
+
+        <fieldset>
+          <legend>Independent evidence reviewed by a human (check all that apply)</legend>
+          <label class="choice"><input type="checkbox" id="ev-witness"> Witness statement</label>
+          <label class="choice"><input type="checkbox" id="ev-records"> Records (documents, time entries, system entries)</label>
+          <label class="choice"><input type="checkbox" id="ev-supervisor"> Supervisor observation</label>
+          <label class="choice"><input type="checkbox" id="ev-employee"> Employee response</label>
+          <label class="choice"><input type="checkbox" id="ev-other"> Other (describe below)</label>
+          <label for="ev-notes">Describe the evidence reviewed</label>
+          <textarea id="ev-notes"></textarea>
+        </fieldset>
+
+        <div class="grid">
+          <div>
+            <label for="reviewer">Name or role of the human reviewer
+              <span class="hint">A role such as “HR Manager”, or a clearly fictional name.</span>
+            </label>
+            <input type="text" id="reviewer">
+          </div>
+          <div>
+            <label for="record-date">Date</label>
+            <input type="date" id="record-date">
+          </div>
+        </div>
+
+        <fieldset>
+          <legend>Employee response recorded?</legend>
+          <div class="inline-choices">
+            <label class="choice"><input type="radio" name="emp-recorded" value="Yes"> Yes</label>
+            <label class="choice"><input type="radio" name="emp-recorded" value="No"> No</label>
+          </div>
+        </fieldset>
+
+        <label for="final-decision">Final decision and reasons, in the reviewer's own words</label>
+        <textarea id="final-decision"></textarea>
+
+        <fieldset>
+          <legend>Escalation needed?</legend>
+          <div class="inline-choices">
+            <label class="choice"><input type="radio" name="escalation" value="Yes"> Yes</label>
+            <label class="choice"><input type="radio" name="escalation" value="No"> No</label>
+          </div>
+        </fieldset>
+      </section>
+    </form>
+
+    <section class="card" aria-labelledby="check-h">
+      <h2 id="check-h">Corroboration checklist</h2>
+      <ul class="corro-list">
+        <li id="chk-evidence" data-ok="false">At least one independent evidence item is checked</li>
+        <li id="chk-reviewer" data-ok="false">A human reviewer is named (name or role)</li>
+      </ul>
+      <p id="corro-status" class="status-pill" role="status">Corroboration not yet documented</p>
+    </section>
+
+    <section class="card" aria-labelledby="out-h">
+      <h2 id="out-h">Record output</h2>
+      <button type="button" class="action" id="copy-btn">Copy record as text</button><span id="copy-msg" class="copy-msg" role="status"></span>
+      <label class="lbl" for="record-out">Generated record text
+        <span class="hint">If the copy button cannot reach your clipboard, select this text and copy it manually.</span>
+      </label>
+      <textarea id="record-out" readonly></textarea>
+      <p class="smallprint">The record exists only in this page's memory and, once generated, in the text box above. Nothing is saved or sent anywhere by this page.</p>
+    </section>
+
+    <noscript><p>This prototype needs JavaScript for the checklist and the copy button; the form fields above remain readable without it.</p></noscript>
+  </main>
+
+  <div class="footer-block">
+    <p class="cred">Gannon Compliance Group</p>
+    <p><em>Strategic Intelligence - Not Legal Counsel (CA B&amp;P Sections 6125-6126)</em></p>
+  </div>
+
+</div>
+<script>
+(() => {
+  "use strict";
+  const byId = (id) => document.getElementById(id);
+  const EVIDENCE = [
+    ["ev-witness", "Witness statement"],
+    ["ev-records", "Records (documents, time entries, system entries)"],
+    ["ev-supervisor", "Supervisor observation"],
+    ["ev-employee", "Employee response"],
+    ["ev-other", "Other"]
+  ];
+  const text = (id) => byId(id).value.trim();
+  const orBlank = (v) => (v === "" ? "(blank)" : v);
+  const block = (v) => (v === "" ? "  (blank)" : v.split("\n").map((l) => "  " + l).join("\n"));
+  const radio = (name) => {
+    const el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : "(not answered)";
+  };
+  const checkedEvidence = () => EVIDENCE.filter(([id]) => byId(id).checked).map(([, lbl]) => lbl);
+
+  const refresh = () => {
+    const hasEvidence = checkedEvidence().length > 0;
+    const hasReviewer = text("reviewer") !== "";
+    byId("chk-evidence").dataset.ok = String(hasEvidence);
+    byId("chk-reviewer").dataset.ok = String(hasReviewer);
+    const pill = byId("corro-status");
+    if (hasEvidence && hasReviewer) {
+      pill.textContent = "Corroboration documented";
+      pill.classList.add("ok");
+    } else {
+      pill.textContent = "Corroboration not yet documented";
+      pill.classList.remove("ok");
+    }
+  };
+
+  const buildRecord = () => {
+    const ev = checkedEvidence();
+    const corro = ev.length > 0 && text("reviewer") !== "";
+    const lines = [
+      "SB 947 HUMAN CORROBORATION RECORD (PROTOTYPE - FICTIONAL DATA)",
+      "",
+      "Case ID (fictional): " + orBlank(text("case-id")),
+      "Decision type: " + orBlank(byId("decision-type").value),
+      "AI tool or system used: " + orBlank(text("ai-tool")),
+      "What the AI output said:",
+      block(text("ai-output")),
+      "Independent evidence reviewed by a human:",
+      ev.length ? ev.map((e) => "  - " + e).join("\n") : "  (none checked)",
+      "Evidence details:",
+      block(text("ev-notes")),
+      "Human reviewer (name or role): " + orBlank(text("reviewer")),
+      "Date: " + orBlank(byId("record-date").value),
+      "Employee response recorded: " + radio("emp-recorded"),
+      "Final decision and reasons (reviewer's own words):",
+      block(text("final-decision")),
+      "Escalation needed: " + radio("escalation"),
+      "Corroboration status: " + (corro
+        ? "Corroboration documented"
+        : "Not yet documented (needs at least one independent evidence item and a named human reviewer)"),
+      "",
+      "Notices:",
+      "- Prototype on fictional data. Human review required. Not legal advice or compliance certification. Release-review status: not released.",
+      "- California SB 947: enacted Sept 30, 2026; operative July 1, 2027 (Verified Current Requirement, future date). Chapter number and statutory wording: Verify - do not publish.",
+      "- Strategic Intelligence - Not Legal Counsel (CA B&P Sections 6125-6126)"
+    ];
+    return lines.join("\n");
+  };
+
+  byId("copy-btn").addEventListener("click", () => {
+    const record = buildRecord();
+    const out = byId("record-out");
+    out.value = record;
+    const msg = byId("copy-msg");
+    const manual = () => {
+      try {
+        out.focus();
+        out.select();
+        const ok = document.execCommand && document.execCommand("copy");
+        msg.textContent = ok
+          ? "Copied to clipboard."
+          : "Clipboard unavailable here. Select the text below and copy it manually.";
+      } catch (e) {
+        msg.textContent = "Clipboard unavailable here. Select the text below and copy it manually.";
+      }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(record).then(
+        () => { msg.textContent = "Copied to clipboard."; },
+        manual
+      );
+    } else {
+      manual();
+    }
+  });
+
+  const form = byId("record-form");
+  form.addEventListener("input", refresh);
+  form.addEventListener("change", refresh);
+  refresh();
+})();
+</script>
+</body>
+</html>
