@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Shift-Change and Dispatch Records Checklist — Prototype</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg-canvas: #F7F9FB;
+    --bg-panel: #FFFFFF;
+    --bg-panel-2: #EEF2F6;
+    --border: #D8DEE4;
+    --text-primary: #14202B;
+    --text-secondary: #4A5A68;
+    --brand-navy: #1B3A5C;
+    --accent: #C9701A;
+    --status-critical: #B3261E;
+    --status-critical-bg: #FBEAE9;
+    --status-warning: #A15C00;
+    --status-warning-bg: #FDF1E0;
+    --status-ok: #1E6B3A;
+    --status-ok-bg: #E9F5EC;
+    --radius: 4px;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-head: Georgia, "Times New Roman", serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg-canvas); color: var(--text-primary); font-family: var(--font-body); font-size: 17px; line-height: 1.6; }
+  h1, h2, h3 { font-family: var(--font-head); font-weight: 600; margin: 0 0 0.4em 0; color: var(--brand-navy); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 16px 90px; }
+  @media (min-width: 640px) { .wrap { padding: 40px 26px 90px; } }
+
+  .banner {
+    background: var(--status-warning-bg);
+    border: 1px solid var(--status-warning);
+    padding: 14px 18px;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    margin-bottom: 26px;
+    color: var(--text-primary);
+  }
+  .banner strong { color: var(--status-warning); }
+
+  .noscript-note {
+    background: var(--status-critical-bg);
+    border: 1px solid var(--status-critical);
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    margin-bottom: 26px;
+    font-size: 0.95rem;
+  }
+
+  .kicker { font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent); margin-bottom: 8px; letter-spacing: 0.04em; }
+  header h1 { font-size: 1.7rem; max-width: 700px; }
+  @media (min-width: 640px) { header h1 { font-size: 1.85rem; } }
+  header p { color: var(--text-secondary); max-width: 680px; margin-top: 10px; font-size: 1.02rem; }
+
+  .progress-block {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin: 26px 0;
+    box-shadow: 0 2px 6px rgba(20, 32, 43, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .progress-block .count { font-family: var(--font-head); font-size: 1.15rem; color: var(--brand-navy); white-space: nowrap; }
+  .progress-block .bar { flex: 1 1 140px; height: 8px; background: var(--bg-panel-2); border-radius: 4px; overflow: hidden; min-width: 120px; }
+  .progress-block .bar-fill { height: 100%; width: 0%; background: var(--brand-navy); border-radius: 4px; transition: width 0.2s ease; }
+  .progress-block button {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    padding: 8px 14px;
+    border: 1px solid var(--brand-navy);
+    background: var(--brand-navy);
+    color: #FFFFFF;
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .progress-block button:hover { background: #254b73; }
+  .progress-block button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .copy-status { font-size: 0.85rem; color: var(--status-ok); flex-basis: 100%; }
+  .copy-status.err { color: var(--status-warning); }
+
+  .plain-text-out {
+    width: 100%;
+    min-height: 220px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin: 0 0 26px;
+    background: var(--bg-panel);
+    color: var(--text-primary);
+  }
+
+  section.block {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 20px 16px;
+    margin-bottom: 26px;
+  }
+  @media (min-width: 640px) { section.block { padding: 24px 26px 18px; } }
+  section.block h2 { font-size: 1.25rem; }
+  section.block > p.section-note { color: var(--text-secondary); font-size: 0.95rem; margin: 0 0 14px; }
+
+  ul.check-list { list-style: none; margin: 0; padding: 0; }
+  ul.check-list li { border-top: 1px solid var(--border); }
+  ul.check-list li:first-child { border-top: none; }
+  ul.check-list label { display: flex; gap: 12px; align-items: flex-start; padding: 12px 4px; cursor: pointer; }
+  ul.check-list input[type="checkbox"] {
+    accent-color: var(--brand-navy);
+    width: 20px;
+    height: 20px;
+    margin-top: 4px;
+    flex: 0 0 auto;
+  }
+  ul.check-list .item-text { font-size: 0.98rem; }
+  ul.check-list .item-text strong { color: var(--brand-navy); }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    background: var(--status-warning-bg);
+    color: var(--status-warning);
+    border: 1px solid var(--status-warning);
+    border-radius: 999px;
+    padding: 1px 10px;
+    margin-left: 6px;
+    white-space: normal;
+  }
+
+  .table-scroll { overflow-x: auto; margin-top: 16px; }
+  table.sample { border-collapse: collapse; width: 100%; font-size: 0.85rem; min-width: 640px; }
+  table.sample caption { text-align: left; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-secondary); padding-bottom: 8px; }
+  table.sample th, table.sample td { border: 1px solid var(--border); padding: 7px 9px; text-align: left; vertical-align: top; }
+  table.sample th { background: var(--bg-panel-2); font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-secondary); }
+  table.sample td.pending { color: var(--status-warning); font-style: italic; }
+  table.sample td.reviewed { color: var(--status-ok); }
+
+  .gaps-none {
+    background: var(--status-ok-bg);
+    border: 1px solid var(--status-ok);
+    color: var(--status-ok);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 0.95rem;
+  }
+  ul.gaps-list { list-style: none; margin: 0; padding: 0; }
+  ul.gaps-list li {
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--status-critical);
+    border-radius: var(--radius);
+    background: var(--bg-canvas);
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  }
+  .gap-head { font-size: 0.95rem; margin-bottom: 8px; }
+  .gap-head .gap-section { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); display: block; margin-bottom: 2px; }
+  .gap-fields { display: flex; gap: 14px; flex-wrap: wrap; }
+  .gap-fields .field { display: flex; flex-direction: column; gap: 2px; }
+  .gap-fields label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-secondary); }
+  .gap-fields input {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    min-width: 170px;
+  }
+  .gap-fields input:focus-visible { outline: 2px solid var(--brand-navy); outline-offset: 1px; }
+  .gaps-memo { font-size: 0.85rem; color: var(--text-secondary); margin: 12px 0 0; }
+
+  .limitations {
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--brand-navy);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 26px;
+    font-size: 0.93rem;
+  }
+  .limitations h2 { font-size: 1.05rem; margin-bottom: 8px; }
+  .limitations ul { margin: 0; padding-left: 20px; }
+  .limitations li { margin-bottom: 6px; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+  }
+  footer .legal { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-primary); margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="banner" role="note">
+    <strong>Prototype on fictional data. Human review required. Not legal advice or compliance certification. Release-review status: not released.</strong>
+  </div>
+
+  <noscript>
+    <div class="noscript-note">
+      JavaScript is off in this browser, so the progress count, the Gaps to close panel, and the copy button will not work. The checklist text itself is still readable below.
+    </div>
+  </noscript>
+
+  <header>
+    <div class="kicker">OPERATIONS RECORDS PROTOTYPE</div>
+    <h1>Shift-Change and Dispatch Records Checklist</h1>
+    <p>A front-end working model of a daily records checklist for a fictional private patrol operator. It walks the shift-change handoff, a completeness pass over the dispatch log, and basic records-handling questions, then turns every unchecked item into a "Gaps to close" entry with an owner and a due date. Every name, site, and log entry on this page is fictional sample content.</p>
+  </header>
+
+  <section class="progress-block" aria-label="Progress and copy">
+    <span class="count" id="progressText" aria-live="polite">0 of 0 items checked</span>
+    <span class="bar" aria-hidden="true"><span class="bar-fill" id="barFill"></span></span>
+    <button type="button" id="copyBtn">Copy checklist as text</button>
+    <span class="copy-status" id="copyStatus" role="status"></span>
+  </section>
+
+  <textarea class="plain-text-out" id="plainTextOut" readonly hidden aria-label="Checklist as plain text"></textarea>
+
+  <section class="block" aria-labelledby="h-s1">
+    <h2 id="h-s1">1. Shift-change handoff</h2>
+    <p class="section-note">Completed together by the outgoing and incoming officers at the start of each shift.</p>
+    <ul class="check-list">
+      <li><label><input type="checkbox" data-id="s1-incidents" data-section="Shift-change handoff" data-short="Open incidents handed off">
+        <span class="item-text"><strong>Open incidents.</strong> Every incident still open from the outgoing shift was walked through with the incoming officer and noted on the handoff record.</span></label></li>
+      <li><label><input type="checkbox" data-id="s1-instructions" data-section="Shift-change handoff" data-short="Changed site instructions acknowledged">
+        <span class="item-text"><strong>Site instructions changed.</strong> Any site instructions that changed since the last shift were called out, and the incoming officer acknowledged them.</span></label></li>
+      <li><label><input type="checkbox" data-id="s1-equipment" data-section="Shift-change handoff" data-short="Equipment and keys signed over">
+        <span class="item-text"><strong>Equipment and keys.</strong> Radios, phones, flashlights, keys, and access cards were counted and signed over; anything missing or damaged is noted.</span></label></li>
+      <li><label><input type="checkbox" data-id="s1-vehicle" data-section="Shift-change handoff" data-short="Vehicle condition recorded">
+        <span class="item-text"><strong>Vehicle condition.</strong> Patrol vehicle fuel level, mileage, damage, and warning lights were checked and recorded on the handoff record.</span></label></li>
+      <li><label><input type="checkbox" data-id="s1-signoff" data-section="Shift-change handoff" data-short="Supervisor sign-off on handoff">
+        <span class="item-text"><strong>Supervisor sign-off.</strong> A supervisor read the completed handoff record and signed it.</span></label></li>
+    </ul>
+  </section>
+
+  <section class="block" aria-labelledby="h-s2">
+    <h2 id="h-s2">2. Dispatch log completeness</h2>
+    <p class="section-note">For the shift under review, confirm that every dispatch log entry carries each field below.</p>
+    <ul class="check-list">
+      <li><label><input type="checkbox" data-id="s2-time" data-section="Dispatch log completeness" data-short="Time stamp on every entry">
+        <span class="item-text"><strong>Time stamp.</strong> Every entry has a time stamp.</span></label></li>
+      <li><label><input type="checkbox" data-id="s2-officer" data-section="Dispatch log completeness" data-short="Officer identifier on every entry">
+        <span class="item-text"><strong>Officer identifier.</strong> Every entry identifies the officer by name or unit number.</span></label></li>
+      <li><label><input type="checkbox" data-id="s2-site" data-section="Dispatch log completeness" data-short="Site named on every entry">
+        <span class="item-text"><strong>Site.</strong> Every entry names the site or post.</span></label></li>
+      <li><label><input type="checkbox" data-id="s2-calltype" data-section="Dispatch log completeness" data-short="Call type on every entry">
+        <span class="item-text"><strong>Call type.</strong> Every entry records the call type (for example: alarm activation, access request, disturbance, patrol check).</span></label></li>
+      <li><label><input type="checkbox" data-id="s2-action" data-section="Dispatch log completeness" data-short="Action taken on every entry">
+        <span class="item-text"><strong>Action taken.</strong> Every entry states what the officer did and how the call was closed.</span></label></li>
+      <li><label><input type="checkbox" data-id="s2-review" data-section="Dispatch log completeness" data-short="Supervisor review mark on every entry">
+        <span class="item-text"><strong>Supervisor review mark.</strong> Every entry carries a mark showing a supervisor has read it.</span></label></li>
+    </ul>
+    <div class="table-scroll">
+      <table class="sample">
+        <caption>Sample dispatch log entries — fictional, shown only to illustrate a complete entry.</caption>
+        <thead>
+          <tr><th scope="col">Time</th><th scope="col">Officer</th><th scope="col">Site</th><th scope="col">Call type</th><th scope="col">Action taken</th><th scope="col">Supervisor review</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>22:14</td><td>Unit 4 — R. Vega</td><td>Site A — Example Distribution Yard (fictional)</td><td>Alarm activation</td><td>Walked the perimeter; found the east gate latch open; closed and locked it; notified the site contact.</td><td class="reviewed">Reviewed — J.O.</td></tr>
+          <tr><td>23:40</td><td>Unit 2 — M. Okafor</td><td>Site B — Example Office Park (fictional)</td><td>Vehicle in lot after hours</td><td>Made contact; tenant employee picking up a laptop; departed without issue; plate noted in report.</td><td class="reviewed">Reviewed — J.O.</td></tr>
+          <tr><td>01:05</td><td>Unit 4 — R. Vega</td><td>Site A — Example Distribution Yard (fictional)</td><td>Noise report from dispatcher</td><td>Checked the loading dock area; no person found; follow-up note left for day shift.</td><td class="pending">Pending</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="h-s3">
+    <h2 id="h-s3">3. Records handling</h2>
+    <p class="section-note">How the handoff records and dispatch logs themselves are kept.</p>
+    <ul class="check-list">
+      <li><label><input type="checkbox" data-id="s3-access" data-section="Records handling" data-short="Log access list in writing">
+        <span class="item-text"><strong>Who can access the log.</strong> The people who may view or change the dispatch log are named in writing, the list is current, and it is limited to people who need it.</span></label></li>
+      <li><label><input type="checkbox" data-id="s3-backup" data-section="Records handling" data-short="Backup method documented and followed">
+        <span class="item-text"><strong>Backup method.</strong> How and where a backup copy of the log is kept is written down, and the backup is actually being made on that schedule.</span></label></li>
+      <li><label><input type="checkbox" data-id="s3-retention" data-section="Records handling" data-short="Retention schedule documented (set by employer policy; confirm with counsel)">
+        <span class="item-text"><strong>Retention schedule.</strong> A written retention schedule covers handoff records and dispatch logs. This prototype states no retention period. <span class="tag">Set by employer policy; confirm with counsel</span></span></label></li>
+    </ul>
+  </section>
+
+  <section class="block" aria-labelledby="h-s4">
+    <h2 id="h-s4">4. Gaps to close</h2>
+    <p class="section-note">Every unchecked item above appears here. Assign an owner and a due date to each one.</p>
+    <div id="gapsPanel" aria-live="polite">
+      <!-- filled by script -->
+    </div>
+    <p class="gaps-memo">Owner and due-date entries are held in this page's memory only. Closing or reloading the page clears them.</p>
+  </section>
+
+  <section class="limitations" aria-labelledby="h-lim">
+    <h2 id="h-lim">Limitations</h2>
+    <ul>
+      <li>This checklist does not decide what any law, licensing rule, or contract requires.</li>
+      <li>It does not assess any system, and it is not an inspection or examination of any kind.</li>
+      <li>Confirm requirements with qualified counsel.</li>
+      <li>In-memory only: nothing is saved. Closing or reloading this page clears every check mark and entry, and nothing is sent anywhere.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div class="legal">Strategic Intelligence - Not Legal Counsel (CA B&amp;P Sections 6125-6126)</div>
+    <div>Prototype on fictional data. In-memory only; nothing is saved.</div>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var boxes = Array.prototype.slice.call(
+    document.querySelectorAll('ul.check-list input[type="checkbox"]')
+  );
+  var gapState = {}; // data-id -> { owner: '', due: '' } (memory only)
+  boxes.forEach(function (b) { gapState[b.dataset.id] = { owner: '', due: '' }; });
+
+  var progressText = document.getElementById('progressText');
+  var barFill = document.getElementById('barFill');
+  var gapsPanel = document.getElementById('gapsPanel');
+  var copyBtn = document.getElementById('copyBtn');
+  var copyStatus = document.getElementById('copyStatus');
+  var plainOut = document.getElementById('plainTextOut');
+
+  function checkedCount() {
+    return boxes.filter(function (b) { return b.checked; }).length;
+  }
+
+  function renderProgress() {
+    var total = boxes.length;
+    var done = checkedCount();
+    progressText.textContent = done + ' of ' + total + ' items checked';
+    barFill.style.width = (total ? (done / total) * 100 : 0) + '%';
+  }
+
+  function makeField(labelText, inputType, inputId, value, placeholder, onInput) {
+    var wrap = document.createElement('span');
+    wrap.className = 'field';
+    var label = document.createElement('label');
+    label.setAttribute('for', inputId);
+    label.textContent = labelText;
+    var input = document.createElement('input');
+    input.type = inputType;
+    input.id = inputId;
+    input.value = value;
+    if (placeholder) { input.placeholder = placeholder; }
+    input.addEventListener('input', onInput);
+    wrap.appendChild(label);
+    wrap.appendChild(input);
+    return wrap;
+  }
+
+  function renderGaps() {
+    var unchecked = boxes.filter(function (b) { return !b.checked; });
+    gapsPanel.innerHTML = '';
+
+    if (unchecked.length === 0) {
+      var ok = document.createElement('div');
+      ok.className = 'gaps-none';
+      ok.textContent = 'No gaps — all ' + boxes.length + ' items are checked.';
+      gapsPanel.appendChild(ok);
+      return;
+    }
+
+    var list = document.createElement('ul');
+    list.className = 'gaps-list';
+    unchecked.forEach(function (b) {
+      var id = b.dataset.id;
+      var li = document.createElement('li');
+
+      var head = document.createElement('div');
+      head.className = 'gap-head';
+      var sec = document.createElement('span');
+      sec.className = 'gap-section';
+      sec.textContent = b.dataset.section;
+      var ttl = document.createElement('strong');
+      ttl.textContent = b.dataset.short;
+      head.appendChild(sec);
+      head.appendChild(ttl);
+      li.appendChild(head);
+
+      var fields = document.createElement('div');
+      fields.className = 'gap-fields';
+      fields.appendChild(makeField('Owner', 'text', 'owner-' + id, gapState[id].owner, 'Name or role', function (e) {
+        gapState[id].owner = e.target.value;
+      }));
+      fields.appendChild(makeField('Due date', 'date', 'due-' + id, gapState[id].due, '', function (e) {
+        gapState[id].due = e.target.value;
+      }));
+      li.appendChild(fields);
+      list.appendChild(li);
+    });
+    gapsPanel.appendChild(list);
+  }
+
+  function sectionsInOrder() {
+    var order = [];
+    boxes.forEach(function (b) {
+      if (order.indexOf(b.dataset.section) === -1) { order.push(b.dataset.section); }
+    });
+    return order;
+  }
+
+  function buildPlainText() {
+    var lines = [];
+    lines.push('SHIFT-CHANGE AND DISPATCH RECORDS CHECKLIST (PROTOTYPE)');
+    lines.push('Prototype on fictional data. Human review required. Not legal advice or compliance certification. Release-review status: not released.');
+    lines.push('');
+    lines.push('Progress: ' + checkedCount() + ' of ' + boxes.length + ' items checked');
+    lines.push('');
+
+    sectionsInOrder().forEach(function (section, i) {
+      lines.push((i + 1) + '. ' + section.toUpperCase());
+      boxes.filter(function (b) { return b.dataset.section === section; })
+        .forEach(function (b) {
+          lines.push('  [' + (b.checked ? 'x' : ' ') + '] ' + b.dataset.short);
+        });
+      lines.push('');
+    });
+
+    var unchecked = boxes.filter(function (b) { return !b.checked; });
+    lines.push('GAPS TO CLOSE (' + unchecked.length + ')');
+    if (unchecked.length === 0) {
+      lines.push('  None — all items are checked.');
+    } else {
+      unchecked.forEach(function (b) {
+        var st = gapState[b.dataset.id];
+        lines.push('  - ' + b.dataset.short +
+          ' | Owner: ' + (st.owner ? st.owner : '(not set)') +
+          ' | Due: ' + (st.due ? st.due : '(not set)'));
+      });
+    }
+    lines.push('');
+    lines.push('Limitations: This checklist does not decide what any law, licensing rule, or contract requires. It does not assess any system, and it is not an inspection or examination of any kind. Confirm requirements with qualified counsel. In-memory only; nothing is saved.');
+    lines.push('Strategic Intelligence - Not Legal Counsel (CA B&P Sections 6125-6126)');
+    return lines.join('\n');
+  }
+
+  function showFallback(text) {
+    plainOut.hidden = false;
+    plainOut.value = text;
+    plainOut.focus();
+    plainOut.select();
+    copyStatus.textContent = 'Clipboard not available here — the text is in the box above; copy it manually.';
+    copyStatus.className = 'copy-status err';
+  }
+
+  copyBtn.addEventListener('click', function () {
+    var text = buildPlainText();
+    copyStatus.textContent = '';
+    copyStatus.className = 'copy-status';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        copyStatus.textContent = 'Copied to clipboard.';
+      }, function () {
+        showFallback(text);
+      });
+    } else {
+      showFallback(text);
+    }
+  });
+
+  boxes.forEach(function (b) {
+    b.addEventListener('change', function () {
+      renderProgress();
+      renderGaps();
+    });
+  });
+
+  renderProgress();
+  renderGaps();
+})();
+</script>
+</body>
+</html>
