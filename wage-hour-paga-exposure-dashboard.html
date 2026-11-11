@@ -433,8 +433,8 @@ function computeBreaks(){
 
   if(restOnCall && restCount > 0){
     verdict.className = 'verdict risk';
-    vt.textContent = 'Rest breaks not compliant under Augustus';
-    vb.innerHTML = 'Keeping a guard reachable by radio, phone, or post coverage during a rest break fails the duty-free standard set in <strong>Augustus v. ABM Security Services</strong> — this is treated as a missed rest break even if the 10 minutes was technically taken off-post.';
+    vt.textContent = 'Rest-break on-call risk (Augustus standard)';
+    vb.innerHTML = 'Keeping a guard reachable by radio, phone, or post coverage during a rest break can fail the duty-free standard set in <strong>Augustus v. ABM Security Services</strong> — the model counts this as a possible missed rest break even if the 10 minutes was technically taken off-post.';
   } else if(shift > 0){
     verdict.className = 'verdict safe';
     vt.textContent = 'Break schedule requirements identified';
