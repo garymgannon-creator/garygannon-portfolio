@@ -204,7 +204,7 @@
 <script>
   const evidenceItems = [
     { text: '"Pattern suggests retaliation risk following a prior complaint" (from the AI summary)', correct: 'inference', options: ['observation', 'allegation', 'inference', 'conclusion'] },
-    { text: '"I don\\'t feel safe working with him" (direct quote, time-stamped message)', correct: 'observation', options: ['observation', 'allegation', 'inference', 'conclusion'] },
+    { text: '"I don\'t feel safe working with him" (direct quote, time-stamped message)', correct: 'observation', options: ['observation', 'allegation', 'inference', 'conclusion'] },
     { text: '"Employee reports ongoing conflict... escalating over several weeks" (AI summary characterization)', correct: 'allegation', options: ['observation', 'allegation', 'inference', 'conclusion'] },
     { text: 'No prior formal complaint exists on file (supervisor email excerpt) — a fact the AI summary omitted entirely', correct: 'unverified-gap', options: ['known fact', 'unknown/unverifiable', 'unverified-gap', 'source-supported'] }
   ];
@@ -245,7 +245,7 @@
   }
 
   const escalationOptionsData = [
-    { id: 'a', text: 'Accept the AI\\'s "immediate priority escalation" recommendation as-is and forward it to leadership.', correct: false },
+    { id: 'a', text: 'Accept the AI\'s "immediate priority escalation" recommendation as-is and forward it to leadership.', correct: false },
     { id: 'b', text: 'Route to a trained human reviewer with the identified gap (no prior complaint on file) and the unsupported inference flagged explicitly, before any priority is assigned.', correct: true },
     { id: 'c', text: 'Take no action since the AI already flagged it as high priority.', correct: false },
     { id: 'd', text: 'Quietly lower the priority without documenting why.', correct: false }
