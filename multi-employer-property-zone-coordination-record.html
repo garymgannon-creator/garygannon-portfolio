@@ -1,0 +1,3178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Employer Property Zone and Coordination Record (Draft Template v0)</title>
+  <style>
+    /* ==========================================================================
+       NEUTRAL PALETTE ONLY (Slate, Gray, Blue Accent). NO RED, GREEN, OR TRAFFIC LIGHTS.
+       System Font Stack Only. Minimum 4.5:1 Contrast.
+       ========================================================================== */
+    :root {
+      --bg-page: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --bg-muted: #e2e8f0;
+      --text-main: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #475569;
+      --border-color: #cbd5e1;
+      --border-strong: #64748b;
+      --accent-primary: #1d4ed8;
+      --accent-hover: #1e40af;
+      --accent-light: #dbeafe;
+      --accent-medium: #93c5fd;
+      --focus-ring: #1d4ed8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    /* Skip Link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent-primary);
+      color: #ffffff;
+      padding: 8px 16px;
+      z-index: 1000;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* Visible Keyboard Focus */
+    :focus-visible {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    /* Top Mandatory Notices */
+    .top-banner {
+      background-color: var(--text-main);
+      color: #ffffff;
+      padding: 8px 16px;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 0.03em;
+      font-size: 13px;
+      border-bottom: 2px solid var(--accent-primary);
+    }
+
+    .data-statement-bar {
+      background-color: var(--bg-subtle);
+      color: var(--text-secondary);
+      padding: 6px 16px;
+      text-align: center;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 500;
+    }
+
+    /* Header & Global Toolbar */
+    .app-header {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+    }
+
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .app-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-main);
+    }
+
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .global-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      background-color: var(--bg-subtle);
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    select, input[type="text"], input[type="date"], textarea {
+      font-family: inherit;
+      font-size: 13px;
+      padding: 6px 10px;
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      background-color: var(--bg-surface);
+      color: var(--text-main);
+    }
+
+    button, .btn {
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border-strong);
+      background-color: var(--bg-surface);
+      color: var(--text-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    button:hover, .btn:hover {
+      background-color: var(--bg-subtle);
+    }
+
+    .btn-primary {
+      background-color: var(--accent-primary);
+      color: #ffffff;
+      border-color: var(--accent-primary);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* Main Layout */
+    .app-layout {
+      display: flex;
+      min-height: calc(100vh - 220px);
+    }
+
+    .sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      background-color: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      padding: 12px 8px;
+    }
+
+    .nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      font-weight: 500;
+      border-radius: 4px;
+      justify-content: flex-start;
+    }
+
+    .nav-btn:hover {
+      background-color: var(--bg-subtle);
+      color: var(--text-main);
+    }
+
+    .nav-btn.active {
+      background-color: var(--accent-light);
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+      font-weight: 700;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 16px 20px;
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+
+    /* Module Header Banner & Statement inside every module view */
+    .module-sticky-notices {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-primary);
+      padding: 8px 12px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .module-sticky-notices strong {
+      display: block;
+      color: var(--text-main);
+    }
+
+    .module-header {
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    .module-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+    }
+
+    .module-subtitle {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    /* Cards & Panels */
+    .card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+      color: var(--text-main);
+    }
+
+    /* Summary KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .kpi-tile {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-top: 3px solid var(--accent-primary);
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 4px 0;
+    }
+
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Tables */
+    .table-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: var(--bg-surface);
+      margin-bottom: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    th {
+      background-color: var(--bg-subtle);
+      color: var(--text-main);
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th:hover {
+      background-color: var(--bg-muted);
+    }
+
+    tr:hover td {
+      background-color: var(--bg-page);
+    }
+
+    tr.clickable-row {
+      cursor: pointer;
+    }
+
+    /* Neutral Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      background-color: var(--bg-subtle);
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
+
+    .badge-accent {
+      background-color: var(--accent-light);
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    /* Schematic Band Grid */
+    .band-section {
+      margin-bottom: 16px;
+    }
+
+    .band-header {
+      font-size: 14px;
+      font-weight: 700;
+      background-color: var(--bg-muted);
+      padding: 6px 12px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      border-left: 4px solid var(--border-strong);
+    }
+
+    .schematic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    .schematic-tile {
+      background-color: var(--bg-surface);
+      border: 2px solid var(--border-strong);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .schematic-tile h4 {
+      margin: 0 0 6px 0;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .schematic-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 2px 0;
+    }
+
+    /* 24-Hour Time Grid - One Hue Two Intensities + Printed Number */
+    .hour-cell {
+      text-align: center;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 6px 4px;
+      border: 1px solid var(--border-color);
+      min-width: 28px;
+    }
+    .hour-0 {
+      background-color: var(--bg-surface);
+      color: var(--text-muted);
+    }
+    .hour-1 {
+      background-color: var(--accent-light);
+      color: var(--text-main);
+    }
+    .hour-2 {
+      background-color: var(--accent-medium);
+      color: var(--text-main);
+      border: 1px solid var(--accent-primary);
+    }
+
+    /* Practice Cards */
+    .practice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 12px;
+    }
+
+    /* Release Review Block */
+    .release-review-box {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    /* Applied Experience Panel & Disclosure */
+    .experience-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .worksheet-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 16px;
+    }
+
+    /* Footer */
+    .app-footer {
+      background-color: var(--bg-surface);
+      border-top: 2px solid var(--border-color);
+      padding: 20px 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .footer-disclaimer {
+      white-space: pre-line;
+      margin-bottom: 12px;
+      line-height: 1.6;
+      color: var(--text-main);
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(15, 23, 42, 0.65);
+      z-index: 900;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-content {
+      background-color: var(--bg-surface);
+      border: 2px solid var(--border-strong);
+      border-radius: 8px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    /* Responsive Breakpoint under 800px */
+    @media (max-width: 800px) {
+      .app-layout {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .nav-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .nav-btn {
+        width: auto;
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+      .experience-container {
+        grid-template-columns: 1fr;
+      }
+      .worksheet-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      .sidebar, .header-controls, .global-bar, .table-toolbar, .no-print {
+        display: none !important;
+      }
+      .app-layout {
+        display: block;
+      }
+      .main-content {
+        padding: 0;
+      }
+      body {
+        background: #ffffff;
+        color: #000000;
+      }
+      .card, .table-container, .kpi-tile {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Exact Top Banner (Section 5.1) -->
+  <div class="top-banner" role="region" aria-label="Prototype Banner">
+    ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY.
+  </div>
+
+  <!-- Exact Data Statement (Section 4) -->
+  <div class="data-statement-bar" role="region" aria-label="In-Browser Data Notice">
+    Prototype uses in-browser demonstration data; changes reset on refresh unless exported.
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-top">
+      <h1 class="app-title">Multi-Employer Property Zone and Coordination Record (Draft Template v0)</h1>
+      <div class="header-controls">
+        <button type="button" id="btn-how-to-use" aria-haspopup="dialog">How to Use This Prototype</button>
+        <button type="button" id="btn-claim-boundaries" aria-haspopup="dialog">Claim Boundaries</button>
+        <button type="button" id="btn-print">Print / Save as PDF</button>
+        <button type="button" id="btn-reset-data">Reset demonstration data</button>
+      </div>
+    </div>
+
+    <div class="global-bar" role="search" aria-label="Global Property Archetype and Search Controls">
+      <div class="control-group">
+        <label for="archetype-select">Property Archetype:</label>
+        <select id="archetype-select" aria-label="Select fictional property archetype">
+          <option value="A">A. Office complex: two towers and a parking structure</option>
+          <option value="B">B. Strip mall with a rear service alley and trash enclosures</option>
+          <option value="C">C. Shopping center with rear service corridor and anchor receiving docks</option>
+          <option value="D">D. Mixed-use pad site with a shared lot</option>
+        </select>
+      </div>
+      <div class="control-group" style="flex: 1; min-width: 220px;">
+        <label for="global-search">Global Table Search:</label>
+        <input type="text" id="global-search" placeholder="Filter records in active view..." style="flex: 1;" aria-label="Global search across current table">
+        <button type="button" id="btn-clear-search">Clear</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- Navigation Sidebar (collapses to top menu under 800px) -->
+    <nav class="sidebar" aria-label="Dashboard Modules">
+      <ul class="nav-list" id="module-nav">
+        <li><button type="button" class="nav-btn active" data-module="m1">1. Property Overview</button></li>
+        <li><button type="button" class="nav-btn" data-module="m2">2. Zone Register</button></li>
+        <li><button type="button" class="nav-btn" data-module="m3">3. Zone Map (Schematic)</button></li>
+        <li><button type="button" class="nav-btn" data-module="m4">4. Shared-Use Matrix</button></li>
+        <li><button type="button" class="nav-btn" data-module="m5">5. Control Facts Worksheet</button></li>
+        <li><button type="button" class="nav-btn" data-module="m6">6. Parties Roster &amp; Routes</button></li>
+        <li><button type="button" class="nav-btn" data-module="m7">7. Time-Window Overlap</button></li>
+        <li><button type="button" class="nav-btn" data-module="m8">8. Log Copy Sharing Record</button></li>
+        <li><button type="button" class="nav-btn" data-module="m9">9. Change Triggers &amp; Actions</button></li>
+        <li><button type="button" class="nav-btn" data-module="m10">10. Daily-Practice Review</button></li>
+        <li><button type="button" class="nav-btn" data-module="m11">11. Readiness Walk Log</button></li>
+        <li><button type="button" class="nav-btn" data-module="m12">12. Source Register &amp; Flags</button></li>
+      </ul>
+    </nav>
+
+    <!-- Main Dynamic View Area -->
+    <main id="main-content" class="main-content" tabindex="-1">
+      <!-- Populated dynamically via Vanilla JS -->
+    </main>
+  </div>
+
+  <!-- Mandatory Footer Area -->
+  <footer class="app-footer">
+    <div class="release-review-box">
+      Release-review status: Not reviewed for release. Reviewer: ________  Date: ________  Pending: attorney review of limitation wording; facilities and security specialist review of any engineering-related prompts; source check of every Source Register entry; operator input on zone types, time windows and practice patterns.
+    </div>
+
+    <div class="experience-container">
+      <div class="card" style="margin-bottom: 12px;">
+        <h2 class="card-title">Applied Experience</h2>
+        <p style="margin: 0 0 8px 0;">Historical executive-level experience in a prominent North Fresno regional retail, office, and multi-employer property portfolio, including recurring workforce training, stakeholder coordination, annual lessons-learned discussion, and seasonal operating-readiness communication.</p>
+      </div>
+      <div class="card" style="margin-bottom: 12px;">
+        <h2 class="card-title">Applied Experience Disclosure</h2>
+        <p style="margin: 0;">This capability summary reflects Gary M. Gannon's self-reported historical operating experience in anonymized multi-employer property environments. It is not a current-client case study, client endorsement, legal compliance determination, incident-investigation claim, threat-assessment claim, safety-engineering opinion, security-system certification, employment-assessment claim, psychometric assessment, or guarantee of outcomes.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 12px;">
+      <p style="margin: 0; font-weight: 600;">Gary M. Gannon, Founder, Gannon Compliance Group. Holds the ASIS CPP® (valid through Apr 30, 2027) and PSP® (valid through Dec 31, 2027) board certifications, the SHRM-SCP, the SHRM California Law HR Specialty Credential and the SHRM People Analytics Specialty Credential.</p>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <button type="button" id="footer-claim-link">Open Claim Boundaries Panel</button>
+      <button type="button" id="footer-howto-link">Open How to Use This Prototype Panel</button>
+    </div>
+
+    <div class="footer-disclaimer">Gannon Compliance Group provides non-legal operational-readiness, documentation, workflow-design, training-support, implementation-support, evidence-management, accountability, human-review, and specialist-referral services. This prototype is not legal advice, a legal opinion, a legal-compliance certification, a Cal/OSHA audit, a psychometric assessment, an employment-decision tool, an incident-investigation tool, behavioral threat assessment, emergency-response system, safety-engineering opinion, technical security assessment, privacy impact assessment, technical AI audit, cybersecurity assessment, or guarantee of outcomes. Users and employers remain responsible for their decisions and should obtain qualified attorney, HR, privacy, technical, or other specialist review when appropriate.
+Strategic Intelligence - Not Legal Counsel (CA B&P Sections 6125-6126)</div>
+  </footer>
+
+  <!-- Modal: How to Use This Prototype -->
+  <div class="modal-backdrop" id="modal-howto" role="dialog" aria-modal="true" aria-labelledby="modal-howto-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-howto-title" style="margin:0; font-size:18px;">How to Use This Prototype</h2>
+        <button type="button" class="close-modal" data-target="modal-howto">Close</button>
+      </div>
+      <p><strong>Purpose:</strong> To demonstrate, on fictional data, how an employer or property operator could record the shared zones of a multi-employer property, who uses and maintains each zone and when, which facts are still unknown, and what follow-up questions and specialist referrals those gaps raise, for human review.</p>
+      <ul>
+        <li><strong>Select a Fictional Property Archetype (A, B, C, or D):</strong> Use the selector at the top to switch between four illustrative property configurations.</li>
+        <li><strong>Review Computed Metrics (Module 1):</strong> Summary counts are calculated automatically from the active dataset. Review the Draft Template Notes showing items marked <em>Template placeholder: pending operator input</em>.</li>
+        <li><strong>Explore Zones &amp; Shared Use (Modules 2, 3, 4, 7):</strong> Filter zones, click any row in the Zone Register to inspect details, view the abstract zone schematic grouped by band, or inspect 24-hour vendor/employer overlap windows (including windows crossing midnight).</li>
+        <li><strong>Test Control Facts &amp; Rule-Based Routing (Module 5):</strong> Change any zone's five control facts (F1 through F5) or evidence labels to see rule-based follow-up questions and specialist flags update dynamically.</li>
+        <li><strong>Manage Actions &amp; Walk Logs (Modules 9, 10, 11):</strong> Add or update follow-up actions and readiness walk observations in memory. Export any table's current filtered view to CSV or use Print / Save as PDF.</li>
+      </ul>
+      <p><strong>In-Browser Data Notice:</strong> Prototype uses in-browser demonstration data; changes reset on refresh unless exported.</p>
+    </div>
+  </div>
+
+  <!-- Modal: Claim Boundaries -->
+  <div class="modal-backdrop" id="modal-claims" role="dialog" aria-modal="true" aria-labelledby="modal-claims-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-claims-title" style="margin:0; font-size:18px;">Claim Boundaries</h2>
+        <button type="button" class="close-modal" data-target="modal-claims">Close</button>
+      </div>
+      <p><strong>Non-Negotiable Prototype Boundaries:</strong></p>
+      <ul>
+        <li>This prototype records facts for discussion and human review.</li>
+        <li>It does not provide legal advice or legal interpretation.</li>
+        <li>It does not determine compliance or noncompliance.</li>
+        <li>It does not determine who is a controlling employer or who is responsible for any area or hazard.</li>
+        <li>It does not assess the adequacy of lighting, locks, cameras, alarms, access control, guard staffing or any physical-security or safety system.</li>
+        <li>It does not perform incident investigation, threat assessment or emergency response.</li>
+        <li>It does not score or evaluate any person, and holds no individual-person data (parties are organizations or roles only).</li>
+        <li>It holds no incident narratives and no real layouts.</li>
+        <li>It guarantees no outcome.</li>
+      </ul>
+      <p><strong>Responsibility &amp; Specialist Review:</strong> Employers and property operators remain responsible for their own decisions and should obtain qualified attorney, facilities, security, insurance, privacy or other specialist review when appropriate.</p>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       TEMPLATE DATA: replace after operator interview.
+       All content is driven from ONE data object named DATA declared at the top.
+       ========================================================================== */
+    const INITIAL_DATA = {
+      activeArchetype: "A",
+      exactTexts: {
+        banner: "ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY.",
+        dataStatement: "Prototype uses in-browser demonstration data; changes reset on refresh unless exported.",
+        releaseReview: "Release-review status: Not reviewed for release. Reviewer: ________  Date: ________  Pending: attorney review of limitation wording; facilities and security specialist review of any engineering-related prompts; source check of every Source Register entry; operator input on zone types, time windows and practice patterns.",
+        internalVerification: "External claims, market information, regulatory status, and source currency must be verified from current authoritative sources before external use. Illustrative data in this prototype is not client-facing evidence."
+      },
+      permittedLabels: {
+        status: [
+          "Needs Review",
+          "Open",
+          "In Progress",
+          "Ready for Management Review",
+          "Paused",
+          "Specialist Review Flag",
+          "Evidence Complete",
+          "Evidence Partial",
+          "Unknown — Fact Intake Needed",
+          "Not Applicable — Documented",
+          "Proposed/Draft — Monitor"
+        ],
+        evidence: [
+          "Directly Documented",
+          "Documented but Needs Context",
+          "Self-Reported — Needs Review",
+          "Inferred — Validate Before Use",
+          "Not Yet Supported"
+        ],
+        controlFactEvidence: [
+          "Self-Reported — Needs Review",
+          "Documented but Needs Context",
+          "Unknown — Fact Intake Needed"
+        ],
+        sourceVerification: [
+          "Verified Primary / Official",
+          "Verified Authoritative Research",
+          "Market Signal — Secondary",
+          "Needs Source Check",
+          "Unverified — Do Not Use",
+          "Retired — Do Not Use"
+        ]
+      },
+      taxonomy: {
+        "Front / public": [
+          "customer parking lot",
+          "employee parking area",
+          "parking structure",
+          "drop-off area",
+          "sidewalks and covered walkways",
+          "building entries and breezeways",
+          "courtyard or plaza",
+          "outdoor dining",
+          "kiosk or cart area"
+        ],
+        "Perimeter": [
+          "property edges and fencing",
+          "shared driveways and entrances",
+          "bus stop area",
+          "adjacent-property interface"
+        ],
+        "Back-of-house": [
+          "rear service corridor behind tenant spaces",
+          "rear tenant doors",
+          "back alley",
+          "trash enclosures and dumpster pads",
+          "loading docks and receiving",
+          "utility and mechanical rooms",
+          "roof access",
+          "cart corrals"
+        ],
+        "Interior common": [
+          "lobby",
+          "common corridors",
+          "shared restrooms",
+          "stairwells",
+          "elevators",
+          "shared break area",
+          "mail or package room"
+        ],
+        "Special": [
+          "construction zone",
+          "seasonal event area",
+          "after-hours access path"
+        ]
+      },
+      draftTemplatePlaceholders: [
+        { category: "Zone Types & Band Assignments", item: "Local site zone inventory and custom nomenclature", note: "Template placeholder: pending operator input." },
+        { category: "Control Facts (F1–F5)", item: "Actual lease, easement, and vendor scope section numbers", note: "Template placeholder: pending operator input." },
+        { category: "Time Windows & Shift Patterns", item: "Seasonally adjusted tenant shift schedules and vendor delivery windows", note: "Template placeholder: pending operator input." },
+        { category: "Vendor Types & Roles", item: "Contracted trade categories and dispatch contact desks", note: "Template placeholder: pending operator input." },
+        { category: "Daily Practice Patterns", item: "Operator interview responses on site hand-off and record routing", note: "Template placeholder: pending operator input." }
+      ],
+      routingRulesCatalog: [
+        { ruleId: "R-01", trigger: "Any F1 to F5 is Unknown", prompt: "Unknown — Fact Intake Needed: [fact name]." },
+        { ruleId: "R-02", trigger: "Two or more employers use the zone", prompt: "Each employer's hazard review should include this zone. Confirm a coordination record exists." },
+        { ruleId: "R-03", trigger: "The F1 party is not among the zone's users", prompt: "Maintenance sits outside the users. Confirm how condition reports reach the maintaining party." },
+        { ruleId: "R-04", trigger: "The F2 or F3 party is a contractor", prompt: "Authority is held by a contractor. Send the agreement reference to employer counsel. Specialist Review Flag." },
+        { ruleId: "R-05", trigger: "F5 is empty and two or more employers use the zone", prompt: "No written reference recorded. Specialist Review Flag: counsel." },
+        { ruleId: "R-06", trigger: "A log-copy period has no recorded recipient", prompt: "Client and counsel designate the recipient. GCG does not designate." },
+        { ruleId: "R-07", trigger: "A vendor window overlaps an employee window in a back-of-house zone", prompt: "Shared-use overlap. Confirm both parties' training and reporting routes cover this zone and these hours." },
+        { ruleId: "R-08", trigger: "Public access is open and no F1 party is recorded", prompt: "Uncontrolled-access question. Facilities review. See the Proposed/Draft — Monitor item in the Source Register." },
+        { ruleId: "R-09", trigger: "A zone note mentions lighting, sight-line or blind-spot", prompt: "Facilities and security review flag. GCG makes no engineering finding." },
+        { ruleId: "R-10", trigger: "A specialized tenant type is in the roster (clinic, health facility, school, childcare)", prompt: "A separate standard may apply to this tenant type. Specialist Review Flag." }
+      ],
+      columnMaps: {
+        zones: [
+          { key: "id", header: "Zone ID", type: "text" },
+          { key: "name", header: "Zone Name", type: "text" },
+          { key: "band", header: "Band", type: "text" },
+          { key: "type", header: "Zone Type", type: "text" },
+          { key: "publicAccess", header: "Public Access", type: "badge" },
+          { key: "employerCount", header: "Employers Using", type: "number" },
+          { key: "unknownFactCount", header: "Unknown Control Facts", type: "number" },
+          { key: "walkNotesCount", header: "Walk Entries", type: "number" },
+          { key: "notes", header: "Observation Notes", type: "text" }
+        ],
+        parties: [
+          { key: "role", header: "Party Role", type: "text" },
+          { key: "category", header: "Employer or Contractor", type: "badge" },
+          { key: "partyType", header: "Operational Type", type: "text" },
+          { key: "contactRoute", header: "Contact Route (Role Only)", type: "text" },
+          { key: "protocolDeliveredDate", header: "Date Protocol Delivered", type: "text" },
+          { key: "trainingMethod", header: "Plan Training Method & Reference", type: "text" },
+          { key: "reportingRoute", header: "Incident Reporting, Investigation & Record Route", type: "text" },
+          { key: "status", header: "Status", type: "badge" }
+        ],
+        logSharing: [
+          { key: "period", header: "Reporting Period", type: "text" },
+          { key: "sendingRole", header: "Sending Party Role", type: "text" },
+          { key: "recipientRole", header: "Recipient Role (as designated by client and counsel)", type: "text" },
+          { key: "dateShared", header: "Date Shared", type: "text" },
+          { key: "method", header: "Delivery Method", type: "text" },
+          { key: "privacyCheck", header: "Privacy Check", type: "text" }
+        ],
+        changeTriggers: [
+          { key: "id", header: "Action ID", type: "text" },
+          { key: "triggerType", header: "Change Trigger Type", type: "text" },
+          { key: "actionText", header: "Review Action Description", type: "text" },
+          { key: "ownerRole", header: "Owner Role", type: "text" },
+          { key: "dueDate", header: "Due Date", type: "text" },
+          { key: "status", header: "Status", type: "badge" }
+        ],
+        walkLog: [
+          { key: "id", header: "Walk ID", type: "text" },
+          { key: "date", header: "Date", type: "text" },
+          { key: "timeOfDay", header: "Time of Day", type: "text" },
+          { key: "zonesWalked", header: "Zones Walked", type: "text" },
+          { key: "observations", header: "Observations (Neutral)", type: "text" },
+          { key: "photosReferenced", header: "Photos Referenced (Text Only)", type: "text" },
+          { key: "actionsOpened", header: "Actions Opened", type: "text" },
+          { key: "specialistFlags", header: "Specialist Flags", type: "badge" }
+        ],
+        sourceRegister: [
+          { key: "sourceTitle", header: "Source Title", type: "text" },
+          { key: "sourceType", header: "Source Type", type: "text" },
+          { key: "issuingOrganization", header: "Issuing Organization", type: "text" },
+          { key: "publicationDate", header: "Publication Date", type: "text" },
+          { key: "urlOrReference", header: "URL or Reference", type: "text" },
+          { key: "claimSupported", header: "Claim Supported", type: "text" },
+          { key: "relevanceNote", header: "Relevance Note", type: "text" },
+          { key: "verificationStatus", header: "Verification Status", type: "badge" },
+          { key: "reviewer", header: "Reviewer", type: "text" },
+          { key: "reviewDate", header: "Review Date", type: "text" },
+          { key: "useLimitation", header: "Use Limitation", type: "text" },
+          { key: "notes", header: "Notes", type: "text" }
+        ],
+        specialistFlags: [
+          { key: "flagType", header: "Flag Type", type: "badge" },
+          { key: "zone", header: "Zone / Scope", type: "text" },
+          { key: "reason", header: "Reason / Prompt", type: "text" },
+          { key: "status", header: "Status", type: "badge" }
+        ],
+        rulesTable: [
+          { key: "ruleId", header: "Rule ID", type: "badge" },
+          { key: "trigger", header: "Rule Trigger Condition", type: "text" },
+          { key: "prompt", header: "Generated Question or Referral Prompt", type: "text" }
+        ]
+      },
+      sourceRegister: [
+        {
+          sourceTitle: "State workplace violence prevention statute — reference to be entered by reviewer — Needs Source Check",
+          sourceType: "Statute Placeholder",
+          issuingOrganization: "Template placeholder: pending operator input",
+          publicationDate: "Template placeholder: pending operator input",
+          urlOrReference: "Reference to be entered by reviewer",
+          claimSupported: "General workplace violence prevention plan recordkeeping framework",
+          relevanceNote: "Multi-employer coordination background",
+          verificationStatus: "Needs Source Check",
+          reviewer: "Pending Reviewer",
+          reviewDate: "Pending",
+          useLimitation: "Verify — Do Not Use Client-Facing",
+          notes: "No statute numbers or section cites included in draft template."
+        },
+        {
+          sourceTitle: "State agency FAQ on workplace violence prevention plans — Needs Source Check",
+          sourceType: "Agency Guidance Placeholder",
+          issuingOrganization: "Template placeholder: pending operator input",
+          publicationDate: "Template placeholder: pending operator input",
+          urlOrReference: "Reference to be entered by reviewer",
+          claimSupported: "Shared worksite coordination and training routes discussion",
+          relevanceNote: "Informational discussion prompt only",
+          verificationStatus: "Needs Source Check",
+          reviewer: "Pending Reviewer",
+          reviewDate: "Pending",
+          useLimitation: "Verify — Do Not Use Client-Facing",
+          notes: "Requires human and legal counsel verification."
+        },
+        {
+          sourceTitle: "Draft state standard on workplace violence prevention — Proposed/Draft — Monitor",
+          sourceType: "Draft Standard Placeholder",
+          issuingOrganization: "Template placeholder: pending operator input",
+          publicationDate: "Template placeholder: pending operator input",
+          urlOrReference: "Reference to be entered by reviewer",
+          claimSupported: "Monitor future administrative rulemaking updates",
+          relevanceNote: "Linked to R-08 uncontrolled-access question",
+          verificationStatus: "Needs Source Check",
+          reviewer: "Pending Reviewer",
+          reviewDate: "Pending",
+          useLimitation: "Proposed/Draft — Monitor",
+          notes: "Draft status only; not an active requirement determination."
+        },
+        {
+          sourceTitle: "Multi-employer worksite guidance from a state agency — Needs Source Check",
+          sourceType: "Administrative Policy Placeholder",
+          issuingOrganization: "Template placeholder: pending operator input",
+          publicationDate: "Template placeholder: pending operator input",
+          urlOrReference: "Reference to be entered by reviewer",
+          claimSupported: "Fact intake worksheet design for role documentation",
+          relevanceNote: "GCG does not determine multi-employer role status",
+          verificationStatus: "Needs Source Check",
+          reviewer: "Pending Reviewer",
+          reviewDate: "Pending",
+          useLimitation: "Verify — Do Not Use Client-Facing",
+          notes: "Subject to attorney review."
+        },
+        {
+          sourceTitle: "Lease and service-agreement section references cited by client — Unknown — Fact Intake Needed",
+          sourceType: "Client Contract Reference Placeholder",
+          issuingOrganization: "Client / Property Operator (Fictional)",
+          publicationDate: "Template placeholder: pending operator input",
+          urlOrReference: "Document cited by client; not reviewed by GCG",
+          claimSupported: "F5 Written reference column in Control Facts Worksheet",
+          relevanceNote: "Records section reference string only; no interpretation",
+          verificationStatus: "Unverified — Do Not Use",
+          reviewer: "Client Counsel",
+          reviewDate: "Pending",
+          useLimitation: "Unknown — Fact Intake Needed",
+          notes: "GCG never summarizes or interprets legal documents."
+        }
+      ],
+      dailyPracticePatterns: [
+        { id: "DP-A", code: "(a)", pattern: "A condition is reported verbally but not written down", question: "How do shift leads record verbal condition reports before shift end?", recordRef: "Shift Desk Log Placeholder (Template placeholder: pending operator input)", readinessStep: "Add standard intake log sheet at property operations desk", ownerRole: "Property Operations Employer", dueDate: "2026-06-15", status: "Needs Review" },
+        { id: "DP-B", code: "(b)", pattern: "A condition is written down but no follow-up is recorded", question: "Which role tracks open condition log lines to closure date?", recordRef: "Maintenance Ticket Log Placeholder", readinessStep: "Add closure date and reviewer role column to log template", ownerRole: "Property Operations Employer", dueDate: "2026-06-18", status: "Open" },
+        { id: "DP-C", code: "(c)", pattern: "A report is referred to another party as 'not our area' and the hand-off is not recorded", question: "When a tenant refers a shared-zone item to property operations, where is the hand-off timestamped?", recordRef: "Cross-Party Hand-Off Form Placeholder", readinessStep: "Establish shared email receipt or log number exchange between desks", ownerRole: "Tenant Employer 1", dueDate: "2026-06-20", status: "In Progress" },
+        { id: "DP-D", code: "(d)", pattern: "Someone without recorded authority approves a change informally", question: "How are temporary physical or schedule adjustments logged against F2/F3 roles?", recordRef: "Change Authorization Register Placeholder", readinessStep: "Review F2/F3 role list with facilities and tenant operations desks", ownerRole: "Property Operations Employer", dueDate: "2026-06-22", status: "Specialist Review Flag" },
+        { id: "DP-E", code: "(e)", pattern: "Access keys or codes are shared by workaround", question: "How do overnight delivery or trash vendors enter gated back-of-house zones?", recordRef: "Vendor Access Protocol Reference (Template placeholder: pending operator input)", readinessStep: "Confirm vendor schedule alignment with F2 access-setting role", ownerRole: "Building Maintenance Contractor", dueDate: "2026-06-25", status: "Needs Review" },
+        { id: "DP-F", code: "(f)", pattern: "The same condition recurs in the same zone", question: "How are repeat observations in the same zone flagged for joint employer review?", recordRef: "Zone Register Notes Summary", readinessStep: "Add recurring-zone filter check to monthly coordination agenda", ownerRole: "Property Operations Employer", dueDate: "2026-06-28", status: "Open" },
+        { id: "DP-G", code: "(g)", pattern: "The written plan describes one practice and daily practice differs", question: "Where do actual shift routines diverge from the written coordination protocol?", recordRef: "Annual Plan Alignment Worksheet Placeholder", readinessStep: "Compare written routes against operator interview notes", ownerRole: "Tenant Employer 2", dueDate: "2026-07-01", status: "Unknown — Fact Intake Needed" },
+        { id: "DP-H", code: "(h)", pattern: "New vendors start without being told the shared-zone routes", question: "What onboarding packet is handed to a new contracted service provider before first shift?", recordRef: "Vendor Dispatch Orientation Checklist Placeholder", readinessStep: "Attach Zone Map and reporting route summary to vendor work orders", ownerRole: "Property Operations Employer", dueDate: "2026-07-05", status: "Ready for Management Review" },
+        { id: "DP-I", code: "(i)", pattern: "A written message about a condition exists and its retention and routing are unclear", question: "Where are text messages or portal notes stored and which roles receive copies?", recordRef: "Communications Retention Schedule Placeholder", readinessStep: "Refer retention and privacy questions to employer counsel", ownerRole: "Property Operations Employer", dueDate: "2026-07-08", status: "Specialist Review Flag" },
+        { id: "DP-J", code: "(j)", pattern: "A tenant change is not shared with neighbors who use the same zone", question: "What trigger notifies adjacent employers when a co-tenant changes hours or delivery windows?", recordRef: "Change Trigger Log (Module 9)", readinessStep: "Link tenant hours-change notice to Shared-Use Matrix review", ownerRole: "Property Operations Employer", dueDate: "2026-07-12", status: "In Progress" },
+        { id: "DP-K", code: "(k)", pattern: "An incident-report route ends at a contracted provider and is not confirmed to continue to each employer's plan owner", question: "When a contractor logs an event in a shared zone, how does notice reach each using employer's plan owner?", recordRef: "Parties Roster Reporting Route Column (Module 6)", readinessStep: "Confirm two-way notification step in contractor dispatch procedures", ownerRole: "Janitorial Contractor", dueDate: "2026-07-15", status: "Needs Review" }
+      ],
+      archetypes: {
+        /* ====================================================================
+           ARCHETYPE A: Office complex: two towers and a parking structure
+           Deliberately seeded so EVERY routing rule R-01 through R-10 fires.
+           ==================================================================== */
+        "A": {
+          id: "A",
+          name: "Archetype A: Office complex (two towers and a parking structure)",
+          description: "Fictional two-tower commercial office property with a multi-level parking structure, plaza, interior lobbies, and shared rear loading dock.",
+          parties: [
+            { role: "Property Operations Employer", category: "Employer", partyType: "Property Management Operations", contactRoute: "Property operations desk", protocolDeliveredDate: "2026-01-15", trainingMethod: "Annual onboarding module; Ref: PO-TRN-01", reportingRoute: "Operations desk intake form -> routed to affected employer plan owners", status: "Evidence Complete" },
+            { role: "Tenant Employer 1", category: "Employer", partyType: "Commercial Office Suite (Tower 1)", contactRoute: "Tenant 1 administrative coordinator desk", protocolDeliveredDate: "2026-01-20", trainingMethod: "Quarterly staff briefing; Ref: TE1-TRN-04", reportingRoute: "Internal HR portal -> shared-zone notice sent to Property operations desk", status: "Evidence Partial" },
+            { role: "Tenant Employer 2", category: "Employer", partyType: "Financial Services Office (Tower 2)", contactRoute: "Tenant 2 facilities coordinator role", protocolDeliveredDate: "2026-02-01", trainingMethod: "New-hire orientation packet; Ref: TE2-TRN-02", reportingRoute: "Branch operations supervisor -> written notice to Property operations desk", status: "Ready for Management Review" },
+            { role: "Tenant Employer 3 (outpatient clinic)", category: "Employer", partyType: "Outpatient Clinic (Tower 1 Ground Floor)", contactRoute: "Clinic administrative director role", protocolDeliveredDate: "2026-02-10", trainingMethod: "Clinic workplace readiness seminar; Ref: TE3-CLN-09", reportingRoute: "Clinic compliance desk -> dual routing to clinic leadership and Property operations desk", status: "Specialist Review Flag" },
+            { role: "Janitorial Contractor", category: "Contractor", partyType: "Contracted Janitorial Service", contactRoute: "Janitorial shift supervisor dispatch desk", protocolDeliveredDate: "2026-01-18", trainingMethod: "Pre-assignment trade orientation; Ref: JAN-SOP-11", reportingRoute: "Night supervisor log -> emailed to Property operations desk by 07:00", status: "Needs Review" },
+            { role: "Trash Service Contractor", category: "Contractor", partyType: "Waste Hauling & Compactor Service", contactRoute: "Commercial route dispatcher role", protocolDeliveredDate: "Unknown — Fact Intake Needed", trainingMethod: "Template placeholder: pending operator input", reportingRoute: "Driver route manifest note -> sent to Property operations desk", status: "Unknown — Fact Intake Needed" },
+            { role: "Building Maintenance Contractor", category: "Contractor", partyType: "HVAC, Lighting & Gate Trade Service", contactRoute: "Facilities trade dispatch desk", protocolDeliveredDate: "2026-01-25", trainingMethod: "Trade contractor protocol acknowledgment; Ref: BMC-ACK-03", reportingRoute: "Work order completion log -> filed with Property operations desk", status: "In Progress" }
+          ],
+          zones: [
+            {
+              id: "A-Z01",
+              name: "Multi-Level Parking Structure",
+              band: "Front / public",
+              type: "parking structure",
+              publicAccess: "open",
+              notes: "Used by Tower 1 and Tower 2 employees and visitors. Walk observation noted a sight-line obstruction near stairwell corner and dim lighting on Level 3 ramp.",
+              facts: {
+                F1: { value: "Building Maintenance Contractor", evidence: "Documented but Needs Context" },
+                F2: { value: "Building Maintenance Contractor", evidence: "Self-Reported — Needs Review" },
+                F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" },
+                F5: { value: "Master Lease Sec. 4.2 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" }
+              }
+            },
+            {
+              id: "A-Z02",
+              name: "Central Courtyard and Plaza",
+              band: "Front / public",
+              type: "courtyard or plaza",
+              publicAccess: "open",
+              notes: "Open pedestrian plaza between Tower 1 and Tower 2. Template placeholder: pending operator input on seasonal kiosk hours.",
+              facts: {
+                F1: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" },
+                F2: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" },
+                F3: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" },
+                F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" },
+                F5: { value: "", evidence: "Unknown — Fact Intake Needed" }
+              }
+            },
+            {
+              id: "A-Z03",
+              name: "Tower 1 Main Entry & Breezeway",
+              band: "Front / public",
+              type: "building entries and breezeways",
+              publicAccess: "open",
+              notes: "Shared entry serving Tenant Employer 1 and Tenant Employer 3 (outpatient clinic).",
+              facts: {
+                F1: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F5: { value: "Tower 1 Lease Exhibit B (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" }
+              }
+            },
+            {
+              id: "A-Z04",
+              name: "North Shared Driveway & Bus Stop Interface",
+              band: "Perimeter",
+              type: "bus stop area",
+              publicAccess: "open",
+              notes: "Public transit stop adjacent to north driveway entrance.",
+              facts: {
+                F1: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" },
+                F2: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" },
+                F3: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" },
+                F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" },
+                F5: { value: "", evidence: "Unknown — Fact Intake Needed" }
+              }
+            },
+            {
+              id: "A-Z05",
+              name: "West Perimeter Fencing & Gate",
+              band: "Perimeter",
+              type: "property edges and fencing",
+              publicAccess: "restricted",
+              notes: "Perimeter gate leading toward rear service area; sight-line note recorded near hedge.",
+              facts: {
+                F1: { value: "Building Maintenance Contractor", evidence: "Self-Reported — Needs Review" },
+                F2: { value: "Building Maintenance Contractor", evidence: "Self-Reported — Needs Review" },
+                F3: { value: "Building Maintenance Contractor", evidence: "Self-Reported — Needs Review" },
+                F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" },
+                F5: { value: "Service Contract App. 2 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" }
+              }
+            },
+            {
+              id: "A-Z06",
+              name: "Rear Loading Docks and Receiving",
+              band: "Back-of-house",
+              type: "loading docks and receiving",
+              publicAccess: "restricted",
+              notes: "Shared receiving platform for both towers; early-morning and late-night vendor deliveries overlap employee arrival/departure.",
+              facts: {
+                F1: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" },
+                F5: { value: "", evidence: "Unknown — Fact Intake Needed" }
+              }
+            },
+            {
+              id: "A-Z07",
+              name: "Trash Enclosures and Dumpster Pads",
+              band: "Back-of-house",
+              type: "trash enclosures and dumpster pads",
+              publicAccess: "restricted",
+              notes: "Overnight trash service and janitorial disposal area; lighting fixture outage reported on north wall.",
+              facts: {
+                F1: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" },
+                F2: { value: "Janitorial Contractor", evidence: "Self-Reported — Needs Review" },
+                F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F5: { value: "House Rules Sec. 9 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" }
+              }
+            },
+            {
+              id: "A-Z08",
+              name: "Tower 1 Ground Floor Lobby & Restrooms",
+              band: "Interior common",
+              type: "shared restrooms",
+              publicAccess: "open",
+              notes: "Common lobby and restroom corridor shared by office and outpatient clinic staff and visitors.",
+              facts: {
+                F1: { value: "Janitorial Contractor", evidence: "Documented but Needs Context" },
+                F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F5: { value: "Tower 1 Lease Sec. 6.1 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" }
+              }
+            },
+            {
+              id: "A-Z09",
+              name: "Tower 2 Elevators and Stairwells",
+              band: "Interior common",
+              type: "elevators",
+              publicAccess: "restricted",
+              notes: "Vertical circulation serving Tenant Employer 2 and Property Operations Employer.",
+              facts: {
+                F1: { value: "Building Maintenance Contractor", evidence: "Documented but Needs Context" },
+                F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" },
+                F5: { value: "Tower 2 Lease Sec. 5.4 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" }
+              }
+            },
+            {
+              id: "A-Z10",
+              name: "After-Hours Access Path (Tower 1 to Structure)",
+              band: "Special",
+              type: "after-hours access path",
+              publicAccess: "restricted",
+              notes: "Designated evening walkway between Tower 1 rear exit and Parking Structure Level 1; blind-spot noted near pillar.",
+              facts: {
+                F1: { value: "Building Maintenance Contractor", evidence: "Self-Reported — Needs Review" },
+                F2: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" },
+                F3: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" },
+                F4: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" },
+                F5: { value: "", evidence: "Unknown — Fact Intake Needed" }
+              }
+            }
+          ],
+          zoneUse: [
+            { zoneId: "A-Z01", partyRole: "Tenant Employer 1", startHour: 7, endHour: 20, frequency: "Mon-Fri daily commute" },
+            { zoneId: "A-Z01", partyRole: "Tenant Employer 2", startHour: 6, endHour: 22, frequency: "Mon-Sat shift parking" },
+            { zoneId: "A-Z01", partyRole: "Tenant Employer 3 (outpatient clinic)", startHour: 7, endHour: 19, frequency: "Mon-Fri staff & patient parking" },
+            { zoneId: "A-Z01", partyRole: "Janitorial Contractor", startHour: 21, endHour: 3, frequency: "Nightly sweeping & trash pickup (crosses midnight)" },
+            { zoneId: "A-Z02", partyRole: "Tenant Employer 1", startHour: 8, endHour: 18, frequency: "Daily break & pedestrian access" },
+            { zoneId: "A-Z02", partyRole: "Tenant Employer 2", startHour: 8, endHour: 18, frequency: "Daily pedestrian access" },
+            { zoneId: "A-Z02", partyRole: "Property Operations Employer", startHour: 8, endHour: 17, frequency: "Daily exterior walks" },
+            { zoneId: "A-Z03", partyRole: "Tenant Employer 1", startHour: 7, endHour: 19, frequency: "Daily entry/exit" },
+            { zoneId: "A-Z03", partyRole: "Tenant Employer 3 (outpatient clinic)", startHour: 7, endHour: 19, frequency: "Daily clinic entry/exit" },
+            { zoneId: "A-Z03", partyRole: "Janitorial Contractor", startHour: 20, endHour: 2, frequency: "Nightly glass & floor care" },
+            { zoneId: "A-Z04", partyRole: "Tenant Employer 1", startHour: 7, endHour: 19, frequency: "Transit commuter access" },
+            { zoneId: "A-Z04", partyRole: "Tenant Employer 3 (outpatient clinic)", startHour: 7, endHour: 19, frequency: "Transit commuter access" },
+            { zoneId: "A-Z05", partyRole: "Property Operations Employer", startHour: 7, endHour: 17, frequency: "Weekly perimeter check" },
+            { zoneId: "A-Z06", partyRole: "Tenant Employer 1", startHour: 7, endHour: 18, frequency: "Daily mail & supply receiving" },
+            { zoneId: "A-Z06", partyRole: "Tenant Employer 2", startHour: 18, endHour: 2, frequency: "Evening courier & archival transfer (crosses midnight)" },
+            { zoneId: "A-Z06", partyRole: "Janitorial Contractor", startHour: 22, endHour: 4, frequency: "Nightly equipment staging (crosses midnight)" },
+            { zoneId: "A-Z06", partyRole: "Building Maintenance Contractor", startHour: 6, endHour: 15, frequency: "Parts delivery & trade staging" },
+            { zoneId: "A-Z07", partyRole: "Tenant Employer 1", startHour: 17, endHour: 21, frequency: "Evening office disposal" },
+            { zoneId: "A-Z07", partyRole: "Tenant Employer 3 (outpatient clinic)", startHour: 18, endHour: 20, frequency: "Non-regulated boxed packaging disposal" },
+            { zoneId: "A-Z07", partyRole: "Janitorial Contractor", startHour: 22, endHour: 5, frequency: "Nightly cart dumping (crosses midnight)" },
+            { zoneId: "A-Z07", partyRole: "Trash Service Contractor", startHour: 23, endHour: 5, frequency: "3x weekly bin haul (crosses midnight)" },
+            { zoneId: "A-Z08", partyRole: "Tenant Employer 1", startHour: 7, endHour: 19, frequency: "Daily use" },
+            { zoneId: "A-Z08", partyRole: "Tenant Employer 3 (outpatient clinic)", startHour: 7, endHour: 19, frequency: "Daily use" },
+            { zoneId: "A-Z08", partyRole: "Janitorial Contractor", startHour: 19, endHour: 1, frequency: "Nightly restroom service" },
+            { zoneId: "A-Z09", partyRole: "Tenant Employer 2", startHour: 6, endHour: 22, frequency: "Daily staff access" },
+            { zoneId: "A-Z09", partyRole: "Property Operations Employer", startHour: 8, endHour: 17, frequency: "Daily administrative access" },
+            { zoneId: "A-Z10", partyRole: "Tenant Employer 1", startHour: 18, endHour: 22, frequency: "After-hours staff departure" },
+            { zoneId: "A-Z10", partyRole: "Tenant Employer 2", startHour: 19, endHour: 1, frequency: "Late shift departure (crosses midnight)" }
+          ],
+          logSharing: [
+            { period: "2026 Q1 (Jan–Mar)", sendingRole: "Property Operations Employer", recipientRole: "Tenant Employer 1 & 2 Plan Owners (as designated by client and counsel)", dateShared: "2026-04-05", method: "Redacted summary packet via portal", privacyCheck: "Yes" },
+            { period: "2026 Q2 (Apr–Jun)", sendingRole: "Tenant Employer 3 (outpatient clinic)", recipientRole: "", dateShared: "Pending", method: "Template placeholder: pending operator input", privacyCheck: "Counsel flag" },
+            { period: "2026 Q2 (Apr–Jun)", sendingRole: "Janitorial Contractor", recipientRole: "Property Operations Desk (as designated by client and counsel)", dateShared: "2026-05-01", method: "Monthly written log extract", privacyCheck: "No" }
+          ],
+          changeTriggers: [
+            { id: "ACT-A1", triggerType: "lighting outage reported by a user", actionText: "Confirm maintenance trade ticket and temporary walkway lighting check on Parking Structure Level 3 and Trash Enclosure.", ownerRole: "Property Operations Employer", dueDate: "2026-06-10", status: "Open" },
+            { id: "ACT-A2", triggerType: "hours change", actionText: "Update Shared-Use Matrix for Tenant Employer 2 late courier window in Rear Loading Docks (A-Z06).", ownerRole: "Tenant Employer 2", dueDate: "2026-06-15", status: "In Progress" },
+            { id: "ACT-A3", triggerType: "new vendor", actionText: "Deliver shared-zone coordination protocol and reporting route sheet to Trash Service Contractor dispatch desk.", ownerRole: "Property Operations Employer", dueDate: "2026-06-20", status: "Needs Review" },
+            { id: "ACT-A4", triggerType: "tenant move-in or out", actionText: "Review specialized tenant coordination requirements for Tenant Employer 3 (outpatient clinic) with counsel.", ownerRole: "Tenant Employer 3 (outpatient clinic)", dueDate: "2026-06-25", status: "Specialist Review Flag" }
+          ],
+          walkLog: [
+            { id: "WLK-A1", date: "2026-05-02", timeOfDay: "21:30", zonesWalked: "A-Z01, A-Z06, A-Z07, A-Z10", observations: "Observed Janitorial Contractor staging bins in A-Z06 while Tenant Employer 2 evening staff exited via A-Z10. Noted lamp out near A-Z07 north pad (Facilities and security review).", photosReferenced: "Ref: IMG-20260502-01 (text reference only; no image stored)", actionsOpened: "ACT-A1", specialistFlags: "Specialist Review Flag" },
+            { id: "WLK-A2", date: "2026-05-10", timeOfDay: "11:00", zonesWalked: "A-Z02, A-Z03, A-Z04", observations: "Walked plaza and north bus stop interface. Maintenance responsibility for A-Z02 and A-Z04 remains unrecorded in worksheet (Counsel and facilities review).", photosReferenced: "Ref: IMG-20260510-04 (text reference only; no image stored)", actionsOpened: "None", specialistFlags: "Specialist Review Flag" }
+          ],
+          specialistFlags: [
+            { flagType: "counsel", zone: "A-Z02, A-Z06, Log Sharing Q2", reason: "Shared zones missing F5 written lease reference; Q2 log-copy recipient designation pending counsel review.", status: "Specialist Review Flag" },
+            { flagType: "facilities", zone: "A-Z01, A-Z02, A-Z04, A-Z07", reason: "Sight-line/lighting notes recorded and open-access zones missing recorded F1 maintainer.", status: "Open" },
+            { flagType: "security", zone: "A-Z01, A-Z05, A-Z10", reason: "Sight-line and blind-spot notes recorded on walk log; contractor holds gate F2/F3 role. GCG makes no engineering finding.", status: "Specialist Review Flag" },
+            { flagType: "privacy", zone: "Log Copy Sharing Record (Q2)", reason: "Outpatient clinic log-sharing redaction check flagged for privacy and counsel review.", status: "Needs Review" },
+            { flagType: "insurance", zone: "A-Z05, A-Z07", reason: "Contractor holds access/change authority (F2/F3); confirm vendor agreement scope with insurance/counsel.", status: "Open" }
+          ]
+        },
+
+        /* ====================================================================
+           ARCHETYPE B: Strip mall with a rear service alley and trash enclosures
+           ==================================================================== */
+        "B": {
+          id: "B",
+          name: "Archetype B: Strip mall with a rear service alley and trash enclosures",
+          description: "Fictional single-story retail strip center with surface parking lot, covered front walkway, continuous rear alley, and shared dumpster enclosures.",
+          parties: [
+            { role: "Property Operations Employer", category: "Employer", partyType: "Strip Center Operations", contactRoute: "Property management remote operations desk", protocolDeliveredDate: "2026-02-01", trainingMethod: "Annual staff handbook review; Ref: SC-OPS-01", reportingRoute: "Operations portal -> email summary to tenant store managers", status: "Evidence Partial" },
+            { role: "Tenant Employer 1", category: "Employer", partyType: "Quick-Service Restaurant", contactRoute: "Store general manager desk", protocolDeliveredDate: "2026-02-05", trainingMethod: "Shift huddle guide; Ref: QSR-TRN-02", reportingRoute: "Shift lead log -> submitted to district manager and Property operations desk", status: "In Progress" },
+            { role: "Tenant Employer 2", category: "Employer", partyType: "Neighborhood Grocery & Pharmacy", contactRoute: "Store operations manager role", protocolDeliveredDate: "2026-02-08", trainingMethod: "Computer-based onboarding module; Ref: GRO-TRN-07", reportingRoute: "Store incident log -> shared-area extract sent to Property operations desk", status: "Ready for Management Review" },
+            { role: "Tenant Employer 3 (urgent care clinic)", category: "Employer", partyType: "Walk-In Urgent Care Clinic", contactRoute: "Clinic practice manager role", protocolDeliveredDate: "2026-02-12", trainingMethod: "Annual clinical operations readiness session; Ref: UCC-TRN-01", reportingRoute: "Clinic administration log -> copy to Property operations desk for exterior zones", status: "Specialist Review Flag" },
+            { role: "Landscaping & Lot Sweeping Contractor", category: "Contractor", partyType: "Exterior Grounds & Sweeper Service", contactRoute: "Crew dispatch coordinator role", protocolDeliveredDate: "2026-02-15", trainingMethod: "Vendor coordination sheet; Ref: LND-03", reportingRoute: "Dispatcher log -> emailed to Property operations desk", status: "Needs Review" },
+            { role: "Trash Service Contractor", category: "Contractor", partyType: "Commercial Waste Hauler", contactRoute: "Route operations desk", protocolDeliveredDate: "Unknown — Fact Intake Needed", trainingMethod: "Template placeholder: pending operator input", reportingRoute: "Route exception ticket -> sent to Property operations desk", status: "Unknown — Fact Intake Needed" }
+          ],
+          zones: [
+            { id: "B-Z01", name: "Front Customer Surface Parking Lot", band: "Front / public", type: "customer parking lot", publicAccess: "open", notes: "Shared customer and staff lot; lighting pole observation noted in north row.", facts: { F1: { value: "Landscaping & Lot Sweeping Contractor", evidence: "Self-Reported — Needs Review" }, F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "Retail Lease CAM Sec. 3.1 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "B-Z02", name: "Covered Front Sidewalk & Breezeway", band: "Front / public", type: "sidewalks and covered walkways", publicAccess: "open", notes: "Continuous storefront walkway connecting all inline tenants.", facts: { F1: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "B-Z03", name: "Patio Outdoor Dining Area", band: "Front / public", type: "outdoor dining", publicAccess: "open", notes: "Adjacent to Tenant Employer 1; fencing and sight-line near drive aisle noted.", facts: { F1: { value: "Tenant Employer 1", evidence: "Self-Reported — Needs Review" }, F2: { value: "Tenant Employer 1", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Tenant Employer 1", evidence: "Self-Reported — Needs Review" }, F5: { value: "Patio Rider Sec. 1.2 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "B-Z04", name: "South Shared Driveway Entrance", band: "Perimeter", type: "shared driveways and entrances", publicAccess: "open", notes: "Shared ingress/egress with adjacent parcel.", facts: { F1: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F2: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F3: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "B-Z05", name: "East Perimeter Block Wall & Fencing", band: "Perimeter", type: "property edges and fencing", publicAccess: "restricted", notes: "Separates rear alley from neighboring residential lot.", facts: { F1: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F2: { value: "Landscaping & Lot Sweeping Contractor", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F5: { value: "CC&R Art. II (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "B-Z06", name: "Rear Service Alley", band: "Back-of-house", type: "back alley", publicAccess: "open", notes: "Used for deliveries and trash haul; blind-spot at alley turn noted.", facts: { F1: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F2: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "B-Z07", name: "Rear Tenant Service Doors", band: "Back-of-house", type: "rear tenant doors", publicAccess: "restricted", notes: "Rear exits opening directly into service alley.", facts: { F1: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F2: { value: "Tenant Employer 1", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F5: { value: "Standard Lease Sec. 8 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "B-Z08", name: "Shared Trash Enclosures #1 and #2", band: "Back-of-house", type: "trash enclosures and dumpster pads", publicAccess: "restricted", notes: "Late-night restaurant trash disposal overlaps overnight lot sweeping and hauling.", facts: { F1: { value: "Landscaping & Lot Sweeping Contractor", evidence: "Self-Reported — Needs Review" }, F2: { value: "Landscaping & Lot Sweeping Contractor", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "B-Z09", name: "Shared Utility & Fire Riser Room", band: "Back-of-house", type: "utility and mechanical rooms", publicAccess: "restricted", notes: "Exterior-access mechanical room at north end of strip.", facts: { F1: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "Standard Lease Sec. 10 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } }
+          ],
+          zoneUse: [
+            { zoneId: "B-Z01", partyRole: "Tenant Employer 1", startHour: 6, endHour: 24, frequency: "Daily staff & customer parking" },
+            { zoneId: "B-Z01", partyRole: "Tenant Employer 2", startHour: 6, endHour: 23, frequency: "Daily staff & customer parking" },
+            { zoneId: "B-Z01", partyRole: "Tenant Employer 3 (urgent care clinic)", startHour: 8, endHour: 20, frequency: "Daily clinic staff & patient parking" },
+            { zoneId: "B-Z01", partyRole: "Landscaping & Lot Sweeping Contractor", startHour: 22, endHour: 4, frequency: "Nightly sweeper truck (crosses midnight)" },
+            { zoneId: "B-Z02", partyRole: "Tenant Employer 1", startHour: 6, endHour: 24, frequency: "Daily storefront access" },
+            { zoneId: "B-Z02", partyRole: "Tenant Employer 2", startHour: 6, endHour: 23, frequency: "Daily storefront access" },
+            { zoneId: "B-Z02", partyRole: "Tenant Employer 3 (urgent care clinic)", startHour: 8, endHour: 20, frequency: "Daily clinic access" },
+            { zoneId: "B-Z03", partyRole: "Tenant Employer 1", startHour: 10, endHour: 23, frequency: "Daily patio dining service" },
+            { zoneId: "B-Z04", partyRole: "Tenant Employer 1", startHour: 6, endHour: 24, frequency: "Daily site entry" },
+            { zoneId: "B-Z04", partyRole: "Tenant Employer 2", startHour: 6, endHour: 23, frequency: "Daily site entry" },
+            { zoneId: "B-Z05", partyRole: "Landscaping & Lot Sweeping Contractor", startHour: 7, endHour: 12, frequency: "Weekly hedge & fence line trim" },
+            { zoneId: "B-Z06", partyRole: "Tenant Employer 1", startHour: 21, endHour: 2, frequency: "Closing shift alley access (crosses midnight)" },
+            { zoneId: "B-Z06", partyRole: "Tenant Employer 2", startHour: 5, endHour: 22, frequency: "Daily vendor receiving" },
+            { zoneId: "B-Z06", partyRole: "Trash Service Contractor", startHour: 23, endHour: 5, frequency: "Overnight bin collection (crosses midnight)" },
+            { zoneId: "B-Z07", partyRole: "Tenant Employer 1", startHour: 6, endHour: 2, frequency: "Rear door deliveries & trash runs" },
+            { zoneId: "B-Z07", partyRole: "Tenant Employer 2", startHour: 6, endHour: 23, frequency: "Rear door receiving" },
+            { zoneId: "B-Z08", partyRole: "Tenant Employer 1", startHour: 22, endHour: 2, frequency: "Closing shift trash run (crosses midnight)" },
+            { zoneId: "B-Z08", partyRole: "Tenant Employer 2", startHour: 8, endHour: 21, frequency: "Daily cardboard & waste disposal" },
+            { zoneId: "B-Z08", partyRole: "Trash Service Contractor", startHour: 0, endHour: 5, frequency: "Early morning haul" },
+            { zoneId: "B-Z09", partyRole: "Tenant Employer 2", startHour: 8, endHour: 17, frequency: "Monthly meter check" }
+          ],
+          logSharing: [
+            { period: "2026 Q1 (Jan–Mar)", sendingRole: "Property Operations Employer", recipientRole: "All Strip Center Tenant Employers (as designated by client and counsel)", dateShared: "2026-04-10", method: "Email distribution to store manager roles", privacyCheck: "Yes" },
+            { period: "2026 Q2 (Apr–Jun)", sendingRole: "Tenant Employer 1", recipientRole: "", dateShared: "Pending", method: "Template placeholder: pending operator input", privacyCheck: "Counsel flag" }
+          ],
+          changeTriggers: [
+            { id: "ACT-B1", triggerType: "hours change", actionText: "Review late-night closing overlap in Rear Service Alley (B-Z06) and Trash Enclosures (B-Z08) with Tenant Employer 1.", ownerRole: "Property Operations Employer", dueDate: "2026-06-14", status: "Open" },
+            { id: "ACT-B2", triggerType: "lighting outage reported by a user", actionText: "Check north parking row light pole and rear alley corner sight-line observation.", ownerRole: "Property Operations Employer", dueDate: "2026-06-19", status: "Needs Review" }
+          ],
+          walkLog: [
+            { id: "WLK-B1", date: "2026-05-04", timeOfDay: "22:45", zonesWalked: "B-Z01, B-Z06, B-Z08", observations: "Walked rear alley during closing shift. Noted sight-line turn at B-Z06 and open public access with no recorded F1 maintainer (Facilities and counsel review).", photosReferenced: "Ref: IMG-20260504-02 (text reference only; no image stored)", actionsOpened: "ACT-B1, ACT-B2", specialistFlags: "Specialist Review Flag" }
+          ],
+          specialistFlags: [
+            { flagType: "counsel", zone: "B-Z02, B-Z06, B-Z08", reason: "Shared zones used by multiple employers lack recorded F5 written reference.", status: "Specialist Review Flag" },
+            { flagType: "facilities", zone: "B-Z01, B-Z06", reason: "Open-access alley missing F1 maintainer; lighting/sight-line observation recorded.", status: "Open" }
+          ]
+        },
+
+        /* ====================================================================
+           ARCHETYPE C: Shopping center with rear service corridor and anchor docks
+           ==================================================================== */
+        "C": {
+          id: "C",
+          name: "Archetype C: Shopping center with rear service corridor and anchor receiving docks",
+          description: "Fictional enclosed/open-air hybrid shopping center featuring inline retail suites connected by an interior rear service corridor, common restrooms, and anchor loading docks.",
+          parties: [
+            { role: "Property Operations Employer", category: "Employer", partyType: "Mall Management Office", contactRoute: "Center management operations desk", protocolDeliveredDate: "2026-01-12", trainingMethod: "Center operations workshop; Ref: MC-TRN-01", reportingRoute: "Center operations desk -> tenant operations liaison routing", status: "Evidence Complete" },
+            { role: "Tenant Employer 1 (Anchor Retailer)", category: "Employer", partyType: "Department Store Anchor", contactRoute: "Anchor store operations manager role", protocolDeliveredDate: "2026-01-19", trainingMethod: "Store readiness orientation; Ref: ANC-TRN-05", reportingRoute: "Anchor operations desk -> reciprocal notice with Center management desk", status: "Ready for Management Review" },
+            { role: "Tenant Employer 2 (Inline Apparel)", category: "Employer", partyType: "Inline Retail Suite", contactRoute: "Store manager desk", protocolDeliveredDate: "2026-01-22", trainingMethod: "Retail team onboarding packet; Ref: INL-TRN-02", reportingRoute: "Store log -> reported to Center management operations desk", status: "In Progress" },
+            { role: "Tenant Employer 3 (pediatric dental & optometry clinic)", category: "Employer", partyType: "Outpatient Health & Optometry Suite", contactRoute: "Clinic office manager role", protocolDeliveredDate: "2026-02-02", trainingMethod: "Clinic staff handbook briefing; Ref: CLN-TRN-08", reportingRoute: "Clinic administrator -> shared-corridor notice to Center management desk", status: "Specialist Review Flag" },
+            { role: "Janitorial Contractor", category: "Contractor", partyType: "Common Area & Corridor Housekeeping", contactRoute: "Housekeeping supervisor role", protocolDeliveredDate: "2026-01-15", trainingMethod: "Housekeeping shift protocol; Ref: HSK-04", reportingRoute: "Shift log -> submitted to Center management operations desk", status: "Evidence Partial" },
+            { role: "Freight & Delivery Carrier Contractor", category: "Contractor", partyType: "Consolidated Dock & Corridor Freight Service", contactRoute: "Dock master dispatch role", protocolDeliveredDate: "Unknown — Fact Intake Needed", trainingMethod: "Template placeholder: pending operator input", reportingRoute: "Dock manifest log -> filed with Center management operations desk", status: "Unknown — Fact Intake Needed" }
+          ],
+          zones: [
+            { id: "C-Z01", name: "Main Customer Parking Field & Cart Corrals", band: "Front / public", type: "customer parking lot", publicAccess: "open", notes: "High-volume lot; lighting observation noted near west cart corral.", facts: { F1: { value: "Janitorial Contractor", evidence: "Self-Reported — Needs Review" }, F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "Center REA Sec. 2.1 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "C-Z02", name: "Center Kiosk and Cart Promenade", band: "Front / public", type: "kiosk or cart area", publicAccess: "open", notes: "Central pedestrian concourse with specialty carts.", facts: { F1: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "C-Z03", name: "Ring Road & Perimeter Transit Interface", band: "Perimeter", type: "shared driveways and entrances", publicAccess: "open", notes: "Perimeter ring road connecting anchor pads and public streets.", facts: { F1: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F2: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F3: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "C-Z04", name: "Rear Service Corridor Behind Inline Tenants", band: "Back-of-house", type: "rear service corridor behind tenant spaces", publicAccess: "restricted", notes: "Long branching interior service hallway behind inline suites; sight-line bend near fire doors noted.", facts: { F1: { value: "Janitorial Contractor", evidence: "Documented but Needs Context" }, F2: { value: "Janitorial Contractor", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "C-Z05", name: "Anchor Receiving Docks & Compactor Bay", band: "Back-of-house", type: "loading docks and receiving", publicAccess: "restricted", notes: "Early-morning freight staging overlaps anchor receiving team and inline restocking shifts.", facts: { F1: { value: "Tenant Employer 1 (Anchor Retailer)", evidence: "Self-Reported — Needs Review" }, F2: { value: "Freight & Delivery Carrier Contractor", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F5: { value: "Anchor Lease Exhibit D (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "C-Z06", name: "Inline Rear Tenant Doors", band: "Back-of-house", type: "rear tenant doors", publicAccess: "restricted", notes: "Individual suite rear doors opening into C-Z04 corridor.", facts: { F1: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F2: { value: "Tenant Employer 2 (Inline Apparel)", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F5: { value: "Inline Lease Sec. 7.3 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "C-Z07", name: "Interior Common Restroom Cluster & Break Area", band: "Interior common", type: "shared restrooms", publicAccess: "open", notes: "Public and tenant staff restroom corridor off main concourse.", facts: { F1: { value: "Janitorial Contractor", evidence: "Documented but Needs Context" }, F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "Inline Lease Sec. 4.1 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "C-Z08", name: "Shared Mail and Package Room", band: "Interior common", type: "mail or package room", publicAccess: "restricted", notes: "Central mail lockbox room accessed by all inline tenants and carriers.", facts: { F1: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "Center Rules Sec. 12 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "C-Z09", name: "Seasonal Event Staging Area", band: "Special", type: "seasonal event area", publicAccess: "open", notes: "Rotunda area reconfigured for seasonal displays.", facts: { F1: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F2: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F4: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } }
+          ],
+          zoneUse: [
+            { zoneId: "C-Z01", partyRole: "Tenant Employer 1 (Anchor Retailer)", startHour: 7, endHour: 23, frequency: "Daily staff & shopper parking" },
+            { zoneId: "C-Z01", partyRole: "Tenant Employer 2 (Inline Apparel)", startHour: 9, endHour: 22, frequency: "Daily staff & shopper parking" },
+            { zoneId: "C-Z01", partyRole: "Tenant Employer 3 (pediatric dental & optometry clinic)", startHour: 8, endHour: 19, frequency: "Daily clinic staff & patient parking" },
+            { zoneId: "C-Z02", partyRole: "Tenant Employer 2 (Inline Apparel)", startHour: 9, endHour: 22, frequency: "Daily concourse access" },
+            { zoneId: "C-Z02", partyRole: "Property Operations Employer", startHour: 8, endHour: 21, frequency: "Daily center operations walks" },
+            { zoneId: "C-Z03", partyRole: "Tenant Employer 1 (Anchor Retailer)", startHour: 5, endHour: 23, frequency: "Daily ring road access" },
+            { zoneId: "C-Z03", partyRole: "Freight & Delivery Carrier Contractor", startHour: 22, endHour: 6, frequency: "Overnight freight truck ingress (crosses midnight)" },
+            { zoneId: "C-Z04", partyRole: "Tenant Employer 2 (Inline Apparel)", startHour: 8, endHour: 22, frequency: "Daily stock movement & trash runs" },
+            { zoneId: "C-Z04", partyRole: "Tenant Employer 3 (pediatric dental & optometry clinic)", startHour: 8, endHour: 19, frequency: "Daily rear staff exit & supply cart transport" },
+            { zoneId: "C-Z04", partyRole: "Janitorial Contractor", startHour: 20, endHour: 4, frequency: "Nightly corridor scrubbing & cart haul (crosses midnight)" },
+            { zoneId: "C-Z04", partyRole: "Freight & Delivery Carrier Contractor", startHour: 6, endHour: 14, frequency: "Daily pallet jack deliveries" },
+            { zoneId: "C-Z05", partyRole: "Tenant Employer 1 (Anchor Retailer)", startHour: 4, endHour: 22, frequency: "Daily dock receiving shifts" },
+            { zoneId: "C-Z05", partyRole: "Tenant Employer 2 (Inline Apparel)", startHour: 7, endHour: 18, frequency: "Shared compactor & freight pickup" },
+            { zoneId: "C-Z05", partyRole: "Freight & Delivery Carrier Contractor", startHour: 23, endHour: 7, frequency: "Overnight line-haul unloading (crosses midnight)" },
+            { zoneId: "C-Z06", partyRole: "Tenant Employer 2 (Inline Apparel)", startHour: 8, endHour: 22, frequency: "Daily rear suite entry" },
+            { zoneId: "C-Z06", partyRole: "Tenant Employer 3 (pediatric dental & optometry clinic)", startHour: 8, endHour: 19, frequency: "Daily rear clinic entry" },
+            { zoneId: "C-Z07", partyRole: "Tenant Employer 2 (Inline Apparel)", startHour: 9, endHour: 22, frequency: "Daily staff restroom use" },
+            { zoneId: "C-Z07", partyRole: "Janitorial Contractor", startHour: 7, endHour: 23, frequency: "Hourly restroom upkeep" },
+            { zoneId: "C-Z08", partyRole: "Tenant Employer 2 (Inline Apparel)", startHour: 10, endHour: 17, frequency: "Daily mail pickup" },
+            { zoneId: "C-Z08", partyRole: "Tenant Employer 3 (pediatric dental & optometry clinic)", startHour: 10, endHour: 17, frequency: "Daily lab parcel & mail pickup" },
+            { zoneId: "C-Z09", partyRole: "Property Operations Employer", startHour: 8, endHour: 20, frequency: "Seasonal setup coordination" }
+          ],
+          logSharing: [
+            { period: "2026 Q1 (Jan–Mar)", sendingRole: "Property Operations Employer", recipientRole: "Anchor & Inline Tenant Plan Owners (as designated by client and counsel)", dateShared: "2026-04-12", method: "Center tenant portal distribution", privacyCheck: "Yes" },
+            { period: "2026 Q2 (Apr–Jun)", sendingRole: "Freight & Delivery Carrier Contractor", recipientRole: "", dateShared: "Pending", method: "Template placeholder: pending operator input", privacyCheck: "No" }
+          ],
+          changeTriggers: [
+            { id: "ACT-C1", triggerType: "seasonal event", actionText: "Review temporary staging layout and delivery hours for Seasonal Event Staging Area (C-Z09) and Rear Service Corridor (C-Z04).", ownerRole: "Property Operations Employer", dueDate: "2026-06-20", status: "Open" },
+            { id: "ACT-C2", triggerType: "new vendor", actionText: "Provide Rear Service Corridor (C-Z04) reporting route sheet to Freight & Delivery Carrier Contractor dispatch desk.", ownerRole: "Property Operations Employer", dueDate: "2026-06-25", status: "Needs Review" }
+          ],
+          walkLog: [
+            { id: "WLK-C1", date: "2026-05-06", timeOfDay: "07:30", zonesWalked: "C-Z04, C-Z05, C-Z06", observations: "Observed freight pallets staged in C-Z04 near inline rear doors during morning clinic and retail arrival window. Sight-line bend noted (Facilities and security review).", photosReferenced: "Ref: IMG-20260506-01 (text reference only; no image stored)", actionsOpened: "ACT-C2", specialistFlags: "Specialist Review Flag" }
+          ],
+          specialistFlags: [
+            { flagType: "counsel", zone: "C-Z03, C-Z04, C-Z05", reason: "Shared rear corridor missing F5 written reference; contractor holds F2 dock access role.", status: "Specialist Review Flag" },
+            { flagType: "facilities", zone: "C-Z01, C-Z03, C-Z04", reason: "Sight-line bend in rear service corridor and open ring road missing recorded F1 maintainer.", status: "Open" }
+          ]
+        },
+
+        /* ====================================================================
+           ARCHETYPE D: Mixed-use pad site with a shared lot
+           ==================================================================== */
+        "D": {
+          id: "D",
+          name: "Archetype D: Mixed-use pad site with a shared lot",
+          description: "Fictional multi-parcel pad property with a drive-thru coffee/retail pad, a two-story professional/childcare building, shared surface parking, and a construction laydown area.",
+          parties: [
+            { role: "Property Operations Employer", category: "Employer", partyType: "Pad Association Operations", contactRoute: "Property association operations desk", protocolDeliveredDate: "2026-01-28", trainingMethod: "Annual pad operator coordination call; Ref: PAD-01", reportingRoute: "Association operations desk -> distributed to pad employer contacts", status: "Evidence Partial" },
+            { role: "Tenant Employer 1 (Drive-Thru Pad)", category: "Employer", partyType: "Coffee & Bakery Pad Operator", contactRoute: "Store shift manager desk", protocolDeliveredDate: "2026-02-03", trainingMethod: "Opening/closing shift module; Ref: DTP-TRN-03", reportingRoute: "Shift log -> sent to district operations and Property association desk", status: "In Progress" },
+            { role: "Tenant Employer 2 (Early Childhood Childcare Center)", category: "Employer", partyType: "Licensed Childcare & Preschool Pad Suite", contactRoute: "Center director administrative desk", protocolDeliveredDate: "2026-02-06", trainingMethod: "Staff readiness & drop-off orientation; Ref: ECC-TRN-01", reportingRoute: "Center director log -> dual notice to licensing liaison and Property association desk", status: "Specialist Review Flag" },
+            { role: "Tenant Employer 3 (Professional Accounting Suite)", category: "Employer", partyType: "Second-Floor Office Suite", contactRoute: "Office administrator role", protocolDeliveredDate: "2026-02-10", trainingMethod: "Annual staff policy acknowledgment; Ref: PRO-TRN-02", reportingRoute: "Office administrator log -> emailed to Property association desk", status: "Ready for Management Review" },
+            { role: "Building & Lot Maintenance Contractor", category: "Contractor", partyType: "Exterior Lighting, Sweeping & Repairs Trade", contactRoute: "Maintenance contractor dispatch desk", protocolDeliveredDate: "2026-02-14", trainingMethod: "Trade work-order protocol; Ref: BLM-02", reportingRoute: "Service ticket portal -> routed to Property association desk", status: "Needs Review" },
+            { role: "Supply & Foodservice Delivery Contractor", category: "Contractor", partyType: "Early-Morning Refrigerated Delivery Carrier", contactRoute: "Regional logistics dispatch role", protocolDeliveredDate: "Unknown — Fact Intake Needed", trainingMethod: "Template placeholder: pending operator input", reportingRoute: "Driver manifest log -> sent to Tenant Employer 1 and Property association desk", status: "Unknown — Fact Intake Needed" }
+          ],
+          zones: [
+            { id: "D-Z01", name: "Shared Surface Parking Lot", band: "Front / public", type: "customer parking lot", publicAccess: "open", notes: "Shared by pad customers, office commuters, and parents; lighting observation noted near west island.", facts: { F1: { value: "Building & Lot Maintenance Contractor", evidence: "Self-Reported — Needs Review" }, F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "D-Z02", name: "Childcare & Office Curbside Drop-Off Area", band: "Front / public", type: "drop-off area", publicAccess: "open", notes: "Dedicated morning and afternoon drop-off lane shared with office deliveries.", facts: { F1: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F2: { value: "Tenant Employer 2 (Early Childhood Childcare Center)", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F5: { value: "Pad Easement Sec. 5 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "D-Z03", name: "Adjacent-Property Interface & Shared Driveway", band: "Perimeter", type: "adjacent-property interface", publicAccess: "open", notes: "Unfenced vehicle and pedestrian connection to neighboring commercial parcel; sight-line note recorded.", facts: { F1: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F2: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F3: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "D-Z04", name: "Shared Trash Enclosure & Grease Bin Pad", band: "Back-of-house", type: "trash enclosures and dumpster pads", publicAccess: "restricted", notes: "Early-morning foodservice delivery and waste haul overlap opening pad shift.", facts: { F1: { value: "Building & Lot Maintenance Contractor", evidence: "Self-Reported — Needs Review" }, F2: { value: "Building & Lot Maintenance Contractor", evidence: "Self-Reported — Needs Review" }, F3: { value: "Building & Lot Maintenance Contractor", evidence: "Self-Reported — Needs Review" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "D-Z05", name: "Pad Rear Receiving Apron", band: "Back-of-house", type: "loading docks and receiving", publicAccess: "restricted", notes: "Rear delivery staging behind Tenant Employer 1 and Building 2.", facts: { F1: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F2: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F4: { value: "Tenant Employer 1 (Drive-Thru Pad)", evidence: "Self-Reported — Needs Review" }, F5: { value: "Pad Lease Sec. 6.2 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "D-Z06", name: "Roof Access Hatch & Exterior Ladder Alcove", band: "Back-of-house", type: "roof access", publicAccess: "restricted", notes: "Gated alcove used by HVAC and roof maintenance trades.", facts: { F1: { value: "Building & Lot Maintenance Contractor", evidence: "Documented but Needs Context" }, F2: { value: "Building & Lot Maintenance Contractor", evidence: "Documented but Needs Context" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "Pad Lease Sec. 9.1 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "D-Z07", name: "Building 2 Shared Lobby, Stairwell & Elevator", band: "Interior common", type: "stairwells", publicAccess: "open", notes: "Connects ground-floor lobby with second-floor office suite.", facts: { F1: { value: "Building & Lot Maintenance Contractor", evidence: "Documented but Needs Context" }, F2: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F3: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F4: { value: "Property Operations Employer", evidence: "Documented but Needs Context" }, F5: { value: "Building 2 Lease Sec. 3 (Document cited by client; not reviewed by GCG.)", evidence: "Documented but Needs Context" } } },
+            { id: "D-Z08", name: "North Pad Remodel Construction Zone", band: "Special", type: "construction zone", publicAccess: "restricted", notes: "Temporary fenced laydown area reducing parking aisle width; blind-spot at fence corner noted.", facts: { F1: { value: "Building & Lot Maintenance Contractor", evidence: "Self-Reported — Needs Review" }, F2: { value: "Building & Lot Maintenance Contractor", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F4: { value: "Unknown", evidence: "Unknown — Fact Intake Needed" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } },
+            { id: "D-Z09", name: "Early-Opener Access Path", band: "Special", type: "after-hours access path", publicAccess: "open", notes: "Walkway from employee parking spaces to Drive-Thru Pad rear door at 04:00.", facts: { F1: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F2: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F3: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F4: { value: "Property Operations Employer", evidence: "Self-Reported — Needs Review" }, F5: { value: "", evidence: "Unknown — Fact Intake Needed" } } }
+          ],
+          zoneUse: [
+            { zoneId: "D-Z01", partyRole: "Tenant Employer 1 (Drive-Thru Pad)", startHour: 4, endHour: 22, frequency: "Daily staff & customer parking" },
+            { zoneId: "D-Z01", partyRole: "Tenant Employer 2 (Early Childhood Childcare Center)", startHour: 6, endHour: 19, frequency: "Daily staff & parent parking" },
+            { zoneId: "D-Z01", partyRole: "Tenant Employer 3 (Professional Accounting Suite)", startHour: 7, endHour: 21, frequency: "Daily office parking" },
+            { zoneId: "D-Z02", partyRole: "Tenant Employer 2 (Early Childhood Childcare Center)", startHour: 7, endHour: 18, frequency: "Morning & afternoon family drop-off/pick-up" },
+            { zoneId: "D-Z02", partyRole: "Tenant Employer 3 (Professional Accounting Suite)", startHour: 8, endHour: 17, frequency: "Client drop-off & courier stops" },
+            { zoneId: "D-Z03", partyRole: "Tenant Employer 1 (Drive-Thru Pad)", startHour: 4, endHour: 22, frequency: "Daily site ingress/egress" },
+            { zoneId: "D-Z03", partyRole: "Supply & Foodservice Delivery Contractor", startHour: 23, endHour: 5, frequency: "Overnight refrigerated truck access (crosses midnight)" },
+            { zoneId: "D-Z04", partyRole: "Tenant Employer 1 (Drive-Thru Pad)", startHour: 4, endHour: 22, frequency: "Daily trash & cardboard runs" },
+            { zoneId: "D-Z04", partyRole: "Tenant Employer 2 (Early Childhood Childcare Center)", startHour: 17, endHour: 19, frequency: "Evening classroom waste disposal" },
+            { zoneId: "D-Z04", partyRole: "Building & Lot Maintenance Contractor", startHour: 22, endHour: 2, frequency: "Enclosure washdown & sweeping (crosses midnight)" },
+            { zoneId: "D-Z05", partyRole: "Tenant Employer 1 (Drive-Thru Pad)", startHour: 4, endHour: 11, frequency: "Morning supply intake" },
+            { zoneId: "D-Z05", partyRole: "Tenant Employer 3 (Professional Accounting Suite)", startHour: 9, endHour: 17, frequency: "Paper & equipment deliveries" },
+            { zoneId: "D-Z05", partyRole: "Supply & Foodservice Delivery Contractor", startHour: 2, endHour: 6, frequency: "Pre-dawn key-drop and dock delivery" },
+            { zoneId: "D-Z06", partyRole: "Property Operations Employer", startHour: 9, endHour: 16, frequency: "Quarterly roof inspection" },
+            { zoneId: "D-Z07", partyRole: "Tenant Employer 2 (Early Childhood Childcare Center)", startHour: 6, endHour: 19, frequency: "Ground-floor lobby interface" },
+            { zoneId: "D-Z07", partyRole: "Tenant Employer 3 (Professional Accounting Suite)", startHour: 7, endHour: 21, frequency: "Daily 2nd-floor stairwell & elevator access" },
+            { zoneId: "D-Z08", partyRole: "Property Operations Employer", startHour: 7, endHour: 17, frequency: "Daily construction fence check" },
+            { zoneId: "D-Z09", partyRole: "Tenant Employer 1 (Drive-Thru Pad)", startHour: 3, endHour: 6, frequency: "Pre-dawn opening shift arrival" },
+            { zoneId: "D-Z09", partyRole: "Supply & Foodservice Delivery Contractor", startHour: 2, endHour: 5, frequency: "Hand-truck route from apron to rear door" }
+          ],
+          logSharing: [
+            { period: "2026 Q1 (Jan–Mar)", sendingRole: "Property Operations Employer", recipientRole: "Pad Tenant Employers 1, 2 & 3 (as designated by client and counsel)", dateShared: "2026-04-08", method: "Shared summary binder at association desk", privacyCheck: "Yes" },
+            { period: "2026 Q2 (Apr–Jun)", sendingRole: "Tenant Employer 2 (Early Childhood Childcare Center)", recipientRole: "", dateShared: "Pending", method: "Template placeholder: pending operator input", privacyCheck: "Counsel flag" }
+          ],
+          changeTriggers: [
+            { id: "ACT-D1", triggerType: "construction", actionText: "Review sight-line around North Pad Remodel Construction Zone (D-Z08) fencing and update Curbside Drop-Off Area (D-Z02) traffic notes.", ownerRole: "Property Operations Employer", dueDate: "2026-06-12", status: "Open" },
+            { id: "ACT-D2", triggerType: "lot reconfiguration", actionText: "Confirm Early-Opener Access Path (D-Z09) lighting and vendor hand-truck overlap hours between 03:00 and 06:00.", ownerRole: "Tenant Employer 1 (Drive-Thru Pad)", dueDate: "2026-06-18", status: "In Progress" }
+          ],
+          walkLog: [
+            { id: "WLK-D1", date: "2026-05-08", timeOfDay: "04:15", zonesWalked: "D-Z01, D-Z04, D-Z05, D-Z08, D-Z09", observations: "Observed Supply & Foodservice Delivery Contractor unloading on D-Z05 while Tenant Employer 1 opening crew walked D-Z09. Construction fence blind-spot noted at D-Z08 (Facilities and security review).", photosReferenced: "Ref: IMG-20260508-03 (text reference only; no image stored)", actionsOpened: "ACT-D1, ACT-D2", specialistFlags: "Specialist Review Flag" }
+          ],
+          specialistFlags: [
+            { flagType: "counsel", zone: "D-Z01, D-Z03, D-Z04", reason: "Shared lot and adjacent-property interface missing F5 written reference; specialized childcare tenant in roster.", status: "Specialist Review Flag" },
+            { flagType: "facilities", zone: "D-Z02, D-Z03, D-Z08", reason: "Open drop-off and adjacent interface missing recorded F1 maintainer; construction fence sight-line noted.", status: "Open" }
+          ]
+        }
+      }
+    };
+
+    // Deep clone INITIAL_DATA into active in-memory DATA state
+    let DATA = JSON.parse(JSON.stringify(INITIAL_DATA));
+
+    // In-memory UI state
+    let UI_STATE = {
+      activeModule: "m1",
+      globalSearch: "",
+      sortState: {},
+      selectedZoneId: null,
+      m2Filters: {
+        band: "ALL",
+        sharedOnly: false,
+        unknownOnly: false,
+        publicAccess: "ALL"
+      },
+      m4PartyCategoryFilter: "ALL",
+      m7SelectedZoneId: null,
+      m5ShowRules: true
+    };
+
+    /* ==========================================================================
+       HELPER & COMPUTATION FUNCTIONS (All metrics computed from DATA at render time)
+       ========================================================================== */
+
+    function getActiveArch() {
+      return DATA.archetypes[DATA.activeArchetype];
+    }
+
+    function getPartyMap(arch) {
+      const map = {};
+      arch.parties.forEach(p => {
+        map[p.role] = p;
+      });
+      return map;
+    }
+
+    function expandWindowHours(startHour, endHour) {
+      const hours = new Array(24).fill(false);
+      const s = Number(startHour);
+      const e = Number(endHour);
+      if (isNaN(s) || isNaN(e)) return hours;
+      if (s === e) return hours;
+      if (s < e) {
+        for (let h = s; h < e && h < 24; h++) hours[h] = true;
+      } else {
+        // Crosses midnight (e.g., 22 to 4 -> 22, 23 and 0, 1, 2, 3)
+        for (let h = s; h < 24; h++) hours[h] = true;
+        for (let h = 0; h < e && h < 24; h++) hours[h] = true;
+      }
+      return hours;
+    }
+
+    function computeZoneOverlapStats(arch, zoneId) {
+      const partyMap = getPartyMap(arch);
+      const uses = arch.zoneUse.filter(u => u.zoneId === zoneId);
+      const empHours = new Array(24).fill(false);
+      const venHours = new Array(24).fill(false);
+
+      uses.forEach(u => {
+        const p = partyMap[u.partyRole];
+        const hrs = expandWindowHours(u.startHour, u.endHour);
+        const isContractor = p && p.category === "Contractor";
+        for (let h = 0; h < 24; h++) {
+          if (hrs[h]) {
+            if (isContractor) venHours[h] = true;
+            else empHours[h] = true;
+          }
+        }
+      });
+
+      let overlapCount = 0;
+      const hourStates = new Array(24).fill(0); // 0 = none, 1 = single group, 2 = vendor + employer overlap
+      for (let h = 0; h < 24; h++) {
+        if (empHours[h] && venHours[h]) {
+          overlapCount++;
+          hourStates[h] = 2;
+        } else if (empHours[h] || venHours[h]) {
+          hourStates[h] = 1;
+        }
+      }
+
+      return { overlapCount, empHours, venHours, hourStates };
+    }
+
+    function getZoneEmployerUsers(arch, zoneId) {
+      const partyMap = getPartyMap(arch);
+      const uses = arch.zoneUse.filter(u => u.zoneId === zoneId);
+      const empSet = new Set();
+      uses.forEach(u => {
+        const p = partyMap[u.partyRole];
+        if (!p || p.category === "Employer") {
+          empSet.add(u.partyRole);
+        }
+      });
+      return Array.from(empSet);
+    }
+
+    function getZoneAllUsers(arch, zoneId) {
+      const uses = arch.zoneUse.filter(u => u.zoneId === zoneId);
+      const set = new Set();
+      uses.forEach(u => set.add(u.partyRole));
+      return Array.from(set);
+    }
+
+    function countZoneUnknownFacts(zone) {
+      let c = 0;
+      ["F1", "F2", "F3", "F4", "F5"].forEach(fk => {
+        const f = zone.facts[fk];
+        if (!f || !f.value || f.value === "Unknown" || f.evidence === "Unknown — Fact Intake Needed") {
+          c++;
+        }
+      });
+      return c;
+    }
+
+    function countZoneWalkNotes(arch, zoneId) {
+      let count = 0;
+      arch.walkLog.forEach(w => {
+        if (w.zonesWalked && w.zonesWalked.indexOf(zoneId) !== -1) {
+          count++;
+        }
+      });
+      return count;
+    }
+
+    /* ==========================================================================
+       SECTION E: ROUTING RULES (R-01 to R-10)
+       Output is a QUESTION or REFERRAL, never a conclusion and never a party named as responsible.
+       ========================================================================== */
+    function evaluateZoneRoutingRules(arch, zone) {
+      const prompts = [];
+      const partyMap = getPartyMap(arch);
+      const factNames = {
+        F1: "F1 Maintains",
+        F2: "F2 Sets access and hours",
+        F3: "F3 Authorizes physical changes",
+        F4: "F4 Schedules vendors",
+        F5: "F5 Written reference"
+      };
+
+      // R-01: Any F1 to F5 is Unknown -> "Unknown — Fact Intake Needed: [fact name]."
+      ["F1", "F2", "F3", "F4", "F5"].forEach(fk => {
+        const f = zone.facts[fk];
+        const isUnk = !f || !f.value || f.value === "Unknown" || f.evidence === "Unknown — Fact Intake Needed";
+        if (isUnk) {
+          prompts.push({
+            ruleId: "R-01",
+            text: "Unknown — Fact Intake Needed: " + factNames[fk] + "."
+          });
+        }
+      });
+
+      const empUsers = getZoneEmployerUsers(arch, zone.id);
+      const allUsers = getZoneAllUsers(arch, zone.id);
+
+      // R-02: Two or more employers use the zone
+      if (empUsers.length >= 2) {
+        prompts.push({
+          ruleId: "R-02",
+          text: "Each employer's hazard review should include this zone. Confirm a coordination record exists."
+        });
+      }
+
+      // R-03: The F1 party is not among the zone's users
+      const f1Val = zone.facts.F1 ? zone.facts.F1.value : "Unknown";
+      if (f1Val && f1Val !== "Unknown" && !allUsers.includes(f1Val)) {
+        prompts.push({
+          ruleId: "R-03",
+          text: "Maintenance sits outside the users. Confirm how condition reports reach the maintaining party."
+        });
+      }
+
+      // R-04: The F2 or F3 party is a contractor
+      const f2Party = zone.facts.F2 ? partyMap[zone.facts.F2.value] : null;
+      const f3Party = zone.facts.F3 ? partyMap[zone.facts.F3.value] : null;
+      if ((f2Party && f2Party.category === "Contractor") || (f3Party && f3Party.category === "Contractor")) {
+        prompts.push({
+          ruleId: "R-04",
+          text: "Authority is held by a contractor. Send the agreement reference to employer counsel. Specialist Review Flag."
+        });
+      }
+
+      // R-05: F5 is empty and two or more employers use the zone
+      const f5Val = zone.facts.F5 ? zone.facts.F5.value.trim() : "";
+      if ((!f5Val || f5Val === "Unknown") && empUsers.length >= 2) {
+        prompts.push({
+          ruleId: "R-05",
+          text: "No written reference recorded. Specialist Review Flag: counsel."
+        });
+      }
+
+      // R-07: A vendor window overlaps an employee window in a back-of-house zone
+      const overlapStats = computeZoneOverlapStats(arch, zone.id);
+      if (zone.band === "Back-of-house" && overlapStats.overlapCount > 0) {
+        prompts.push({
+          ruleId: "R-07",
+          text: "Shared-use overlap. Confirm both parties' training and reporting routes cover this zone and these hours."
+        });
+      }
+
+      // R-08: Public access is open and no F1 party is recorded
+      if (zone.publicAccess === "open" && (!f1Val || f1Val === "Unknown")) {
+        prompts.push({
+          ruleId: "R-08",
+          text: "Uncontrolled-access question. Facilities review. See the Proposed/Draft — Monitor item in the Source Register."
+        });
+      }
+
+      // R-09: A zone note mentions lighting, sight-line or blind-spot
+      const noteLower = (zone.notes || "").toLowerCase();
+      if (noteLower.includes("lighting") || noteLower.includes("sight-line") || noteLower.includes("blind-spot")) {
+        prompts.push({
+          ruleId: "R-09",
+          text: "Facilities and security review flag. GCG makes no engineering finding."
+        });
+      }
+
+      return prompts;
+    }
+
+    function evaluatePropertyWideRoutingRules(arch) {
+      const prompts = [];
+      // R-06: A log-copy period has no recorded recipient
+      const missingRecipient = arch.logSharing.some(row => !row.recipientRole || row.recipientRole.trim() === "" || row.recipientRole.toLowerCase().includes("unknown"));
+      if (missingRecipient) {
+        prompts.push({
+          ruleId: "R-06",
+          scope: "Log Copy Sharing Record (Module 8)",
+          text: "Client and counsel designate the recipient. GCG does not designate."
+        });
+      }
+
+      // R-10: A specialized tenant type is in the roster (clinic, health facility, school, childcare)
+      const specKeywords = ["clinic", "health facility", "school", "childcare"];
+      arch.parties.forEach(p => {
+        const combined = ((p.role || "") + " " + (p.partyType || "")).toLowerCase();
+        if (specKeywords.some(kw => combined.includes(kw))) {
+          prompts.push({
+            ruleId: "R-10",
+            scope: "Parties Roster: " + p.role,
+            text: "A separate standard may apply to this tenant type. Specialist Review Flag."
+          });
+        }
+      });
+
+      return prompts;
+    }
+
+    function computeOverviewMetrics(arch) {
+      const totalZones = arch.zones.length;
+      const totalParties = arch.parties.length;
+      let sharedZonesCount = 0;
+      let unknownControlFactsCount = 0;
+      let totalOverlapHours = 0;
+
+      arch.zones.forEach(z => {
+        const empUsers = getZoneEmployerUsers(arch, z.id);
+        if (empUsers.length >= 2) sharedZonesCount++;
+        unknownControlFactsCount += countZoneUnknownFacts(z);
+        const ov = computeZoneOverlapStats(arch, z.id);
+        totalOverlapHours += ov.overlapCount;
+      });
+
+      const openStatuses = ["Open", "Needs Review", "In Progress", "Specialist Review Flag", "Unknown — Fact Intake Needed"];
+      const openActionsCount = arch.changeTriggers.filter(a => openStatuses.includes(a.status)).length;
+
+      return {
+        totalZones,
+        totalParties,
+        sharedZonesCount,
+        unknownControlFactsCount,
+        openActionsCount,
+        totalOverlapHours
+      };
+    }
+
+    /* ==========================================================================
+       EXPLICIT COLUMN MAP TABLE RENDERER + CSV EXPORT (Blob download, no network)
+       ========================================================================== */
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function filterAndSortRows(rows, columnMap, tableId) {
+      const q = (UI_STATE.globalSearch || "").trim().toLowerCase();
+      let filtered = rows.filter(row => {
+        if (!q) return true;
+        return columnMap.some(col => {
+          const val = row[col.key];
+          return val !== null && val !== undefined && String(val).toLowerCase().includes(q);
+        });
+      });
+
+      const sortCfg = UI_STATE.sortState[tableId];
+      if (sortCfg && sortCfg.key) {
+        const colDef = columnMap.find(c => c.key === sortCfg.key);
+        filtered.sort((a, b) => {
+          const va = a[sortCfg.key];
+          const vb = b[sortCfg.key];
+          if (colDef && colDef.type === "number") {
+            return sortCfg.dir === "asc" ? (Number(va) - Number(vb)) : (Number(vb) - Number(va));
+          }
+          const sa = String(va || "").toLowerCase();
+          const sb = String(vb || "").toLowerCase();
+          if (sa < sb) return sortCfg.dir === "asc" ? -1 : 1;
+          if (sa > sb) return sortCfg.dir === "asc" ? 1 : -1;
+          return 0;
+        });
+      }
+      return filtered;
+    }
+
+    function exportTableToCSV(rows, columnMap, filename) {
+      const headers = columnMap.map(c => '"' + String(c.header).replace(/"/g, '""') + '"').join(",");
+      const csvRows = rows.map(r => {
+        return columnMap.map(c => {
+          const raw = r[c.key] !== undefined && r[c.key] !== null ? String(r[c.key]) : "";
+          return '"' + raw.replace(/"/g, '""') + '"';
+        }).join(",");
+      });
+      const csvString = [headers].concat(csvRows).join("\r\n");
+      const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    /* ==========================================================================
+       MODULE RENDERERS (Every module displays exact Banner and Data Statement)
+       ========================================================================== */
+    function renderModuleHeaderBlock(title, subtitle) {
+      return `
+        <div class="module-sticky-notices" role="region" aria-label="Module Guardrail Banner and Data Statement">
+          <strong>${escapeHtml(DATA.exactTexts.banner)}</strong>
+          <span>${escapeHtml(DATA.exactTexts.dataStatement)}</span>
+        </div>
+        <div class="module-header">
+          <h2 class="module-title">${escapeHtml(title)}</h2>
+          <p class="module-subtitle">${escapeHtml(subtitle)}</p>
+        </div>
+      `;
+    }
+
+    // MODULE 1: PROPERTY OVERVIEW
+    function renderModule1(arch) {
+      const metrics = computeOverviewMetrics(arch);
+      const propRules = evaluatePropertyWideRoutingRules(arch);
+      let zoneRulesFired = new Set();
+      arch.zones.forEach(z => {
+        evaluateZoneRoutingRules(arch, z).forEach(r => zoneRulesFired.add(r.ruleId));
+      });
+      propRules.forEach(r => zoneRulesFired.add(r.ruleId));
+      const sortedRulesFired = Array.from(zoneRulesFired).sort();
+
+      const placeholderRows = DATA.draftTemplatePlaceholders.map(p => `
+        <tr>
+          <td><strong>${escapeHtml(p.category)}</strong></td>
+          <td>${escapeHtml(p.item)}</td>
+          <td><span class="badge badge-accent">${escapeHtml(p.note)}</span></td>
+        </tr>
+      `).join("");
+
+      return `
+        ${renderModuleHeaderBlock("1. Property Overview", arch.name + " — " + arch.description)}
+
+        <div class="kpi-grid" role="region" aria-label="Computed Property Summary Tiles">
+          <div class="kpi-tile">
+            <div class="kpi-label">Recorded Zones</div>
+            <div class="kpi-value">${metrics.totalZones}</div>
+            <div class="kpi-sub">Computed from Zone Register</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-label">Parties in Roster</div>
+            <div class="kpi-value">${metrics.totalParties}</div>
+            <div class="kpi-sub">Organizations &amp; generic roles only</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-label">Shared-Use Zones</div>
+            <div class="kpi-value">${metrics.sharedZonesCount}</div>
+            <div class="kpi-sub">Used by 2 or more employers</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-label">Unknown Control Facts</div>
+            <div class="kpi-value">${metrics.unknownControlFactsCount}</div>
+            <div class="kpi-sub">Across F1–F5 fact columns</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-label">Open Actions</div>
+            <div class="kpi-value">${metrics.openActionsCount}</div>
+            <div class="kpi-sub">From Change Triggers &amp; Actions</div>
+          </div>
+          <div class="kpi-tile">
+            <div class="kpi-label">Total Overlap Hours</div>
+            <div class="kpi-value">${metrics.totalOverlapHours}</div>
+            <div class="kpi-sub">Vendor vs. employer shift hours</div>
+          </div>
+        </div>
+
+        <div class="release-review-box" role="region" aria-label="Release Review Status">
+          ${escapeHtml(DATA.exactTexts.releaseReview)}
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Active Routing Rules Triggered in ${escapeHtml(arch.id)} (${sortedRulesFired.length} of 10 Rules Active)</h3>
+          <p style="margin: 0 0 8px 0; font-size: 13px; color: var(--text-secondary);">Rule-based prompts generate follow-up questions and specialist referrals for human review. They never assign fault or determine who is responsible.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            ${sortedRulesFired.map(rid => `<span class="badge badge-accent">${escapeHtml(rid)} Active</span>`).join("")}
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            <h3 class="card-title" style="margin:0;">Draft Template Notes (Items Pending Operator Interview)</h3>
+            <button type="button" id="btn-export-m1-placeholders">Export CSV (current filtered view)</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Template Area</th>
+                  <th>Item to Revise During Operator Interview</th>
+                  <th>Status Label</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${placeholderRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // MODULE 2: ZONE REGISTER
+    function renderModule2(arch) {
+      const colMap = DATA.columnMaps.zones;
+      const enrichedZones = arch.zones.map(z => {
+        const empUsers = getZoneEmployerUsers(arch, z.id);
+        const unkCount = countZoneUnknownFacts(z);
+        const walkCount = countZoneWalkNotes(arch, z.id);
+        return {
+          id: z.id,
+          name: z.name,
+          band: z.band,
+          type: z.type,
+          publicAccess: z.publicAccess,
+          employerCount: empUsers.length,
+          unknownFactCount: unkCount,
+          walkNotesCount: walkCount,
+          notes: z.notes,
+          _raw: z
+        };
+      });
+
+      const f = UI_STATE.m2Filters;
+      const preFiltered = enrichedZones.filter(row => {
+        if (f.band !== "ALL" && row.band !== f.band) return false;
+        if (f.sharedOnly && row.employerCount < 2) return false;
+        if (f.unknownOnly && row.unknownFactCount === 0) return false;
+        if (f.publicAccess !== "ALL" && row.publicAccess !== f.publicAccess) return false;
+        return true;
+      });
+
+      const finalRows = filterAndSortRows(preFiltered, colMap, "m2_zones");
+
+      const selectedZone = arch.zones.find(z => z.id === UI_STATE.selectedZoneId) || arch.zones[0];
+      const selectedPrompts = selectedZone ? evaluateZoneRoutingRules(arch, selectedZone) : [];
+      const selectedUsers = selectedZone ? arch.zoneUse.filter(u => u.zoneId === selectedZone.id) : [];
+
+      return `
+        ${renderModuleHeaderBlock("2. Zone Register", "Sortable, searchable register of property zones. Click any row to inspect control facts, usage windows, and rule-based prompts.")}
+
+        <div class="table-toolbar" role="region" aria-label="Zone Register Filters">
+          <div class="control-group">
+            <label for="m2-filter-band">Band:</label>
+            <select id="m2-filter-band">
+              <option value="ALL" ${f.band === "ALL" ? "selected" : ""}>All Bands</option>
+              ${Object.keys(DATA.taxonomy).map(b => `<option value="${escapeHtml(b)}" ${f.band === b ? "selected" : ""}>${escapeHtml(b)}</option>`).join("")}
+            </select>
+
+            <label for="m2-filter-access">Public Access:</label>
+            <select id="m2-filter-access">
+              <option value="ALL" ${f.publicAccess === "ALL" ? "selected" : ""}>All Access Types</option>
+              <option value="open" ${f.publicAccess === "open" ? "selected" : ""}>open</option>
+              <option value="restricted" ${f.publicAccess === "restricted" ? "selected" : ""}>restricted</option>
+              <option value="unknown" ${f.publicAccess === "unknown" ? "selected" : ""}>unknown</option>
+            </select>
+
+            <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer;">
+              <input type="checkbox" id="m2-filter-shared" ${f.sharedOnly ? "checked" : ""}>
+              Shared-Use (2+ Employers)
+            </label>
+
+            <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer;">
+              <input type="checkbox" id="m2-filter-unknown" ${f.unknownOnly ? "checked" : ""}>
+              Has Unknown Facts
+            </label>
+          </div>
+          <button type="button" id="btn-export-m2">Export CSV (current filtered view)</button>
+        </div>
+
+        <div class="table-container">
+          <table aria-label="Zone Register Table">
+            <thead>
+              <tr>
+                ${colMap.map(c => `<th data-sort-table="m2_zones" data-sort-key="${escapeHtml(c.key)}">${escapeHtml(c.header)} ↕</th>`).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${finalRows.length === 0 ? `<tr><td colspan="${colMap.length}">No matching zone records in current filter view.</td></tr>` : finalRows.map(r => `
+                <tr class="clickable-row" data-zone-id="${escapeHtml(r.id)}" style="${selectedZone && selectedZone.id === r.id ? "background-color: var(--accent-light);" : ""}">
+                  ${colMap.map(c => {
+                    const val = r[c.key];
+                    if (c.type === "badge") return `<td><span class="badge">${escapeHtml(val)}</span></td>`;
+                    return `<td>${escapeHtml(val)}</td>`;
+                  }).join("")}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+
+        ${selectedZone ? `
+          <div class="card" role="region" aria-label="Selected Zone Detail Panel">
+            <h3 class="card-title">Zone Detail Panel: ${escapeHtml(selectedZone.id)} — ${escapeHtml(selectedZone.name)}</h3>
+            <p style="margin: 0 0 10px 0;"><strong>Band:</strong> ${escapeHtml(selectedZone.band)} | <strong>Taxonomy Type:</strong> ${escapeHtml(selectedZone.type)} | <strong>Public Access:</strong> <span class="badge">${escapeHtml(selectedZone.publicAccess)}</span></p>
+            <p style="margin: 0 0 12px 0;"><strong>Neutral Observation Notes:</strong> ${escapeHtml(selectedZone.notes)}</p>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+              <div>
+                <h4 style="margin:0 0 6px 0;">Recorded Control Facts (F1–F5)</h4>
+                <ul style="margin:0; padding-left:18px; font-size:13px;">
+                  <li><strong>F1 Maintains:</strong> ${escapeHtml(selectedZone.facts.F1.value)} (<em>${escapeHtml(selectedZone.facts.F1.evidence)}</em>)</li>
+                  <li><strong>F2 Sets access/hours:</strong> ${escapeHtml(selectedZone.facts.F2.value)} (<em>${escapeHtml(selectedZone.facts.F2.evidence)}</em>)</li>
+                  <li><strong>F3 Authorizes changes:</strong> ${escapeHtml(selectedZone.facts.F3.value)} (<em>${escapeHtml(selectedZone.facts.F3.evidence)}</em>)</li>
+                  <li><strong>F4 Schedules vendors:</strong> ${escapeHtml(selectedZone.facts.F4.value)} (<em>${escapeHtml(selectedZone.facts.F4.evidence)}</em>)</li>
+                  <li><strong>F5 Written reference:</strong> ${escapeHtml(selectedZone.facts.F5.value || "None recorded")} (<em>${escapeHtml(selectedZone.facts.F5.evidence)}</em>)</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="margin:0 0 6px 0;">Rule-Based Follow-Up Prompts (${selectedPrompts.length})</h4>
+                ${selectedPrompts.length === 0 ? `<p style="margin:0; font-size:13px;">No routing rules triggered for this zone.</p>` : `
+                  <ul style="margin:0; padding-left:18px; font-size:13px;">
+                    ${selectedPrompts.map(p => `<li><span class="badge badge-accent">${escapeHtml(p.ruleId)}</span> ${escapeHtml(p.text)}</li>`).join("")}
+                  </ul>
+                `}
+                <h4 style="margin:12px 0 6px 0;">Recorded Users (${selectedUsers.length})</h4>
+                <ul style="margin:0; padding-left:18px; font-size:13px;">
+                  ${selectedUsers.map(u => `<li><strong>${escapeHtml(u.partyRole)}:</strong> ${u.startHour}:00 to ${u.endHour}:00 (${escapeHtml(u.frequency)})</li>`).join("")}
+                </ul>
+              </div>
+            </div>
+          </div>
+        ` : ""}
+      `;
+    }
+
+    // MODULE 3: ZONE MAP (FICTIONAL SCHEMATIC)
+    function renderModule3(arch) {
+      const bands = Object.keys(DATA.taxonomy);
+      const bandBlocks = bands.map(bandName => {
+        const zonesInBand = arch.zones.filter(z => z.band === bandName);
+        if (zonesInBand.length === 0) return "";
+        return `
+          <div class="band-section">
+            <div class="band-header">Band: ${escapeHtml(bandName)} (${zonesInBand.length} Zones)</div>
+            <div class="schematic-grid">
+              ${zonesInBand.map(z => {
+                const empCount = getZoneEmployerUsers(arch, z.id).length;
+                const unkCount = countZoneUnknownFacts(z);
+                return `
+                  <div class="schematic-tile">
+                    <h4>${escapeHtml(z.id)}: ${escapeHtml(z.name)}</h4>
+                    <div class="schematic-meta"><strong>Type:</strong> ${escapeHtml(z.type)}</div>
+                    <div class="schematic-meta"><strong>Public Access:</strong> ${escapeHtml(z.publicAccess)}</div>
+                    <div class="schematic-meta"><strong>Employers Using Zone:</strong> ${empCount}</div>
+                    <div class="schematic-meta"><strong>Unknown Control Facts:</strong> ${unkCount}</div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        ${renderModuleHeaderBlock("3. Zone Map (Fictional Schematic)", "Conceptual grouping of recorded zones by operational band.")}
+
+        <div class="card">
+          <p style="margin: 0 0 12px 0; font-weight: 700; color: var(--text-main);">
+            Fictional schematic. Not to scale. Not a floor plan, security plan or building layout.
+          </p>
+          ${bandBlocks}
+        </div>
+      `;
+    }
+
+    // MODULE 4: SHARED-USE MATRIX
+    function renderModule4(arch) {
+      const catFilter = UI_STATE.m4PartyCategoryFilter;
+      const visibleParties = arch.parties.filter(p => catFilter === "ALL" || p.category === catFilter);
+
+      const matrixMap = [
+        { key: "zoneLabel", header: "Zone", type: "text" },
+        { key: "band", header: "Band", type: "text" },
+        ...visibleParties.map(p => ({ key: "party_" + p.role, header: p.role + " (" + p.category + ")", type: "text" })),
+        { key: "distinctEmployers", header: "Row Total (Distinct Employers)", type: "number" }
+      ];
+
+      const matrixRows = arch.zones.map(z => {
+        const row = {
+          zoneLabel: z.id + " — " + z.name,
+          band: z.band,
+          distinctEmployers: getZoneEmployerUsers(arch, z.id).length
+        };
+        visibleParties.forEach(p => {
+          const use = arch.zoneUse.find(u => u.zoneId === z.id && u.partyRole === p.role);
+          row["party_" + p.role] = use ? `${use.startHour}:00–${use.endHour}:00 (${use.frequency})` : "—";
+        });
+        return row;
+      });
+
+      const filteredRows = filterAndSortRows(matrixRows, matrixMap, "m4_matrix");
+
+      return `
+        ${renderModuleHeaderBlock("4. Shared-Use Matrix", "Zones by parties matrix showing usage time windows, frequency text, and distinct employer totals per zone.")}
+
+        <div class="table-toolbar">
+          <div class="control-group">
+            <label for="m4-party-filter">Column Filter by Party Type:</label>
+            <select id="m4-party-filter">
+              <option value="ALL" ${catFilter === "ALL" ? "selected" : ""}>All Parties (Employers &amp; Contractors)</option>
+              <option value="Employer" ${catFilter === "Employer" ? "selected" : ""}>Employers Only</option>
+              <option value="Contractor" ${catFilter === "Contractor" ? "selected" : ""}>Contractors Only</option>
+            </select>
+          </div>
+          <button type="button" id="btn-export-m4">Export CSV (current filtered view)</button>
+        </div>
+
+        <div class="table-container">
+          <table aria-label="Shared-Use Matrix Table">
+            <thead>
+              <tr>
+                ${matrixMap.map(c => `<th data-sort-table="m4_matrix" data-sort-key="${escapeHtml(c.key)}">${escapeHtml(c.header)} ↕</th>`).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredRows.map(r => `
+                <tr>
+                  ${matrixMap.map(c => {
+                    if (c.key === "distinctEmployers") return `<td><span class="badge badge-accent">${escapeHtml(r[c.key])} Employers</span></td>`;
+                    return `<td>${escapeHtml(r[c.key])}</td>`;
+                  }).join("")}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // MODULE 5: CONTROL FACTS WORKSHEET
+    function renderModule5(arch) {
+      const partyRoles = ["Unknown", ...arch.parties.map(p => p.role)];
+      const evidenceOptions = DATA.permittedLabels.controlFactEvidence;
+      const rulesMap = DATA.columnMaps.rulesTable;
+
+      const worksheetMap = [
+        { key: "zoneId", header: "Zone ID", type: "text" },
+        { key: "zoneName", header: "Zone Name", type: "text" },
+        { key: "F1", header: "F1 Maintains", type: "text" },
+        { key: "F2", header: "F2 Sets Access & Hours", type: "text" },
+        { key: "F3", header: "F3 Authorizes Physical Changes", type: "text" },
+        { key: "F4", header: "F4 Schedules Vendors", type: "text" },
+        { key: "F5", header: "F5 Written Reference", type: "text" },
+        { key: "routingPrompts", header: "Rule-Based Prompts", type: "text" }
+      ];
+
+      const exportRows = arch.zones.map(z => {
+        const prompts = evaluateZoneRoutingRules(arch, z).map(p => `${p.ruleId}: ${p.text}`).join(" | ");
+        return {
+          zoneId: z.id,
+          zoneName: z.name,
+          F1: `${z.facts.F1.value} [${z.facts.F1.evidence}]`,
+          F2: `${z.facts.F2.value} [${z.facts.F2.evidence}]`,
+          F3: `${z.facts.F3.value} [${z.facts.F3.evidence}]`,
+          F4: `${z.facts.F4.value} [${z.facts.F4.evidence}]`,
+          F5: `${z.facts.F5.value || "Empty"} [${z.facts.F5.evidence}]`,
+          routingPrompts: prompts || "None"
+        };
+      });
+
+      const filteredExportRows = filterAndSortRows(exportRows, worksheetMap, "m5_worksheet");
+      const visibleZoneIds = new Set(filteredExportRows.map(r => r.zoneId));
+      const visibleZones = arch.zones.filter(z => visibleZoneIds.has(z.id));
+
+      return `
+        ${renderModuleHeaderBlock("5. Control Facts Worksheet", "Edit F1–F5 party roles and evidence labels per zone. Editing immediately re-runs routing rules R-01 through R-10 and updates Overview counts.")}
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <h3 class="card-title" style="margin:0;">Collapsible Panel: Routing Rules Used (R-01 to R-10)</h3>
+            <div>
+              <button type="button" id="btn-toggle-rules">${UI_STATE.m5ShowRules ? "Collapse Rules Panel" : "Expand Rules Panel"}</button>
+              <button type="button" id="btn-export-m5">Export CSV (current filtered view)</button>
+            </div>
+          </div>
+          ${UI_STATE.m5ShowRules ? `
+            <div class="table-container" style="margin-top:12px; margin-bottom:0;">
+              <table>
+                <thead>
+                  <tr>
+                    ${rulesMap.map(c => `<th>${escapeHtml(c.header)}</th>`).join("")}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${DATA.routingRulesCatalog.map(r => `
+                    <tr>
+                      <td><span class="badge badge-accent">${escapeHtml(r.ruleId)}</span></td>
+                      <td>${escapeHtml(r.trigger)}</td>
+                      <td>${escapeHtml(r.prompt)}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          ` : ""}
+        </div>
+
+        ${visibleZones.map(z => {
+          const prompts = evaluateZoneRoutingRules(arch, z);
+          return `
+            <div class="card" data-worksheet-zone="${escapeHtml(z.id)}">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; margin-bottom:10px; border-bottom:1px solid var(--border-color); padding-bottom:8px;">
+                <div>
+                  <h3 class="card-title" style="margin:0;">${escapeHtml(z.id)}: ${escapeHtml(z.name)}</h3>
+                  <span style="font-size:12px; color:var(--text-secondary);">Band: ${escapeHtml(z.band)} | Type: ${escapeHtml(z.type)} | Public Access: ${escapeHtml(z.publicAccess)}</span>
+                </div>
+                <span class="badge">${countZoneUnknownFacts(z)} Unknown Fact(s)</span>
+              </div>
+
+              <div class="worksheet-grid">
+                <div class="table-container" style="margin-bottom:0;">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Control Fact</th>
+                        <th>Party Role / Reference Value</th>
+                        <th>Evidence Label</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${["F1", "F2", "F3", "F4"].map(fk => {
+                        const labels = {
+                          F1: "F1 Maintains (routine upkeep & repairs)",
+                          F2: "F2 Sets access and hours",
+                          F3: "F3 Authorizes physical changes",
+                          F4: "F4 Schedules vendors"
+                        };
+                        const currVal = z.facts[fk].value;
+                        const currEv = z.facts[fk].evidence;
+                        return `
+                          <tr>
+                            <td><strong>${escapeHtml(labels[fk])}</strong></td>
+                            <td>
+                              <select class="cf-role-select" data-zone="${escapeHtml(z.id)}" data-fact="${fk}" aria-label="${escapeHtml(labels[fk])} role for ${escapeHtml(z.id)}">
+                                ${partyRoles.map(pr => `<option value="${escapeHtml(pr)}" ${currVal === pr ? "selected" : ""}>${escapeHtml(pr)}</option>`).join("")}
+                              </select>
+                            </td>
+                            <td>
+                              <select class="cf-ev-select" data-zone="${escapeHtml(z.id)}" data-fact="${fk}" aria-label="${escapeHtml(labels[fk])} evidence for ${escapeHtml(z.id)}">
+                                ${evidenceOptions.map(ev => `<option value="${escapeHtml(ev)}" ${currEv === ev ? "selected" : ""}>${escapeHtml(ev)}</option>`).join("")}
+                              </select>
+                            </td>
+                          </tr>
+                        `;
+                      }).join("")}
+                      <tr>
+                        <td>
+                          <strong>F5 Written reference</strong>
+                          <div style="font-size:11px; color:var(--text-muted);">Document cited by client; not reviewed by GCG.</div>
+                        </td>
+                        <td>
+                          <input type="text" class="cf-f5-input" data-zone="${escapeHtml(z.id)}" value="${escapeHtml(z.facts.F5.value)}" placeholder="Section reference only..." style="width:100%;" aria-label="F5 Written reference for ${escapeHtml(z.id)}">
+                        </td>
+                        <td>
+                          <select class="cf-ev-select" data-zone="${escapeHtml(z.id)}" data-fact="F5" aria-label="F5 evidence for ${escapeHtml(z.id)}">
+                            ${evidenceOptions.map(ev => `<option value="${escapeHtml(ev)}" ${z.facts.F5.evidence === ev ? "selected" : ""}>${escapeHtml(ev)}</option>`).join("")}
+                          </select>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style="background-color:var(--bg-subtle); padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+                  <h4 style="margin:0 0 8px 0; font-size:14px;">Rule-Based Routing Prompts (${prompts.length})</h4>
+                  ${prompts.length === 0 ? `<p style="margin:0; font-size:13px;">No zone-level prompts triggered.</p>` : `
+                    <ul style="margin:0; padding-left:18px; font-size:13px; display:flex; flex-direction:column; gap:6px;">
+                      ${prompts.map(p => `<li><span class="badge badge-accent">${escapeHtml(p.ruleId)}</span> ${escapeHtml(p.text)}</li>`).join("")}
+                    </ul>
+                  `}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      `;
+    }
+
+    // MODULE 6: PARTIES ROSTER, COORDINATION MAP AND ROUTES
+    function renderModule6(arch) {
+      const colMap = DATA.columnMaps.parties;
+      const rows = filterAndSortRows(arch.parties, colMap, "m6_parties");
+      const r10Prompts = evaluatePropertyWideRoutingRules(arch).filter(r => r.ruleId === "R-10");
+
+      return `
+        ${renderModuleHeaderBlock("6. Parties Roster, Coordination Map and Training/Reporting Routes", "Organizations and generic roles only. Holds no individual-person data and no incident narratives.")}
+
+        ${r10Prompts.length > 0 ? `
+          <div class="card">
+            <h3 class="card-title">Specialized Tenant Type Prompts (Rule R-10)</h3>
+            <ul style="margin:0; padding-left:18px;">
+              ${r10Prompts.map(p => `<li><span class="badge badge-accent">${escapeHtml(p.ruleId)}</span> <strong>${escapeHtml(p.scope)}:</strong> ${escapeHtml(p.text)}</li>`).join("")}
+            </ul>
+          </div>
+        ` : ""}
+
+        <div class="table-toolbar">
+          <span>Showing ${rows.length} party role record(s) (organizations or generic operational roles only)</span>
+          <button type="button" id="btn-export-m6">Export CSV (current filtered view)</button>
+        </div>
+
+        <div class="table-container">
+          <table aria-label="Parties Roster Table">
+            <thead>
+              <tr>
+                ${colMap.map(c => `<th data-sort-table="m6_parties" data-sort-key="${escapeHtml(c.key)}">${escapeHtml(c.header)} ↕</th>`).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(r => `
+                <tr>
+                  ${colMap.map(c => {
+                    if (c.type === "badge") return `<td><span class="badge">${escapeHtml(r[c.key])}</span></td>`;
+                    return `<td>${escapeHtml(r[c.key])}</td>`;
+                  }).join("")}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // MODULE 7: TIME-WINDOW OVERLAP
+    function renderModule7(arch) {
+      if (!UI_STATE.m7SelectedZoneId || !arch.zones.some(z => z.id === UI_STATE.m7SelectedZoneId)) {
+        UI_STATE.m7SelectedZoneId = arch.zones[0].id;
+      }
+      const zone = arch.zones.find(z => z.id === UI_STATE.m7SelectedZoneId);
+      const uses = arch.zoneUse.filter(u => u.zoneId === zone.id);
+      const partyMap = getPartyMap(arch);
+      const ovStats = computeZoneOverlapStats(arch, zone.id);
+      const hoursHeader = Array.from({ length: 24 }, (_, i) => i);
+
+      const publicHoursActive = zone.publicAccess === "open" ? expandWindowHours(6, 22) : new Array(24).fill(false);
+
+      const gridMap = [
+        { key: "rowLabel", header: "Role / Window Type", type: "text" },
+        { key: "category", header: "Category", type: "text" },
+        { key: "windowText", header: "Recorded Hours", type: "text" },
+        { key: "frequency", header: "Frequency", type: "text" }
+      ];
+      const exportRows = uses.map(u => ({
+        rowLabel: u.partyRole,
+        category: partyMap[u.partyRole] ? partyMap[u.partyRole].category : "Role",
+        windowText: `${u.startHour}:00 to ${u.endHour}:00`,
+        frequency: u.frequency
+      }));
+      const filteredExportRows = filterAndSortRows(exportRows, gridMap, "m7_overlap");
+
+      return `
+        ${renderModuleHeaderBlock("7. Time-Window Overlap", "24-hour visual and numerical overlap schedule for any selected zone, supporting windows that cross midnight.")}
+
+        <div class="table-toolbar">
+          <div class="control-group">
+            <label for="m7-zone-select">Select Zone:</label>
+            <select id="m7-zone-select">
+              ${arch.zones.map(z => `<option value="${escapeHtml(z.id)}" ${z.id === zone.id ? "selected" : ""}>${escapeHtml(z.id)} — ${escapeHtml(z.name)} (${escapeHtml(z.band)})</option>`).join("")}
+            </select>
+          </div>
+          <div class="control-group">
+            <span class="badge badge-accent">Computed Vendor/Employer Overlap: ${ovStats.overlapCount} Hour(s)</span>
+            <button type="button" id="btn-export-m7">Export CSV (current filtered view)</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">24-Hour Schedule &amp; Overlap Grid: ${escapeHtml(zone.id)} — ${escapeHtml(zone.name)}</h3>
+          <p style="margin:0 0 10px 0; font-size:12px; color:var(--text-secondary);">
+            Legend (One Hue in Two Intensities + Printed Number): <code>0</code> = Inactive hour | <code>1</code> (Light Blue) = Active window | <code>2</code> (Medium Blue w/ Border) = Simultaneous Vendor &amp; Employer Overlap Hour.
+          </p>
+
+          <div class="table-container">
+            <table aria-label="24-Hour Time Window Overlap Grid">
+              <thead>
+                <tr>
+                  <th>Role / Schedule Row</th>
+                  <th>Type</th>
+                  <th>Window</th>
+                  ${hoursHeader.map(h => `<th style="text-align:center; padding:4px;">${String(h).padStart(2, "0")}</th>`).join("")}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Public Access Window (${escapeHtml(zone.publicAccess)})</strong></td>
+                  <td><span class="badge">Public</span></td>
+                  <td>${zone.publicAccess === "open" ? "06:00–22:00 (Illustrative)" : "Restricted"}</td>
+                  ${hoursHeader.map(h => `<td class="hour-cell ${publicHoursActive[h] ? "hour-1" : "hour-0"}">${publicHoursActive[h] ? "1" : "0"}</td>`).join("")}
+                </tr>
+                ${uses.map(u => {
+                  const p = partyMap[u.partyRole];
+                  const cat = p ? p.category : "Employer";
+                  const hrs = expandWindowHours(u.startHour, u.endHour);
+                  return `
+                    <tr>
+                      <td><strong>${escapeHtml(u.partyRole)}</strong><div style="font-size:11px; color:var(--text-muted);">${escapeHtml(u.frequency)}</div></td>
+                      <td><span class="badge">${escapeHtml(cat)}</span></td>
+                      <td>${u.startHour}:00–${u.endHour}:00</td>
+                      ${hoursHeader.map(h => `<td class="hour-cell ${hrs[h] ? "hour-1" : "hour-0"}">${hrs[h] ? "1" : "0"}</td>`).join("")}
+                    </tr>
+                  `;
+                }).join("")}
+                <tr style="border-top: 2px solid var(--border-strong);">
+                  <td colspan="2"><strong>Computed Vendor vs. Employer Overlap Row</strong></td>
+                  <td><strong>${ovStats.overlapCount} Overlap Hr(s)</strong></td>
+                  ${hoursHeader.map(h => {
+                    const st = ovStats.hourStates[h];
+                    return `<td class="hour-cell hour-${st}">${st}</td>`;
+                  }).join("")}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          ${zone.band === "Back-of-house" && ovStats.overlapCount > 0 ? `
+            <p style="margin:0; font-weight:600;"><span class="badge badge-accent">R-07 Active</span> Shared-use overlap. Confirm both parties' training and reporting routes cover this zone and these hours.</p>
+          ` : ""}
+        </div>
+      `;
+    }
+
+    // MODULE 8: LOG COPY SHARING RECORD
+    function renderModule8(arch) {
+      const colMap = DATA.columnMaps.logSharing;
+      const rows = filterAndSortRows(arch.logSharing, colMap, "m8_logsharing");
+      const r06Prompts = evaluatePropertyWideRoutingRules(arch).filter(r => r.ruleId === "R-06");
+
+      return `
+        ${renderModuleHeaderBlock("8. Log Copy Sharing Record (No Incident Content)", "Administrative record of periodic log-copy exchanges between party roles. Holds no incident narratives or personal data.")}
+
+        <div class="card">
+          <p style="margin:0; font-weight:700;">Mandatory Notice: GCG does not designate a recipient. Recipient roles are recorded strictly "as designated by client and counsel."</p>
+          ${r06Prompts.length > 0 ? `<p style="margin:8px 0 0 0;"><span class="badge badge-accent">R-06 Triggered</span> Client and counsel designate the recipient. GCG does not designate.</p>` : ""}
+        </div>
+
+        <div class="table-toolbar">
+          <span>Showing ${rows.length} log-sharing administrative record(s)</span>
+          <button type="button" id="btn-export-m8">Export CSV (current filtered view)</button>
+        </div>
+
+        <div class="table-container">
+          <table aria-label="Log Copy Sharing Record Table">
+            <thead>
+              <tr>
+                ${colMap.map(c => `<th data-sort-table="m8_logsharing" data-sort-key="${escapeHtml(c.key)}">${escapeHtml(c.header)} ↕</th>`).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(r => `
+                <tr>
+                  ${colMap.map(c => {
+                    const val = r[c.key] || "None recorded — Unknown — Fact Intake Needed";
+                    if (c.type === "badge") return `<td><span class="badge">${escapeHtml(val)}</span></td>`;
+                    return `<td>${escapeHtml(val)}</td>`;
+                  }).join("")}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // MODULE 9: CHANGE TRIGGERS AND ACTIONS
+    function renderModule9(arch) {
+      const colMap = DATA.columnMaps.changeTriggers;
+      const rows = filterAndSortRows(arch.changeTriggers, colMap, "m9_triggers");
+      const triggerTypes = [
+        "tenant move-in or out",
+        "hours change",
+        "construction",
+        "new vendor",
+        "lot reconfiguration",
+        "seasonal event",
+        "lighting outage reported by a user"
+      ];
+
+      return `
+        ${renderModuleHeaderBlock("9. Change Triggers and Actions", "Record property or operational change triggers and track review actions. Adding, updating, or deleting actions dynamically updates Open Action counts.")}
+
+        <div class="card no-print">
+          <h3 class="card-title">Add Review Action from Change Trigger</h3>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; align-items:end;">
+            <div>
+              <label for="m9-trigger-type">Trigger Type:</label><br>
+              <select id="m9-trigger-type" style="width:100%;">
+                ${triggerTypes.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("")}
+              </select>
+            </div>
+            <div>
+              <label for="m9-owner-role">Owner Role:</label><br>
+              <select id="m9-owner-role" style="width:100%;">
+                ${arch.parties.map(p => `<option value="${escapeHtml(p.role)}">${escapeHtml(p.role)}</option>`).join("")}
+              </select>
+            </div>
+            <div>
+              <label for="m9-due-date">Due Date:</label><br>
+              <input type="date" id="m9-due-date" value="2026-07-01" style="width:100%;">
+            </div>
+            <div>
+              <label for="m9-status">Initial Status:</label><br>
+              <select id="m9-status" style="width:100%;">
+                ${DATA.permittedLabels.status.map(s => `<option value="${escapeHtml(s)}" ${s === "Open" ? "selected" : ""}>${escapeHtml(s)}</option>`).join("")}
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+            <input type="text" id="m9-action-text" placeholder="Enter neutral review action description..." style="flex:1;" aria-label="Review action description">
+            <button type="button" class="btn-primary" id="btn-add-action">Add Action</button>
+          </div>
+        </div>
+
+        <div class="table-toolbar">
+          <span>Showing ${rows.length} action record(s)</span>
+          <button type="button" id="btn-export-m9">Export CSV (current filtered view)</button>
+        </div>
+
+        <div class="table-container">
+          <table aria-label="Change Triggers and Actions Table">
+            <thead>
+              <tr>
+                ${colMap.map(c => `<th data-sort-table="m9_triggers" data-sort-key="${escapeHtml(c.key)}">${escapeHtml(c.header)} ↕</th>`).join("")}
+                <th class="no-print">Manage</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(r => `
+                <tr>
+                  <td>${escapeHtml(r.id)}</td>
+                  <td><span class="badge">${escapeHtml(r.triggerType)}</span></td>
+                  <td>${escapeHtml(r.actionText)}</td>
+                  <td>${escapeHtml(r.ownerRole)}</td>
+                  <td>${escapeHtml(r.dueDate)}</td>
+                  <td>
+                    <select class="m9-status-change" data-action-id="${escapeHtml(r.id)}" aria-label="Change status for ${escapeHtml(r.id)}">
+                      ${DATA.permittedLabels.status.map(s => `<option value="${escapeHtml(s)}" ${r.status === s ? "selected" : ""}>${escapeHtml(s)}</option>`).join("")}
+                    </select>
+                  </td>
+                  <td class="no-print">
+                    <button type="button" class="btn-delete-action" data-action-id="${escapeHtml(r.id)}">Delete</button>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // MODULE 10: DAILY-PRACTICE REVIEW
+    function renderModule10(arch) {
+      const dpMap = [
+        { key: "code", header: "Code", type: "text" },
+        { key: "pattern", header: "Practice Pattern (Observational)", type: "text" },
+        { key: "question", header: "Factual Question to Ask", type: "text" },
+        { key: "recordRef", header: "Record Reference", type: "text" },
+        { key: "readinessStep", header: "Readiness Step", type: "text" },
+        { key: "ownerRole", header: "Owner Role", type: "text" },
+        { key: "dueDate", header: "Due Date", type: "text" },
+        { key: "status", header: "Status", type: "badge" }
+      ];
+
+      const rows = filterAndSortRows(DATA.dailyPracticePatterns, dpMap, "m10_practice");
+
+      return `
+        ${renderModuleHeaderBlock("10. Daily-Practice Review", "Eleven neutral practice patterns for operator discussion. Wording is strictly observational and never assigns fault, intent, or responsibility.")}
+
+        <div class="table-toolbar">
+          <span>Showing ${rows.length} of 11 daily-practice review pattern(s)</span>
+          <button type="button" id="btn-export-m10">Export CSV (current filtered view)</button>
+        </div>
+
+        <div class="practice-grid">
+          ${rows.map(p => `
+            <div class="card" style="margin-bottom:0;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="badge badge-accent">Pattern ${escapeHtml(p.code)}</span>
+                <select class="m10-status-select" data-dp-id="${escapeHtml(p.id)}" aria-label="Status for pattern ${escapeHtml(p.code)}">
+                  ${DATA.permittedLabels.status.map(s => `<option value="${escapeHtml(s)}" ${p.status === s ? "selected" : ""}>${escapeHtml(s)}</option>`).join("")}
+                </select>
+              </div>
+              <h3 class="card-title" style="font-size:15px;">${escapeHtml(p.pattern)}</h3>
+              <p style="margin:0 0 6px 0; font-size:13px;"><strong>Factual Question:</strong> ${escapeHtml(p.question)}</p>
+              <p style="margin:0 0 6px 0; font-size:13px;"><strong>Record Reference:</strong> ${escapeHtml(p.recordRef)}</p>
+              <p style="margin:0 0 6px 0; font-size:13px;"><strong>Readiness Step:</strong> ${escapeHtml(p.readinessStep)}</p>
+              <p style="margin:0; font-size:12px; color:var(--text-secondary);"><strong>Owner Role:</strong> ${escapeHtml(p.ownerRole)} | <strong>Due:</strong> ${escapeHtml(p.dueDate)}</p>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    // MODULE 11: READINESS WALK LOG
+    function renderModule11(arch) {
+      const colMap = DATA.columnMaps.walkLog;
+      const rows = filterAndSortRows(arch.walkLog, colMap, "m11_walklog");
+
+      return `
+        ${renderModuleHeaderBlock("11. Readiness Walk Log", "Record administrative and environmental coordination walks. New entries update Zone Register walk counts and can optionally open a follow-up action.")}
+
+        <div class="card no-print">
+          <h3 class="card-title">Add Readiness Walk Entry</h3>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
+            <div>
+              <label for="m11-date">Date:</label><br>
+              <input type="date" id="m11-date" value="2026-05-15" style="width:100%;">
+            </div>
+            <div>
+              <label for="m11-time">Time of Day:</label><br>
+              <input type="text" id="m11-time" value="20:30" placeholder="HH:MM" style="width:100%;">
+            </div>
+            <div>
+              <label for="m11-zone">Primary Zone Walked:</label><br>
+              <select id="m11-zone" style="width:100%;">
+                ${arch.zones.map(z => `<option value="${escapeHtml(z.id)}">${escapeHtml(z.id)} — ${escapeHtml(z.name)}</option>`).join("")}
+              </select>
+            </div>
+            <div>
+              <label for="m11-flag">Specialist Flag:</label><br>
+              <select id="m11-flag" style="width:100%;">
+                <option value="Specialist Review Flag">Specialist Review Flag</option>
+                <option value="Needs Review">Needs Review</option>
+                <option value="Not Applicable — Documented">Not Applicable — Documented</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+            <div>
+              <label for="m11-obs">Neutral Observations (no hazard conclusions):</label><br>
+              <input type="text" id="m11-obs" placeholder="e.g., Observed vendor staging during evening shift change..." style="width:100%;">
+            </div>
+            <div>
+              <label for="m11-photos">Photos Referenced (reference text only, no images stored):</label><br>
+              <input type="text" id="m11-photos" value="Ref: IMG-WALK-01 (text reference only)" style="width:100%;">
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <label style="cursor:pointer;">
+              <input type="checkbox" id="m11-open-action" checked>
+              Also open a linked Review Action in Module 9 (Change Triggers &amp; Actions)
+            </label>
+            <button type="button" class="btn-primary" id="btn-add-walk">Add Walk Log Entry</button>
+          </div>
+        </div>
+
+        <div class="table-toolbar">
+          <span>Showing ${rows.length} readiness walk log entry(ies)</span>
+          <button type="button" id="btn-export-m11">Export CSV (current filtered view)</button>
+        </div>
+
+        <div class="table-container">
+          <table aria-label="Readiness Walk Log Table">
+            <thead>
+              <tr>
+                ${colMap.map(c => `<th data-sort-table="m11_walklog" data-sort-key="${escapeHtml(c.key)}">${escapeHtml(c.header)} ↕</th>`).join("")}
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(r => `
+                <tr>
+                  ${colMap.map(c => {
+                    if (c.type === "badge") return `<td><span class="badge">${escapeHtml(r[c.key])}</span></td>`;
+                    return `<td>${escapeHtml(r[c.key])}</td>`;
+                  }).join("")}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // MODULE 12: SOURCE REGISTER, SPECIALIST FLAGS AND LIMITATIONS
+    function renderModule12(arch) {
+      const srcMap = DATA.columnMaps.sourceRegister;
+      const flagMap = DATA.columnMaps.specialistFlags;
+      const srcRows = filterAndSortRows(DATA.sourceRegister, srcMap, "m12_sources");
+      const flagRows = filterAndSortRows(arch.specialistFlags, flagMap, "m12_flags");
+
+      return `
+        ${renderModuleHeaderBlock("12. Source Register, Specialist Flags and Limitations", "Placeholder source records (no statute numbers, section cites, or quotations), specialist review referrals, and prototype limitations.")}
+
+        <div class="release-review-box" role="region" aria-label="Internal Verification Statement">
+          <strong>Internal Verification Statement:</strong> ${escapeHtml(DATA.exactTexts.internalVerification)}
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            <h3 class="card-title" style="margin:0;">Source Register (Placeholder Entries — Verify Before External Use)</h3>
+            <button type="button" id="btn-export-m12-sources">Export Source Register CSV</button>
+          </div>
+          <div class="table-container" style="margin-bottom:0;">
+            <table aria-label="Source Register Table">
+              <thead>
+                <tr>
+                  ${srcMap.map(c => `<th data-sort-table="m12_sources" data-sort-key="${escapeHtml(c.key)}">${escapeHtml(c.header)} ↕</th>`).join("")}
+                </tr>
+              </thead>
+              <tbody>
+                ${srcRows.map(r => `
+                  <tr>
+                    ${srcMap.map(c => {
+                      if (c.type === "badge") return `<td><span class="badge">${escapeHtml(r[c.key])}</span></td>`;
+                      return `<td>${escapeHtml(r[c.key])}</td>`;
+                    }).join("")}
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            <h3 class="card-title" style="margin:0;">Specialist Flags Register (${escapeHtml(arch.id)})</h3>
+            <button type="button" id="btn-export-m12-flags">Export Specialist Flags CSV</button>
+          </div>
+          <div class="table-container" style="margin-bottom:0;">
+            <table aria-label="Specialist Flags Table">
+              <thead>
+                <tr>
+                  ${flagMap.map(c => `<th data-sort-table="m12_flags" data-sort-key="${escapeHtml(c.key)}">${escapeHtml(c.header)} ↕</th>`).join("")}
+                </tr>
+              </thead>
+              <tbody>
+                ${flagRows.map(r => `
+                  <tr>
+                    ${flagMap.map(c => {
+                      if (c.type === "badge") return `<td><span class="badge badge-accent">${escapeHtml(r[c.key])}</span></td>`;
+                      return `<td>${escapeHtml(r[c.key])}</td>`;
+                    }).join("")}
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Prototype Limitations &amp; Human-Review Requirements</h3>
+          <ul style="margin:0; padding-left:18px; line-height:1.6;">
+            <li><strong>Rough-Draft Template Status:</strong> Items marked <em>Template placeholder: pending operator input</em> require direct operator fact intake and verification before use.</li>
+            <li><strong>No Legal or Role-Status Determinations:</strong> This tool records self-reported and documented operational facts for discussion; it never determines legal obligations or hazard responsibility (see Claim Boundaries panel).</li>
+            <li><strong>No Engineering, Security, or Safety Certification:</strong> Sight-line, lighting, and access observations are logged strictly to prompt facilities or security specialist referral. GCG makes no engineering or adequacy findings.</li>
+            <li><strong>No Individual-Person Data or Scoring:</strong> Parties are organizations or generic roles only. The prototype performs no employee evaluation, psychometric assessment, or automated employment decision-making.</li>
+            <li><strong>Front-End Demonstration Only:</strong> All records reside in browser memory only and reset on refresh unless exported via CSV or printed to PDF.</li>
+          </ul>
+        </div>
+      `;
+    }
+
+    /* ==========================================================================
+       MAIN RENDER CONTROLLER & EVENT BINDING
+       ========================================================================== */
+    function renderApp() {
+      const arch = getActiveArch();
+      const container = document.getElementById("main-content");
+
+      let html = "";
+      switch (UI_STATE.activeModule) {
+        case "m1": html = renderModule1(arch); break;
+        case "m2": html = renderModule2(arch); break;
+        case "m3": html = renderModule3(arch); break;
+        case "m4": html = renderModule4(arch); break;
+        case "m5": html = renderModule5(arch); break;
+        case "m6": html = renderModule6(arch); break;
+        case "m7": html = renderModule7(arch); break;
+        case "m8": html = renderModule8(arch); break;
+        case "m9": html = renderModule9(arch); break;
+        case "m10": html = renderModule10(arch); break;
+        case "m11": html = renderModule11(arch); break;
+        case "m12": html = renderModule12(arch); break;
+        default: html = renderModule1(arch);
+      }
+
+      container.innerHTML = html;
+      bindDynamicModuleEvents(arch);
+    }
+
+    function bindDynamicModuleEvents(arch) {
+      // Sortable column headers
+      document.querySelectorAll("th[data-sort-table]").forEach(th => {
+        th.addEventListener("click", () => {
+          const tableId = th.getAttribute("data-sort-table");
+          const key = th.getAttribute("data-sort-key");
+          const current = UI_STATE.sortState[tableId];
+          const nextDir = current && current.key === key && current.dir === "asc" ? "desc" : "asc";
+          UI_STATE.sortState[tableId] = { key, dir: nextDir };
+          renderApp();
+        });
+      });
+
+      // Module 1 export
+      const btnExpM1 = document.getElementById("btn-export-m1-placeholders");
+      if (btnExpM1) {
+        btnExpM1.addEventListener("click", () => {
+          const map = [
+            { key: "category", header: "Template Area", type: "text" },
+            { key: "item", header: "Item to Revise", type: "text" },
+            { key: "note", header: "Placeholder Label", type: "text" }
+          ];
+          exportTableToCSV(DATA.draftTemplatePlaceholders, map, `GCG_Template_Placeholders_${arch.id}.csv`);
+        });
+      }
+
+      // Module 2 filters, row click & export
+      const m2Band = document.getElementById("m2-filter-band");
+      if (m2Band) {
+        m2Band.addEventListener("change", e => { UI_STATE.m2Filters.band = e.target.value; renderApp(); });
+      }
+      const m2Access = document.getElementById("m2-filter-access");
+      if (m2Access) {
+        m2Access.addEventListener("change", e => { UI_STATE.m2Filters.publicAccess = e.target.value; renderApp(); });
+      }
+      const m2Shared = document.getElementById("m2-filter-shared");
+      if (m2Shared) {
+        m2Shared.addEventListener("change", e => { UI_STATE.m2Filters.sharedOnly = e.target.checked; renderApp(); });
+      }
+      const m2Unk = document.getElementById("m2-filter-unknown");
+      if (m2Unk) {
+        m2Unk.addEventListener("change", e => { UI_STATE.m2Filters.unknownOnly = e.target.checked; renderApp(); });
+      }
+      document.querySelectorAll("tr.clickable-row[data-zone-id]").forEach(tr => {
+        tr.addEventListener("click", () => {
+          UI_STATE.selectedZoneId = tr.getAttribute("data-zone-id");
+          renderApp();
+        });
+      });
+      const btnExpM2 = document.getElementById("btn-export-m2");
+      if (btnExpM2) {
+        btnExpM2.addEventListener("click", () => {
+          const colMap = DATA.columnMaps.zones;
+          const enriched = arch.zones.map(z => ({
+            id: z.id, name: z.name, band: z.band, type: z.type, publicAccess: z.publicAccess,
+            employerCount: getZoneEmployerUsers(arch, z.id).length,
+            unknownFactCount: countZoneUnknownFacts(z),
+            walkNotesCount: countZoneWalkNotes(arch, z.id),
+            notes: z.notes
+          }));
+          const f = UI_STATE.m2Filters;
+          const preFiltered = enriched.filter(row => {
+            if (f.band !== "ALL" && row.band !== f.band) return false;
+            if (f.sharedOnly && row.employerCount < 2) return false;
+            if (f.unknownOnly && row.unknownFactCount === 0) return false;
+            if (f.publicAccess !== "ALL" && row.publicAccess !== f.publicAccess) return false;
+            return true;
+          });
+          const rows = filterAndSortRows(preFiltered, colMap, "m2_zones");
+          exportTableToCSV(rows, colMap, `GCG_Zone_Register_${arch.id}.csv`);
+        });
+      }
+
+      // Module 4 filter & export
+      const m4Filter = document.getElementById("m4-party-filter");
+      if (m4Filter) {
+        m4Filter.addEventListener("change", e => {
+          UI_STATE.m4PartyCategoryFilter = e.target.value;
+          renderApp();
+        });
+      }
+      const btnExpM4 = document.getElementById("btn-export-m4");
+      if (btnExpM4) {
+        btnExpM4.addEventListener("click", () => {
+          const catFilter = UI_STATE.m4PartyCategoryFilter;
+          const visibleParties = arch.parties.filter(p => catFilter === "ALL" || p.category === catFilter);
+          const matrixMap = [
+            { key: "zoneLabel", header: "Zone", type: "text" },
+            { key: "band", header: "Band", type: "text" },
+            ...visibleParties.map(p => ({ key: "party_" + p.role, header: p.role, type: "text" })),
+            { key: "distinctEmployers", header: "Distinct Employers", type: "number" }
+          ];
+          const matrixRows = arch.zones.map(z => {
+            const row = { zoneLabel: z.id + " — " + z.name, band: z.band, distinctEmployers: getZoneEmployerUsers(arch, z.id).length };
+            visibleParties.forEach(p => {
+              const use = arch.zoneUse.find(u => u.zoneId === z.id && u.partyRole === p.role);
+              row["party_" + p.role] = use ? `${use.startHour}:00-${use.endHour}:00 (${use.frequency})` : "None";
+            });
+            return row;
+          });
+          exportTableToCSV(filterAndSortRows(matrixRows, matrixMap, "m4_matrix"), matrixMap, `GCG_Shared_Use_Matrix_${arch.id}.csv`);
+        });
+      }
+
+      // Module 5 Control Facts interactive editing
+      const btnToggleRules = document.getElementById("btn-toggle-rules");
+      if (btnToggleRules) {
+        btnToggleRules.addEventListener("click", () => {
+          UI_STATE.m5ShowRules = !UI_STATE.m5ShowRules;
+          renderApp();
+        });
+      }
+      document.querySelectorAll(".cf-role-select").forEach(sel => {
+        sel.addEventListener("change", e => {
+          const zId = e.target.getAttribute("data-zone");
+          const fk = e.target.getAttribute("data-fact");
+          const z = arch.zones.find(item => item.id === zId);
+          if (z && z.facts[fk]) {
+            z.facts[fk].value = e.target.value;
+            if (e.target.value === "Unknown") {
+              z.facts[fk].evidence = "Unknown — Fact Intake Needed";
+            }
+            renderApp();
+          }
+        });
+      });
+      document.querySelectorAll(".cf-ev-select").forEach(sel => {
+        sel.addEventListener("change", e => {
+          const zId = e.target.getAttribute("data-zone");
+          const fk = e.target.getAttribute("data-fact");
+          const z = arch.zones.find(item => item.id === zId);
+          if (z && z.facts[fk]) {
+            z.facts[fk].evidence = e.target.value;
+            renderApp();
+          }
+        });
+      });
+      document.querySelectorAll(".cf-f5-input").forEach(inp => {
+        inp.addEventListener("change", e => {
+          const zId = e.target.getAttribute("data-zone");
+          const z = arch.zones.find(item => item.id === zId);
+          if (z && z.facts.F5) {
+            z.facts.F5.value = e.target.value;
+            renderApp();
+          }
+        });
+      });
+      const btnExpM5 = document.getElementById("btn-export-m5");
+      if (btnExpM5) {
+        btnExpM5.addEventListener("click", () => {
+          const worksheetMap = [
+            { key: "zoneId", header: "Zone ID", type: "text" },
+            { key: "zoneName", header: "Zone Name", type: "text" },
+            { key: "F1", header: "F1 Maintains", type: "text" },
+            { key: "F2", header: "F2 Sets Access & Hours", type: "text" },
+            { key: "F3", header: "F3 Authorizes Physical Changes", type: "text" },
+            { key: "F4", header: "F4 Schedules Vendors", type: "text" },
+            { key: "F5", header: "F5 Written Reference", type: "text" },
+            { key: "routingPrompts", header: "Rule-Based Prompts", type: "text" }
+          ];
+          const exportRows = arch.zones.map(z => ({
+            zoneId: z.id,
+            zoneName: z.name,
+            F1: `${z.facts.F1.value} [${z.facts.F1.evidence}]`,
+            F2: `${z.facts.F2.value} [${z.facts.F2.evidence}]`,
+            F3: `${z.facts.F3.value} [${z.facts.F3.evidence}]`,
+            F4: `${z.facts.F4.value} [${z.facts.F4.evidence}]`,
+            F5: `${z.facts.F5.value || "Empty"} [${z.facts.F5.evidence}]`,
+            routingPrompts: evaluateZoneRoutingRules(arch, z).map(p => `${p.ruleId}: ${p.text}`).join(" | ")
+          }));
+          exportTableToCSV(filterAndSortRows(exportRows, worksheetMap, "m5_worksheet"), worksheetMap, `GCG_Control_Facts_${arch.id}.csv`);
+        });
+      }
+
+      // Module 6 export
+      const btnExpM6 = document.getElementById("btn-export-m6");
+      if (btnExpM6) {
+        btnExpM6.addEventListener("click", () => {
+          const colMap = DATA.columnMaps.parties;
+          exportTableToCSV(filterAndSortRows(arch.parties, colMap, "m6_parties"), colMap, `GCG_Parties_Roster_${arch.id}.csv`);
+        });
+      }
+
+      // Module 7 zone selector & export
+      const m7Select = document.getElementById("m7-zone-select");
+      if (m7Select) {
+        m7Select.addEventListener("change", e => {
+          UI_STATE.m7SelectedZoneId = e.target.value;
+          renderApp();
+        });
+      }
+      const btnExpM7 = document.getElementById("btn-export-m7");
+      if (btnExpM7) {
+        btnExpM7.addEventListener("click", () => {
+          const zone = arch.zones.find(z => z.id === UI_STATE.m7SelectedZoneId) || arch.zones[0];
+          const uses = arch.zoneUse.filter(u => u.zoneId === zone.id);
+          const partyMap = getPartyMap(arch);
+          const map = [
+            { key: "zoneId", header: "Zone ID", type: "text" },
+            { key: "partyRole", header: "Party Role", type: "text" },
+            { key: "category", header: "Category", type: "text" },
+            { key: "startHour", header: "Start Hour", type: "number" },
+            { key: "endHour", header: "End Hour", type: "number" },
+            { key: "frequency", header: "Frequency", type: "text" }
+          ];
+          const rows = uses.map(u => ({
+            zoneId: u.zoneId,
+            partyRole: u.partyRole,
+            category: partyMap[u.partyRole] ? partyMap[u.partyRole].category : "Employer",
+            startHour: u.startHour,
+            endHour: u.endHour,
+            frequency: u.frequency
+          }));
+          exportTableToCSV(filterAndSortRows(rows, map, "m7_overlap"), map, `GCG_Time_Overlap_${zone.id}.csv`);
+        });
+      }
+
+      // Module 8 export
+      const btnExpM8 = document.getElementById("btn-export-m8");
+      if (btnExpM8) {
+        btnExpM8.addEventListener("click", () => {
+          const colMap = DATA.columnMaps.logSharing;
+          exportTableToCSV(filterAndSortRows(arch.logSharing, colMap, "m8_logsharing"), colMap, `GCG_Log_Copy_Sharing_${arch.id}.csv`);
+        });
+      }
+
+      // Module 9 Add / Update / Delete Action & Export
+      const btnAddAction = document.getElementById("btn-add-action");
+      if (btnAddAction) {
+        btnAddAction.addEventListener("click", () => {
+          const triggerType = document.getElementById("m9-trigger-type").value;
+          const ownerRole = document.getElementById("m9-owner-role").value;
+          const dueDate = document.getElementById("m9-due-date").value || "2026-07-01";
+          const status = document.getElementById("m9-status").value;
+          const actionText = document.getElementById("m9-action-text").value.trim() || "Template placeholder: pending operator input.";
+          const newId = `ACT-${arch.id}${arch.changeTriggers.length + 1}`;
+          arch.changeTriggers.push({ id: newId, triggerType, actionText, ownerRole, dueDate, status });
+          renderApp();
+        });
+      }
+      document.querySelectorAll(".m9-status-change").forEach(sel => {
+        sel.addEventListener("change", e => {
+          const actId = e.target.getAttribute("data-action-id");
+          const item = arch.changeTriggers.find(a => a.id === actId);
+          if (item) {
+            item.status = e.target.value;
+            renderApp();
+          }
+        });
+      });
+      document.querySelectorAll(".btn-delete-action").forEach(btn => {
+        btn.addEventListener("click", e => {
+          const actId = e.target.getAttribute("data-action-id");
+          arch.changeTriggers = arch.changeTriggers.filter(a => a.id !== actId);
+          renderApp();
+        });
+      });
+      const btnExpM9 = document.getElementById("btn-export-m9");
+      if (btnExpM9) {
+        btnExpM9.addEventListener("click", () => {
+          const colMap = DATA.columnMaps.changeTriggers;
+          exportTableToCSV(filterAndSortRows(arch.changeTriggers, colMap, "m9_triggers"), colMap, `GCG_Change_Triggers_Actions_${arch.id}.csv`);
+        });
+      }
+
+      // Module 10 status change & export
+      document.querySelectorAll(".m10-status-select").forEach(sel => {
+        sel.addEventListener("change", e => {
+          const dpId = e.target.getAttribute("data-dp-id");
+          const item = DATA.dailyPracticePatterns.find(d => d.id === dpId);
+          if (item) {
+            item.status = e.target.value;
+            renderApp();
+          }
+        });
+      });
+      const btnExpM10 = document.getElementById("btn-export-m10");
+      if (btnExpM10) {
+        btnExpM10.addEventListener("click", () => {
+          const dpMap = [
+            { key: "code", header: "Code", type: "text" },
+            { key: "pattern", header: "Practice Pattern", type: "text" },
+            { key: "question", header: "Factual Question", type: "text" },
+            { key: "recordRef", header: "Record Reference", type: "text" },
+            { key: "readinessStep", header: "Readiness Step", type: "text" },
+            { key: "ownerRole", header: "Owner Role", type: "text" },
+            { key: "dueDate", header: "Due Date", type: "text" },
+            { key: "status", header: "Status", type: "badge" }
+          ];
+          exportTableToCSV(filterAndSortRows(DATA.dailyPracticePatterns, dpMap, "m10_practice"), dpMap, `GCG_Daily_Practice_Review_${arch.id}.csv`);
+        });
+      }
+
+      // Module 11 Add Walk Entry & Export
+      const btnAddWalk = document.getElementById("btn-add-walk");
+      if (btnAddWalk) {
+        btnAddWalk.addEventListener("click", () => {
+          const date = document.getElementById("m11-date").value || "2026-05-15";
+          const timeOfDay = document.getElementById("m11-time").value || "20:30";
+          const zonesWalked = document.getElementById("m11-zone").value;
+          const specialistFlags = document.getElementById("m11-flag").value;
+          const observations = document.getElementById("m11-obs").value.trim() || "Neutral walk observation recorded (Template placeholder: pending operator input).";
+          const photosReferenced = document.getElementById("m11-photos").value.trim() || "None";
+          const openActionChecked = document.getElementById("m11-open-action").checked;
+
+          let openedActionId = "None";
+          if (openActionChecked) {
+            openedActionId = `ACT-${arch.id}${arch.changeTriggers.length + 1}`;
+            arch.changeTriggers.push({
+              id: openedActionId,
+              triggerType: "lighting outage reported by a user",
+              actionText: `Follow-up from Walk Log in ${zonesWalked}: ${observations}`,
+              ownerRole: "Property Operations Employer",
+              dueDate: "2026-07-10",
+              status: "Open"
+            });
+          }
+
+          const newWalkId = `WLK-${arch.id}${arch.walkLog.length + 1}`;
+          arch.walkLog.push({
+            id: newWalkId,
+            date,
+            timeOfDay,
+            zonesWalked,
+            observations,
+            photosReferenced,
+            actionsOpened: openedActionId,
+            specialistFlags
+          });
+          renderApp();
+        });
+      }
+      const btnExpM11 = document.getElementById("btn-export-m11");
+      if (btnExpM11) {
+        btnExpM11.addEventListener("click", () => {
+          const colMap = DATA.columnMaps.walkLog;
+          exportTableToCSV(filterAndSortRows(arch.walkLog, colMap, "m11_walklog"), colMap, `GCG_Readiness_Walk_Log_${arch.id}.csv`);
+        });
+      }
+
+      // Module 12 Exports
+      const btnExpM12Src = document.getElementById("btn-export-m12-sources");
+      if (btnExpM12Src) {
+        btnExpM12Src.addEventListener("click", () => {
+          const srcMap = DATA.columnMaps.sourceRegister;
+          exportTableToCSV(filterAndSortRows(DATA.sourceRegister, srcMap, "m12_sources"), srcMap, `GCG_Source_Register.csv`);
+        });
+      }
+      const btnExpM12Flags = document.getElementById("btn-export-m12-flags");
+      if (btnExpM12Flags) {
+        btnExpM12Flags.addEventListener("click", () => {
+          const flagMap = DATA.columnMaps.specialistFlags;
+          exportTableToCSV(filterAndSortRows(arch.specialistFlags, flagMap, "m12_flags"), flagMap, `GCG_Specialist_Flags_${arch.id}.csv`);
+        });
+      }
+    }
+
+    /* ==========================================================================
+       INITIALIZE APP & GLOBAL CONTROLS
+       ========================================================================== */
+    function initGlobalEvents() {
+      // Sidebar Module Navigation
+      document.querySelectorAll("#module-nav .nav-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#module-nav .nav-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          UI_STATE.activeModule = btn.getAttribute("data-module");
+          renderApp();
+        });
+      });
+
+      // Archetype Selector
+      const archSelect = document.getElementById("archetype-select");
+      archSelect.addEventListener("change", e => {
+        DATA.activeArchetype = e.target.value;
+        UI_STATE.selectedZoneId = null;
+        UI_STATE.m7SelectedZoneId = null;
+        renderApp();
+      });
+
+      // Global Search Input
+      const searchInput = document.getElementById("global-search");
+      searchInput.addEventListener("input", e => {
+        UI_STATE.globalSearch = e.target.value;
+        renderApp();
+      });
+      document.getElementById("btn-clear-search").addEventListener("click", () => {
+        searchInput.value = "";
+        UI_STATE.globalSearch = "";
+        renderApp();
+      });
+
+      // Print / Save as PDF
+      document.getElementById("btn-print").addEventListener("click", () => {
+        window.print();
+      });
+
+      // Reset Demonstration Data
+      document.getElementById("btn-reset-data").addEventListener("click", () => {
+        DATA = JSON.parse(JSON.stringify(INITIAL_DATA));
+        document.getElementById("archetype-select").value = DATA.activeArchetype;
+        document.getElementById("global-search").value = "";
+        UI_STATE.globalSearch = "";
+        UI_STATE.selectedZoneId = null;
+        UI_STATE.m7SelectedZoneId = null;
+        renderApp();
+      });
+
+      // Modals (How to Use & Claim Boundaries)
+      const openModal = id => document.getElementById(id).classList.add("open");
+      const closeModal = id => document.getElementById(id).classList.remove("open");
+
+      document.getElementById("btn-how-to-use").addEventListener("click", () => openModal("modal-howto"));
+      document.getElementById("footer-howto-link").addEventListener("click", () => openModal("modal-howto"));
+      document.getElementById("btn-claim-boundaries").addEventListener("click", () => openModal("modal-claims"));
+      document.getElementById("footer-claim-link").addEventListener("click", () => openModal("modal-claims"));
+
+      document.querySelectorAll(".close-modal").forEach(btn => {
+        btn.addEventListener("click", () => closeModal(btn.getAttribute("data-target")));
+      });
+
+      document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+        backdrop.addEventListener("click", e => {
+          if (e.target === backdrop) backdrop.classList.remove("open");
+        });
+      });
+
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+          document.querySelectorAll(".modal-backdrop.open").forEach(m => m.classList.remove("open"));
+        }
+      });
+    }
+
+    window.onload = function () {
+      initGlobalEvents();
+      renderApp();
+    };
+  </script>
+</body>
+</html>
