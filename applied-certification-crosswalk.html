@@ -133,8 +133,8 @@
   <div id="rowsContainer"></div>
 
   <div class="evidence-key">
-    Evidence key: <span class="evidence-tag doc">Document-verified</span> confirmed via Credly transcript, DD-214, or dated certificate ·
-    <span class="evidence-tag buddy">Buddy-corroborated</span> confirmed by a signed third-party declaration ·
+    Evidence key: <span class="evidence-tag doc">Credential on record; practice self-reported</span> the credential is confirmed by a Credly record, ASIS or SHRM portal, or dated certificate; the practice described is the founder's own account ·
+    <span class="evidence-tag buddy">Buddy-corroborated</span> corroborated by a third party's statement ·
     <span class="evidence-tag self">Self-reported</span> real, but not independently document-verified
   </div>
 
@@ -143,7 +143,7 @@
   </div>
 
   <div class="footer-block">
-    <div class="cred">Gary M. Gannon, MBA, CPP, PSP, SHRM-SCP, SHRM-CA, SHRM-PA — Gannon Compliance Group</div>
+    <div class="cred">Gary M. Gannon, MBA, CPP®, PSP®, SHRM-SCP, SHRM California Law HR Specialty Credential, SHRM People Analytics Specialty Credential — Gannon Compliance Group</div>
     This tool presents Gary M. Gannon's own verified professional record for demonstration purposes. It does not certify, audit, or validate any third party's credentials, and does not constitute legal advice or a compliance certification.
     <br><br>
     <em>Strategic Intelligence — Not Legal Counsel (CA B&P Sections 6125-6126)</em>
@@ -153,10 +153,10 @@
 
 <script>
   const data = [
-    { cred: 'CPP', domain: 'Security Principles & Practices', weight: '22% of exam', applied: 'Ran the entire security function as one integrated risk system across 350+ personnel — not siloed incident response.', evidence: 'doc' },
+    { cred: 'CPP', domain: 'Security Principles & Practices', weight: '22% of exam', applied: 'Ran the entire security function as one integrated risk system across a California private-security operation — not siloed incident response.', evidence: 'doc' },
     { cred: 'CPP', domain: 'Business Principles & Practices', weight: '15% of exam', applied: 'Full P&L authority; monthly financials and department-performance graphs presented to ownership; self-built KPI system.', evidence: 'self' },
-    { cred: 'CPP', domain: 'Personnel Security', weight: '11% of exam', applied: 'Direct hazard/threat handling built into daily operations; background-screening certificate obtained because this was already a live function.', evidence: 'doc' },
-    { cred: 'CPP', domain: 'Physical Security', weight: '16% of exam', applied: '24 years of continuous physical-security leadership at a multi-employer property portfolio — CPTED-informed monthly training, not a one-time assessment.', evidence: 'buddy' },
+    { cred: 'CPP', domain: 'Personnel Security', weight: '11% of exam', applied: 'Direct hazard/threat handling built into daily operations; background-screening certificate obtained because this was already an operating function.', evidence: 'doc' },
+    { cred: 'CPP', domain: 'Physical Security', weight: '16% of exam', applied: 'Long-running physical-security leadership at multi-employer properties (self-reported) — CPTED-informed monthly training, not a one-time assessment.', evidence: 'buddy' },
     { cred: 'CPP', domain: 'Crisis Management', weight: '13% of exam', applied: 'Recurring active-attack response training delivered 1995–2024; annual holiday safety briefings coordinated with local law enforcement.', evidence: 'doc' },
     { cred: 'PSP', domain: 'Physical Security Assessment', weight: '34% of exam', applied: '24-year continuous assessment cycle at a regional property portfolio, not a point-in-time audit.', evidence: 'buddy' },
     { cred: 'PSP', domain: 'Application, Design & Integration (CPTED)', weight: '35% of exam', applied: 'Monthly on-site CPTED training explicitly named in the operating record — the named domain in direct, repeated practice.', evidence: 'self' },
@@ -164,9 +164,9 @@
     { cred: 'SHRM-SCP', domain: 'Employee & Labor Relations', weight: 'Interpersonal Cluster', applied: 'Wrote the employee handbook annually for ~15 consecutive years; managed grievance and discipline processes as sole internal HR professional.', evidence: 'self' },
     { cred: 'SHRM-SCP', domain: 'U.S. Employment Law & Regulations', weight: 'Workplace Knowledge Domain', applied: 'Read the CA Labor Law Digest cover-to-cover annually for ~15 years; direct administration of PAGA, meal/rest-break, and classification compliance.', evidence: 'self' },
     { cred: 'SHRM-SCP', domain: 'Risk Management', weight: 'Workplace Knowledge Domain', applied: 'Direct match to the workplace-violence-prevention and de-escalation curriculum built and delivered to personnel.', evidence: 'doc' },
-    { cred: 'SHRM-SCP', domain: 'Workforce Management', weight: 'Organization Knowledge Domain', applied: 'Scaled 30 to 350+ employees over 29 years — the exact workforce-planning and restructuring content this domain covers.', evidence: 'doc' },
+    { cred: 'SHRM-SCP', domain: 'Workforce Management', weight: 'Organization Knowledge Domain', applied: 'Grew the workforce over 29 years (self-reported) — the exact workforce-planning and restructuring content this domain covers.', evidence: 'doc' },
     { cred: 'SHRM-SCP', domain: 'Technology Management', weight: 'Organization Knowledge Domain', applied: 'HR and financial systems implemented and maintained directly, not outsourced to IT.', evidence: 'self' },
-    { cred: 'SHRM-PA', domain: 'Data-Driven HR Decision-Making', weight: 'Specialty Credential', applied: 'The KPI/leading-lagging-indicator system, tracked monthly and presented to ownership, predates and directly matches this credential\'s content.', evidence: 'self' },
+    { cred: 'SHRM People Analytics Specialty Credential', domain: 'Data-Driven HR Decision-Making', weight: 'Specialty Credential', applied: 'The KPI/leading-lagging-indicator system, tracked monthly and presented to ownership, predates and directly matches this credential\'s content.', evidence: 'self' },
   ];
 
   let activeFilter = 'ALL';
@@ -200,7 +200,7 @@
           <div class="domain-weight">${row.weight}</div>
         </div>
         <div class="applied-text">${row.applied}</div>
-        <div><span class="evidence-tag ${row.evidence}">${row.evidence === 'doc' ? 'Document-verified' : row.evidence === 'buddy' ? 'Buddy-corroborated' : 'Self-reported'}</span></div>
+        <div><span class="evidence-tag ${row.evidence}">${row.evidence === 'doc' ? 'Credential on record; practice self-reported' : row.evidence === 'buddy' ? 'Buddy-corroborated' : 'Self-reported'}</span></div>
       `;
       container.appendChild(div);
     });

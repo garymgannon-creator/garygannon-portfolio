@@ -200,7 +200,7 @@ ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY<br>
 </div>
 
 <div class="wrap">
-  <p class="tagline">Four working checks against the meal-and-rest-break, classification, and PAGA-penalty rules Gary Gannon administered directly as the sole internal HR authority for 29 years — updated for the post-2024 PAGA reform and 2026 California wage figures.</p>
+  <p class="tagline">Four working checks against the meal-and-rest-break, classification, and PAGA-penalty rules.</p>
 
   <nav class="module-nav">
     <a href="#breaks">1 · Meal &amp; rest break compliance</a>
@@ -306,10 +306,17 @@ ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY<br>
         <div class="field">
           <label for="classSalary">Annual guaranteed base salary ($)</label>
           <input type="number" id="classSalary" min="0" step="500" value="65000">
-          <div class="hint">2026 general threshold: $70,304/yr ($5,858.67/mo)</div>
+          <div class="hint" id="classHint">2026 general threshold: $70,304/yr ($5,858.67/mo)</div>
         </div>
       </div>
       <div class="group-card">
+        <div class="field">
+          <label for="classYear">Figures year</label>
+          <select id="classYear">
+            <option value="2026">2026 (current)</option>
+            <option value="2027">2027 (effective Jan 1, 2027)</option>
+          </select>
+        </div>
         <div class="field">
           <label for="classCategory">Role category</label>
           <select id="classCategory">
@@ -334,7 +341,7 @@ ILLUSTRATIVE PROTOTYPE — FICTIONAL / REDACTED DATA ONLY<br>
       <div class="verdict-title" id="classVerdictTitle">—</div>
       <div class="verdict-body" id="classVerdictBody"></div>
     </div>
-    <p class="cite">2026 CA figures: general exempt threshold $70,304/yr (2x the $16.90/hr state minimum wage, 40-hr week); computer professional $58.85/hr / $122,573.13/yr; licensed physician/surgeon $107.17/hr. Only guaranteed base salary counts toward the threshold — bonuses and commissions do not. Higher local or industry-specific minimum wages (fast food, health care) will raise the effective threshold further and are not reflected in this screener.</p>
+    <p class="cite">2027 figures (effective Jan 1, 2027; DIR Release 2026-66): state minimum wage $17.40/hr and general exempt threshold $72,384/yr. 2026 CA figures: general exempt threshold $70,304/yr (2x the $16.90/hr state minimum wage, 40-hr week); computer professional $58.85/hr / $122,573.13/yr; licensed physician/surgeon $107.17/hr. Only guaranteed base salary counts toward the threshold — bonuses and commissions do not. Higher local or industry-specific minimum wages (fast food, health care) will raise the effective threshold further and are not reflected in this screener.</p>
   </section>
 
   <hr class="hair-rule">
@@ -433,8 +440,8 @@ function computeBreaks(){
 
   if(restOnCall && restCount > 0){
     verdict.className = 'verdict risk';
-    vt.textContent = 'Rest-break on-call risk (Augustus standard)';
-    vb.innerHTML = 'Keeping a guard reachable by radio, phone, or post coverage during a rest break can fail the duty-free standard set in <strong>Augustus v. ABM Security Services</strong> — the model counts this as a possible missed rest break even if the 10 minutes was technically taken off-post.';
+    vt.textContent = 'Rest-break coverage flagged for human review';
+    vb.innerHTML = 'Keeping a guard reachable by radio, phone, or post coverage during a rest break raises a question under the duty-free rest-break standard discussed in <strong>Augustus v. ABM Security Services</strong>. The model flags it for review by qualified counsel; it does not decide whether a break was missed.';
   } else if(shift > 0){
     verdict.className = 'verdict safe';
     vt.textContent = 'Break schedule requirements identified';
@@ -473,12 +480,16 @@ computePremium();
 function computeClass(){
   const salary = parseFloat(document.getElementById('classSalary').value) || 0;
   const category = document.getElementById('classCategory').value;
+  const yr = document.getElementById('classYear').value;
   const dutiesOK = document.getElementById('classDuties').value === 'yes';
 
   let threshold, thresholdLabel;
   if(category === 'computer'){ threshold = 122573.13; thresholdLabel = 'computer professional ($122,573.13/yr)'; }
   else if(category === 'physician'){ threshold = 107.17 * 40 * 52; thresholdLabel = 'licensed physician/surgeon ($107.17/hr equivalent)'; }
+  else if(yr === '2027'){ threshold = 72384; thresholdLabel = 'general exec/admin/professional ($72,384/yr, 2027)'; }
   else { threshold = 70304; thresholdLabel = 'general exec/admin/professional ($70,304/yr)'; }
+  if(yr === '2027' && category !== 'general'){ thresholdLabel += ' — 2026 figure; the 2027 figure for this category is not loaded in this prototype, verify with DIR'; }
+  document.getElementById('classHint').textContent = yr === '2027' ? '2027 general threshold: $72,384/yr (2 × $17.40/hr × 2,080 hrs)' : '2026 general threshold: $70,304/yr ($5,858.67/mo)';
 
   const salaryOK = salary >= threshold;
 
@@ -500,7 +511,7 @@ function computeClass(){
     vb.innerHTML = 'Salary meets the ' + thresholdLabel + ' threshold, but the duties test is flagged as not clearly met. <strong>Misclassification risk if actual day-to-day work is more than 50% non-exempt tasks</strong> — this is the single most common basis for a wage-and-hour PAGA claim.';
   }
 }
-['classSalary','classCategory','classDuties'].forEach(id=>document.getElementById(id).addEventListener('input', computeClass));
+['classSalary','classYear','classCategory','classDuties'].forEach(id=>document.getElementById(id).addEventListener('input', computeClass));
 computeClass();
 
 /* Module 4: PAGA penalty exposure estimator */
